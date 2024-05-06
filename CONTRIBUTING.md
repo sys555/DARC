@@ -1,6 +1,6 @@
 # How to develop on this project
 
-llmsafetychallenge welcomes contributions from the community.
+darc welcomes contributions from the community.
 
 **You need PYTHON3!**
 
@@ -8,9 +8,9 @@ This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 ## Setting up your own fork of this repo.
 
 - On github interface click on `Fork` button.
-- Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/LLMSafetyChallenge.git`
-- Enter the directory `cd LLMSafetyChallenge`
-- Add upstream repo `git remote add upstream https://github.com/SACLabs/LLMSafetyChallenge`
+- Clone your fork of this repo. `git clone git@github.com:YOUR_GIT_USERNAME/darc.git`
+- Enter the directory `cd darc`
+- Add upstream repo `git remote add upstream https://github.com/SACLabs/darc`
 
 ## Setting up your own virtual environment
 
