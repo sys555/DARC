@@ -8,3 +8,4 @@ black
 mypy
 pytest
 coverage
+pytest-cov
