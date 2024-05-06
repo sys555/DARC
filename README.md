@@ -1,66 +1,31 @@
 
-# Application: LLM Safety Challenge
+# DARC: Decentralized Agent Relay for Communication and Optimization
+[![codecov](https://codecov.io/gh/SACLabs/darc/branch/main/graph/badge.svg?token=darc_token_here)](https://codecov.io/gh/SACLabs/darc)
+[![CI](https://github.com/SACLabs/darc/actions/workflows/main.yml/badge.svg)](https://github.com/SACLabs/darc/actions/workflows/main.yml)
 
-A typical application of our system.
 
-See also 
-- [Flask-Project-Template](https://github.com/rochacbruno/flask-project-template/) for a full feature Flask project including database, API, admin interface, etc.
-- [FastAPI-Project-Template](https://github.com/rochacbruno/fastapi-project-template/) The base to start an openapi project featuring: SQLModel, Typer, FastAPI, JWT Token Auth, Interactive Shell, Management Commands.
 
-### HOW TO USE THIS TEMPLATE
-
-> **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/rochacbruno/python-project-template/generate)** feature.
-
-1. Click on **[Use this template](https://github.com/rochacbruno/python-project-template/generate)**
-3. Give a name to your project  
-   (e.g. `my_awesome_project` recommendation is to use all lowercase and underscores separation for repo names.)
-3. Wait until the first run of CI finishes  
-   (Github Actions will process the template and commit to your new repo)
-4. If you want [codecov](https://about.codecov.io/sign-up/) Reports and Automatic Release to [PyPI](https://pypi.org)  
-  On the new repository `settings->secrets` add your `PYPI_API_TOKEN` and `CODECOV_TOKEN` (get the tokens on respective websites)
-4. Read the file [CONTRIBUTING.md](CONTRIBUTING.md)
-5. Then clone your new project and happy coding!
-
-> **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
-
-### What is included on this template?
-
-- 🖼️ Templates for starting multiple application types:
-  * **Basic low dependency** Python program (default) [use this template](https://github.com/rochacbruno/python-project-template/generate)
-  * **Flask** with database, admin interface, restapi and authentication [use this template](https://github.com/rochacbruno/flask-project-template/generate).
-  **or Run `make init` after cloning to generate a new project based on a template.**
-- 📦 A basic [setup.py](setup.py) file to provide installation, packaging and distribution for your project.  
-  Template uses setuptools because it's the de-facto standard for Python packages, you can run `make switch-to-poetry` later if you want.
-- 🤖 A [Makefile](Makefile) with the most useful commands to install, test, lint, format and release your project.
-- 📃 Documentation structure using [mkdocs](http://www.mkdocs.org)
-- 💬 Auto generation of change log using **gitchangelog** to keep a HISTORY.md file automatically based on your commit history on every release.
-- 🐋 A simple [Containerfile](Containerfile) to build a container image for your project.  
-  `Containerfile` is a more open standard for building container images than Dockerfile, you can use buildah or docker with this file.
-- 🧪 Testing structure using [pytest](https://docs.pytest.org/en/latest/)
-- ✅ Code linting using [flake8](https://flake8.pycqa.org/en/latest/)
-- 📊 Code coverage reports using [codecov](https://about.codecov.io/sign-up/)
-- 🛳️ Automatic release to [PyPI](https://pypi.org) using [twine](https://twine.readthedocs.io/en/latest/) and github actions.
-- 🎯 Entry points to execute your program using `python -m <llmsafetychallenge>` or `$ llmsafetychallenge` with basic CLI argument parsing.
-- 🔄 Continuous integration using [Github Actions](.github/workflows/) with jobs to lint, test and release your project on Linux, Mac and Windows environments.
-
-> Curious about architectural decisions on this template? read [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  
-> If you want to contribute to this template please open an [issue](https://github.com/rochacbruno/python-project-template/issues) or fork and send a PULL REQUEST.
-
-[❤️ Sponsor this project](https://github.com/sponsors/rochacbruno/)
 
 <!--  DELETE THE LINES ABOVE THIS AND WRITE YOUR PROJECT README BELOW -->
 
 ---
-# DARC：Decentralized Agent Relay for Communication and Engagement
+# Usage: LLM Safety Challenge
 
-[![codecov](https://codecov.io/gh/SACLabs/LLMSafetyChallenge/branch/main/graph/badge.svg?token=LLMSafetyChallenge_token_here)](https://codecov.io/gh/SACLabs/LLMSafetyChallenge)
-[![CI](https://github.com/SACLabs/LLMSafetyChallenge/actions/workflows/main.yml/badge.svg)](https://github.com/SACLabs/LLMSafetyChallenge/actions/workflows/main.yml)
+A typical application of our system. 
 
-The kernel of our system.
+## Difficulties:
+1. multiple heterogeneous intelligences
+2. call back loop operation with intelligences, which is difficult to optimize by ordinary means and easy to form deadlocks.
+3. asynchronous message merge operation of intelligences
+4. intelligent message fork operation
+5. there are conditional smart body decisions
+6. the same intelligent body can simultaneously complete multiple tasks
+
+
 
 ## Pre-requisites
 
-1. [Optinal] Install [conda](https://docs.conda.io/en/latest/miniconda.html) if you want to keep your system clean. 
+1. Install [conda](https://docs.conda.io/en/latest/miniconda.html) if you want to keep your environment clean. 
 Then create a conda environment.
 
 ```bash
@@ -69,22 +34,76 @@ conda activate your_env_name
 ```
 2. Install [poetry](https://python-poetry.org/docs/#installation)
 
+## Installation
+```bash
+poetry install && make compile
+poetry run python xxxx/main.py
+```
 
 ## Usage
 
 ```py
-from llmsafetychallenge import BaseClass
-from llmsafetychallenge import base_function
+"""Step1: 组件引入，先将所有的组件的入口Class全部import
+"""
+from dataset import DatasetDB
+from attacker import Attacker
+from filter import Filter
+from llm import LLM_with_PPL
+from attack_evaluator import Evaluator
+from leaderboard import LeaderBoard
 
-BaseClass().base_method()
-base_function()
+"""Step2: 关系定义，使用json
+"""
+config = {
+"node": [DatasetDB, Attacker, Filter, LLM_with_PPL, Evaluator, LeaderBoard]
+"edge": [(DatasetDB, Attacker), (DatasetDB, Filter), (DatasetDB, Evaluator), 
+(Attacker, Filter), 
+(Filter, LLM_with_PPL), (Filter, Attacker),
+(LLM_with_PPL, Evaluator),
+(AttackEvaluator, DatasetDB), (Evaluator, LeaderBoard), 
+]
+"args": [(DatasetDB, 1, {"db":"NormalQ"}), (DatasetDB, 1, {"db":"NormalA"}),
+ (DatasetDB, 1, {"db":"BadQ"}), (DatasetDB, 1, {"db":"BadA"}), 
+ (Evaluator, 1, {"mode":"Attack"}), 
+ (LLM_with_PP, 1, {"llm": "GPT4"})
+ ]
+
+"""Step3：设置任务，开始运行
+1. 建立运行图
+2. 设定入口agent和出口agent
+2. 设置初始输入
+3. 自动运行
+"""
+
+Graph.check(config)  
+graph = Graph.init(config)
+
+graph.find_type("DatasetDB")
+> DatasetDB(id="12345", db="NormalQ"), DatasetDB(id="54321", db="NormalA").....
+
+graph.find_type(LeaderBoard)
+> LeaderBoard(id="67891")
+
+task = Task(graph)
+task.set_entry_node("12345") #指定入口节点
+task.set_exit_node("67891") #指定出口节点
+task.set_initial_input("Select data from * sample(10)") # 指定初始条件
+task.run()
+
+
+""" 数据记录导出
+"""
+task.save(path = ".......")
 ```
 
-```bash
-$ python -m llmsafetychallenge
-#or
-$ llmsafetychallenge
-```
+
+
+# Kernel System: DARC Arch
+The kernel of our system.
+
+## Communication
+
+## Optimization
 
 ## Development
 
