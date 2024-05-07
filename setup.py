@@ -1,4 +1,4 @@
-"""Python setup.py for llmsafetychallenge package"""
+"""Python setup.py for darc package"""
 import io
 import os
 from setuptools import find_packages, setup
@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 def read(*paths, **kwargs):
     """Read the contents of a text file safely.
-    >>> read("llmsafetychallenge", "VERSION")
+    >>> read("darc", "VERSION")
     '0.1.0'
     >>> read("README.md")
     ...
@@ -30,17 +30,17 @@ def read_requirements(path):
 
 
 setup(
-    name="llmsafetychallenge",
-    version=read("llmsafetychallenge", "VERSION"),
-    description="Awesome llmsafetychallenge created by SACLabs",
-    url="https://github.com/SACLabs/LLMSafetyChallenge/",
+    name="darc",
+    version=read("darc", "VERSION"),
+    description="Awesome darc created by SACLabs",
+    url="https://github.com/SACLabs/darc/",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     author="SACLabs",
     packages=find_packages(exclude=["tests", ".github"]),
     install_requires=read_requirements("requirements.txt"),
     entry_points={
-        "console_scripts": ["llmsafetychallenge = llmsafetychallenge.__main__:main"]
+        "console_scripts": ["darc = darc.__main__:main"]
     },
     extras_require={"test": read_requirements("requirements-test.txt")},
 )

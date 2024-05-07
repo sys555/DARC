@@ -1,4 +1,4 @@
-"""CLI interface for llmsafetychallenge project.
+"""CLI interface for darc project.
 
 Be creative! do whatever you want!
 
@@ -12,7 +12,7 @@ Be creative! do whatever you want!
 def main():  # pragma: no cover
     """
     The main function executes on commands:
-    `python -m llmsafetychallenge` and `$ llmsafetychallenge `.
+    `python -m darc` and `$ darc `.
 
     This is your program's entry point.
 

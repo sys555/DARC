@@ -1,5 +1,5 @@
-from llmsafetychallenge.base import NAME
+from darc.base import NAME
 
 
 def test_base():
-    assert NAME == "llmsafetychallenge"
+    assert NAME == "darc"
