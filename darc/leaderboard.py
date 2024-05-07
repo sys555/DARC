@@ -1,4 +1,4 @@
-from darc.node import Node
+from darc.darc.node import Node
 
 
 class LeaderBoard(Node):
