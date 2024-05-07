@@ -1,19 +1,27 @@
 
-# DARC: Decentralized Agent Relay for Communication and Optimization
+# DARC for LLM Safety Challenge
 [![codecov](https://codecov.io/gh/SACLabs/darc/branch/main/graph/badge.svg?token=darc_token_here)](https://codecov.io/gh/SACLabs/darc)
 [![CI](https://github.com/SACLabs/darc/actions/workflows/main.yml/badge.svg)](https://github.com/SACLabs/darc/actions/workflows/main.yml)
 
 
+# 研发专区
+## 文件目录说明
+仓库目录主要分为三块，分别是docs、darc以及tests。其中darc文件夹为代码文件，test为测试代码文件，doc为文档。
 
+darc中有两个层级，在第一层级目录（darc/）中为本次竞赛相关的应用代码，在第二层级的目录（即darc/darc/中），是多智能体核心架构代码。
+
+## PR提交说明
+所有改动请先从dev新建分支，然后向dev提交PR，review过后进行分支合并。
+请见[飞书文档](https://aicarrier.feishu.cn/docx/HNw9deXBtojuv6xIZXTck6Zfnfg?from=from_copylink)
 
 <!--  DELETE THE LINES ABOVE THIS AND WRITE YOUR PROJECT README BELOW -->
 
 ---
-# Usage: LLM Safety Challenge
+# 用户使用说明: 
 
 A typical application of our system. 
 
-## Difficulties:
+## 场景难点:
 1. multiple heterogeneous intelligences
 2. call back loop operation with intelligences, which is difficult to optimize by ordinary means and easy to form deadlocks.
 3. asynchronous message merge operation of intelligences
@@ -97,14 +105,13 @@ task.save(path = ".......")
 ```
 
 
-
-# Kernel System: DARC Arch
+# 核心架构：DARC(Decentralized Agent Relay for Communication and Optimization)
 The kernel of our system.
 
 ## Communication
-
+TBD
 ## Optimization
-
+TBD
 ## Development
 
 Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
