@@ -6,9 +6,12 @@ class Node:
     def process(self, message_type):
         def decorator(func):
             self.process_handlers[message_type] = func
+
             def wrapper(*args, **kwargs):
                 return func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     def handle_message(self, message_type, *args, **kwargs):
