@@ -3,7 +3,6 @@ class Task:
         pass
 
 
-
 class Graph:
     def __init__(self) -> None:
         pass

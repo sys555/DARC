@@ -10,10 +10,10 @@ PingPong2PingPongMessage = Message("PingPong2PingPongMessage")
 
 class TestRouter(unittest.TestCase):
     def setUp(self) -> None:
-        self.alice_bob_router = Router("PingPonger -- PingPonger")
-        self.alice_bob_router.get_address_book = unittest.mock(return_value={"PingPonger": "TestPingPongerAddr"}) 
+        self.alice_bob_router = Router(
+            "PingPonger -- PingPonger", "PingPongerRouterAddr"
+        )
         return super().setUp()
-
 
     def test_broadcast(self):
         pass

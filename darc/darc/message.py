@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 import uuid
+from typing import Union
 
 
 @dataclass
 class Message:
     message_name: str
-    message_id: uuid.uuid4 = "None"
+    message_id: Union[uuid.UUID, str] = "None"
     from_agent: str = "None"
     to_agent: str = "None"
     content: str = "None"

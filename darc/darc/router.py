@@ -1,4 +1,4 @@
-from darc.actor import AbstractActor
+from .actor import AbstractActor
 
 
 class Router(AbstractActor):
@@ -6,7 +6,7 @@ class Router(AbstractActor):
         super().__init__()
         self._address = address
         self._name = name
-        
+
     def get_address_book(self):
         pass
 
