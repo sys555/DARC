@@ -27,7 +27,7 @@ class Node(AbstractActor):
         #     "defence match": ["attack node"]
         # }
         
-    def process_message(self, message):
+    def process(self, message):
         handler = self.handlers.get(message.message_name, self.default_handler)
         return handler(message)
 
