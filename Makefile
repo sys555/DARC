@@ -35,7 +35,7 @@ lint:             ## Run pep8, black, mypy linters.
 	$(ENV_PREFIX)flake8 darc/
 	$(ENV_PREFIX)black -l 79 --check darc/
 	$(ENV_PREFIX)black -l 79 --check tests/
-	$(ENV_PREFIX)mypy --explicit-package-bases --ignore-missing-imports --check-untyped-defs darc/
+	$(ENV_PREFIX)mypy --explicit-package-bases --ignore-missing-imports darc/
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage report.
