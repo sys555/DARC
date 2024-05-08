@@ -1,10 +1,33 @@
-from darc.darc.actor import AbstractActor
+from darc.darc.actor import AbstractActor, Preprocessor, defaultdict
+from darc.darc.message import Message
+import json
 
 def message_handler(message_names):
     def decorator(func):
         func._message_names = message_names
         return func
     return decorator
+
+class GatherPreprocessor(Preprocessor):
+    def __init__(self):
+        self.messages = defaultdict(list)
+
+    def pre_process(self, actor, message: Message) -> bool:
+        # Assume the message content is a JSON string with a task_id
+        content = json.loads(message.content)
+        task_id = content['task_id']
+        self.messages[task_id].append(content['data'])
+
+        # Check if all parts are gathered, for demonstration assume a fixed number
+        if len(self.messages[task_id]) >= 3:  # Assuming we wait for 3 parts
+            # When all parts are gathered, we call the process method
+            full_message = ' '.join(self.messages[task_id])
+            processed_data = actor.process(full_message)
+            actor.send(Message(content=processed_data, to_actor=message._to))
+            del self.messages[task_id]  # Clear the gathered messages for this task_id
+            return False  # Indicates that the message should not be processed further
+        return False  # Processing is not complete, do not call process yet
+
 
 class Node(AbstractActor):
     def __init__(self):
@@ -26,6 +49,7 @@ class Node(AbstractActor):
         #     "attack match": ["LLM"],
         #     "defence match": ["attack node"]
         # }
+        self.preprocessor = GatherPreprocessor()
         
     def process(self, message):
         handler = self.handlers.get(message.message_name, self.default_handler)
@@ -41,27 +65,6 @@ class Node(AbstractActor):
     @message_handler(["Data_Process"])
     def handle_data_processing(self, message):
         return f"Data processed: {message.content}"
-        
-    def gather(self, message):
-        task_id = message.task_id
-        message_name = message.message_name
-
-        # Check if all messages for the task_id have been received
-        required_nodes = set(self._prefix.get(message_name, []))
-        received_nodes = set(msg.message_name for msg in self.memory if msg.task_id == task_id)
-
-        if required_nodes.issubset(received_nodes):
-            # All required messages are received
-            contents = [msg.content for msg in self.memory if msg.task_id == task_id]
-            self.memory = [msg for msg in self.memory if msg.task_id != task_id]  # Clear memory for this task
-            return self.handle_message(contents, message_name)
-        else:
-            # Not all messages are received, store the current message
-            self.memory.append(message)
-            return "Waiting for more messages"
-
-    def pre_process(self, message):
-        self.gather(message)
     
     def handle_message(self, contents, message_name):
         # Dummy handler function

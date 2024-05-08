@@ -1,49 +1,47 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Dict, List
 from darc.darc.message import Message
 
+class Preprocessor(metaclass=ABCMeta):
+    @abstractmethod
+    def pre_process(self, message: Message) -> bool:
+        pass
+
+class StopPreprocessor(Preprocessor):
+    def pre_process(self, message: Message) -> bool:
+        return message.content != "stop"
+
+class DefaultPreprocessor(Preprocessor):
+    def pre_process(self, message: Message) -> bool:
+        message.content = f"Processed content: {message.content}"
+        return True
+
 class AbstractActor(metaclass=ABCMeta):
-    def __init__(self):
+    def __init__(self, preprocessor: Preprocessor = None):
         self._address_book: Dict[str, str] = dict()
-        self._instance: Dict[str, str] = dict()  # Maps agent identifiers to pykka actor instances
+        self._instance: Dict[str, str] = dict()
+        self.preprocessor = preprocessor or DefaultPreprocessor()
 
-    def recv(self, message):
-        # 预操作, 如 node 的 gather
-        pre_result = self.pre_process(message)
-        if pre_result is False:
-            # 预操作返回False，停止处理
-            return
-        # 预操作返回了数据，调用process处理
-        processed_data = self.process(pre_result)
-        self.send(Message(content=processed_data, to_actor=message._to))
+    def recv(self, message: Message):
+        if self.preprocessor.pre_process(message):
+            processed_data = self.process(message.content)
+            self.send(Message(content=processed_data, to_actor=message._to))
+        else:
+            print("Message processing stopped by preprocessor.")
 
-
-    def pre_process(self, message):
-        # 这里实现预处理逻辑，根据实际需求调整
-        # 示例：假设如果消息内容为"stop", 则返回False
-        if message.content == "stop":
-            return False
-        # 否则返回处理后的数据
-        return f"Processed content: {message.content}"
-    
     def send(self, message: Message):
-        # Retrieve the identifier of the actor to which the message should be sent
         agent_identifier = self._address_book.get(message._to)
         if agent_identifier:
-            # Retrieve the actor instance using the identifier
             actor = self._instance.get(agent_identifier)
             if actor:
                 actor.recv(message)
-                # actor.tell(message)
-                ...
             else:
                 print(f"No actor found with identifier {agent_identifier}")
         else:
             print(f"No agent found with name {message._to}")
-    
-    def spawn_new_actor(self):
-        ...
+
+    def set_preprocessor(self, preprocessor: Preprocessor):
+        self.preprocessor = preprocessor
 
     def process(self, data: str) -> str:
         return "process " + data
-    
