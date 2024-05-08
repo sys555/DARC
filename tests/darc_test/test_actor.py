@@ -70,4 +70,3 @@ def test_send_success():
     actor.send(message)
     
     recipient_actor.recv.assert_called_once_with(message)
-
