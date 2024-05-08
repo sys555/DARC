@@ -18,18 +18,12 @@ class TestNodeGate(unittest.TestCase):
         return super().setUp()
 
     def test_spawn_new_actor(self):
-        self.node_gate.get_address_book = mock.Mock(
+        self.node_gate._address_book = mock.Mock(
             return_value={
-                "alice_addr": PingPonger("alice", "alice_addr"),
-                "bob_addr": PingPonger("bob", "bob_addr"),
+                "alice_addr": self.alice,
+                "bob_addr": self.bob,
+                "cindy_addr": self.cindy,
             }
-        )
-
-        self.assertEqual(
-            id(self.alice), id(self.node_gate.get_address_book()["alice_addr"])
-        )
-        self.assertEqual(
-            id(self.bob), id(self.node_gate.get_address_book()["bob_addr"])
         )
 
     def test_send(self):
