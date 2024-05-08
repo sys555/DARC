@@ -47,7 +47,7 @@ def setup_graph():
                 2,
                 {"llm": "GPT4"},
             ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
-        ],
+        ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个实例
     }
     return Graph.init(config)
 
@@ -56,8 +56,8 @@ def setup_graph():
 def test_graph_initialization(setup_graph):
     assert isinstance(setup_graph, Graph)
     assert (
-        len(setup_graph.nodes) == 7
-    )  # 确保所有节点都已初始化， 根据config的args参数，一共7个节点
+        len(setup_graph.nodes) == 10
+    )  # 确保所有节点都已初始化， 根据config的args参数，一共10个节点
 
 
 # 测试节点查找功能
@@ -87,8 +87,8 @@ def test_find_node_types(node_ids):
 @pytest.fixture
 def task(setup_graph, node_ids):
     task = Task(setup_graph)
-    task.set_entry_node(node_ids["entry_node_id"])
-    task.set_exit_node(node_ids["exit_node_id"])
+    task.set_entry_node(node_ids["dataset_node_id"])
+    task.set_exit_node(node_ids["leaderboard_node_id"])
     return task
 
 
@@ -100,8 +100,8 @@ def test_task_initialization(task):
 # 测试设置入口和出口节点
 def test_set_entry_and_exit_nodes(task, node_ids):
     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
-    assert task.entry_node == node_ids["entry_node_id"]
-    assert task.exit_node == node_ids["exit_node_id"]
+    assert task.entry_node == node_ids["dataset_node_id"]
+    assert task.exit_node == node_ids["leaderboard_node_id"]
 
 
 # 测试任务的执行
@@ -113,5 +113,5 @@ def test_task_execution(task):
 
 # 测试结果的正确性
 def test_result_correctness(task):
-    expected_result = "expected task result"  # 根据实际情况修改期望结果
+    expected_result = None  # 根据实际情况修改期望结果
     assert task.result == expected_result

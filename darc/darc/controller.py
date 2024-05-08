@@ -7,18 +7,27 @@ class Graph:
     def init(cls, config):
         graph = cls()
         node_instances = {}
+        instantiated_classes = set()
 
-        # 创建节点实例
-        for node_cls, count, args in config["args"]:
+        # 创建节点实例，并记录已实例化的类
+        for node_cls, count, args in config.get("args", []):
+            instantiated_classes.add(node_cls)
             for _ in range(count):
                 instance = node_cls(**args)
                 node_instances.setdefault(node_cls, []).append(instance)
                 graph.add_node(instance)
 
+        # 检查config["node"]中提到的所有类，为未实例化的类创建默认实例
+        for node_cls in config.get("node", []):
+            if node_cls not in instantiated_classes:
+                instance = node_cls()  # 假设所有类都有一个无参数的构造函数
+                node_instances.setdefault(node_cls, []).append(instance)
+                graph.add_node(instance)
+
         # 设置边
-        for src_cls, dst_cls in config["edge"]:
-            for src in node_instances[src_cls]:
-                for dst in node_instances[dst_cls]:
+        for src_cls, dst_cls in config.get("edge", []):
+            for src in node_instances.get(src_cls, []):
+                for dst in node_instances.get(dst_cls, []):
                     graph.add_edge(src, dst)
 
         return graph
