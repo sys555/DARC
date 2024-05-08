@@ -15,6 +15,8 @@ class Node(AbstractActor):
                 for message_name in method._message_names:
                     self.handlers[message_name] = method
         
+        self.memory = []
+        
     def process_message(self, message):
         handler = self.handlers.get(message.message_name, self.default_handler)
         return handler(message)
@@ -30,4 +32,4 @@ class Node(AbstractActor):
     def handle_data_processing(self, message):
         return f"Data processed: {message.content}"
         
-        
+    

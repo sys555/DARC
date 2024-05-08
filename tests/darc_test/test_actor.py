@@ -1,77 +1,73 @@
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from darc.darc.node import Node
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
 
-# Define the message routing map
-message_routing = {"1": "AtoB_Router"}
+# Test initialization of the AbstractActor class
+def test_initialization():
+    actor = AbstractActor()
+    assert actor._address_book == {}
+    assert actor._instance == {}
 
-@pytest.fixture
-def actor():
-    actor_instance = AbstractActor()
-    actor_instance.id = 'Actor_1'
-    return actor_instance
+# Test the recv method particularly when pre_process returns False
+def test_recv_pre_process_returns_false():
+    actor = AbstractActor()
+    actor.pre_process = Mock(return_value=False)
+    actor.process = Mock()
+    actor.send = Mock()
+    
+    message = Message(content='stop', to_actor='actor1')
+    actor.recv(message)
+    
+    actor.pre_process.assert_called_once_with(message)
+    actor.process.assert_not_called()
+    actor.send.assert_not_called()
 
-@pytest.fixture
-def message():
-    return Message(content="Hello, World!", task_id="1", message_name="Init")
+# Test the recv method's normal operation
+def test_recv_normal_operation():
+    actor = AbstractActor()
+    actor.pre_process = Mock(return_value='Processed content: continue')
+    actor.process = Mock(return_value='processed data')
+    actor.send = Mock()
+    
+    message = Message(content='continue', to_actor='actor1')
+    actor.recv(message)
+    
+    actor.pre_process.assert_called_once_with(message)
+    actor.process.assert_called_once_with('Processed content: continue')
+    actor.send.assert_called_once()
 
-def route_message(task_id):
-    return message_routing.get(task_id)
+# Test the pre_process method to ensure it returns False correctly
+def test_pre_process():
+    actor = AbstractActor()
+    stop_message = Message(content='stop', to_actor='actor1')
+    continue_message = Message(content='continue', to_actor='actor1')
+    
+    assert actor.pre_process(stop_message) == False
+    assert actor.pre_process(continue_message) == 'Processed content: continue'
 
-def test_send_message(actor, message):
-    with patch.object(actor, 'send', autospec=True) as mock_send:
-        # Assuming send needs to decide where to route the message
-        to_actor = route_message(message.task_id)
-        actor.send(message)
-        mock_send.assert_called_with(message)
+# Test the send method to handle cases where no actor is found
+def test_send_no_actor_found():
+    actor = AbstractActor()
+    actor._address_book = {'actor1': 'id1'}
+    actor._instance = {}
+    actor.send = Mock()
+    
+    message = Message(content='data', to_actor='actor1')
+    actor.send(message)
+    actor.send.assert_called_once()
+    # Here you should assert the output to the console or handle it through logging
 
-def test_receive_and_process_message(actor):
-    with patch.object(actor, 'recv', autospec=True) as mock_recv, \
-        patch.object(actor, 'process', autospec=True) as mock_process:
-        
-        # Setup for testing recv and processing
-        message = Message(content="Test data", task_id="1", message_name="Data_Process")
-        mock_recv.return_value = message
-        mock_process.return_value = "processed " + message.content
+# Setup for testing send where actors exist and message is successfully sent
+def test_send_success():
+    actor = AbstractActor()
+    actor._address_book = {'actor1': 'id1'}
+    recipient_actor = Mock()
+    actor._instance = {'id1': recipient_actor}
+    
+    message = Message(content='data', to_actor='actor1')
+    actor.send(message)
+    
+    recipient_actor.recv.assert_called_once_with(message)
 
-        # Simulate reception and decision on whether to forward
-        received_message = actor.recv()
-        processed_data = actor.process(received_message.content)
-
-        # Determine next action based on node position
-        if actor.id == route_message(received_message.task_id):
-            # This is the last actor, no forwarding
-            final_output = processed_data
-        else:
-            # Not the last node, forward to next actor
-            next_actor = route_message(received_message.task_id)
-            actor.send(Message(from_actor = actor.id, to_actor = next_actor, content=processed_data, task_id=received_message.task_id, message_name="Forward"))
-            final_output = "Message forwarded to " + next_actor
-
-        # Assertions
-        mock_recv.assert_called_once()
-        mock_process.assert_called_once_with(received_message.content)
-        assert final_output.startswith("processed") or "forwarded" in final_output
-
-# Additional test to cover different message names and types
-def test_message_routing_and_processing(actor, message):
-    with patch.object(actor, 'send', autospec=True) as mock_send:
-        # Different message types might be handled differently
-        if message.message_name == "Init":
-            processed_content = "Initialization complete"
-        elif message.message_name == "Data_Process":
-            processed_content = "Data processed: " + message.content
-        else:
-            processed_content = "Unhandled message type"
-
-        # Prepare the message object
-        outgoing_message = Message(content=processed_content, task_id=message.task_id, message_name=message.message_name)
-        
-        # Send and attempt to assert
-        actor.send(outgoing_message)
-        print(f"Mock calls: {mock_send.mock_calls}")  # Diagnostic print
-
-        # Assert that send was called correctly
-        mock_send.assert_called_with(outgoing_message)
