@@ -14,7 +14,13 @@ class Message:
     broadcasting: bool = True
 
     def __call__(
-        self, message_id, from_agent, to_agent, content, task_id, broadcasting=True
+        self,
+        message_id,
+        from_agent,
+        task_id,
+        to_agent="None",
+        content="None",
+        broadcasting=True,
     ):
         message_name = self.message_name
         return Message(

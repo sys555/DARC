@@ -1,4 +1,5 @@
 from .actor import AbstractActor
+from .message import Message
 from typing import Dict, Set
 
 
@@ -26,7 +27,7 @@ class NodeGate(AbstractActor):
     def _point_to_point(self):
         pass
 
-    def send(self):
+    def send(self, message: "Message"):
         pass
 
     def recv(self):

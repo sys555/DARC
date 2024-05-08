@@ -1,11 +1,19 @@
-import unittest
+import uuid
+
 from darc.darc.node import Node
 from darc.darc.message import Message
-import uuid
+
 
 PingMessage = Message(message_name="PingMessage")
 PongMessage = Message(message_name="PongMessage")
 ArgueMessage = Message(message_name="ArgueMessage")
+
+TestPingMessage = PingMessage(
+    message_id=uuid.uuid4(),
+    from_agent="alice_addr",
+    content=f"broadcasting ... I am alice",
+    task_id=uuid.uuid4(),
+)
 
 
 class PingPonger(Node):
@@ -17,7 +25,7 @@ class PingPonger(Node):
         task_id = uuid.uuid4()
         ping_message = PingMessage(
             message_id=message_uid,
-            from_agent=self._address,
+            from_agent=self._addr,
             content=f"broadcasting ... I am {self._node_name}",
             task_id=task_id,
         )
@@ -27,7 +35,7 @@ class PingPonger(Node):
     def pong(self, message: Message):
         pong_message = PongMessage(
             message_id=message.message_id,
-            from_agent=self._address,
+            from_agent=self._addr,
             to_agent=message.from_agent,
             content=f"hello, I am {self._node_name}",
             task_id=message.task_id,

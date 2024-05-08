@@ -1,4 +1,5 @@
 from .actor import AbstractActor
+from .message import Message
 from typing import Dict, Set
 
 
@@ -18,7 +19,7 @@ class Node(AbstractActor):
             self._addr = addr
             self.__first_init__.add(addr)
 
-    def send(self):
+    def send(self, message: "Message"):
         pass
 
     def recv(self):

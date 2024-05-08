@@ -4,20 +4,20 @@ from .actor import AbstractActor
 class Router(AbstractActor):
     def __init__(self, address, name):
         super().__init__()
-        self._address = address
-        self._name = name
+        self._addr = address
+        self._router_name = name
 
     def get_address_book(self):
         pass
 
-    def send(self):
+    def send(self, message):
         pass
 
     def recv(self):
         pass
 
-    def spawn_new_actor(self):
-        return super().spawn_new_actor()
+    def spawn_new_actor(self, args_list):
+        pass
 
     def _broadcast(self):
         pass

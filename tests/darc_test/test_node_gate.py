@@ -1,12 +1,8 @@
-from darc.darc.node_gate import NodeGate
-from darc.darc.message import Message
 import unittest
 from unittest import mock
-import uuid
-from .test_base import PingPonger
 
-
-RouterMessage = Message("PingPonger--PingPonger")
+from darc.darc.node_gate import NodeGate
+from .test_base import PingPonger, TestPingMessage
 
 
 class TestNodeGate(unittest.TestCase):
@@ -18,6 +14,7 @@ class TestNodeGate(unittest.TestCase):
         )
         self.alice = PingPonger("alice", "alice_addr")
         self.bob = PingPonger("bob", "bob_addr")
+        self.cindy = PingPonger("cindy", "cindy_addr")
         return super().setUp()
 
     def test_spawn_new_actor(self):
@@ -36,14 +33,19 @@ class TestNodeGate(unittest.TestCase):
         )
 
     def test_send(self):
-        # mock message from router
-        mock_router_message = RouterMessage(
-            message_id=uuid.uuid4(), from_agent="test_ping_ponger_router_addr", to_agent="test_ping_ponger_gate_addr"
-        )
-        
+        # send mock message to node
+        self.node_gate.send(TestPingMessage)
+        self.bob._message_box = mock.Mock(return_value=[TestPingMessage])
+        self.cindy._message_box = mock.Mock(return_value=[TestPingMessage])
 
     def test_recv(self):
-        pass
+        # mock message from alice
+        self.alice.broadcast_ping()
+        self.node_gate._message_box = mock.Mock(return_value=[TestPingMessage])
 
     def tearDown(self) -> None:
         return super().tearDown()
+
+
+if __name__ == "__main__":
+    unittest.main()
