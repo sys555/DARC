@@ -4,37 +4,32 @@ from darc.darc.node import Node, message_handler
 from darc.darc.message import Message
 from darc.darc.node_gate import NodeGate
 
-from test_base import PingPonger
-
+from test_base import PingPonger, TestPingMessage
+ 
 def test_pingpong():
-    nodeGate = NodeGate()
-
-    pingNode = PingPonger(node_name="pingNode", address="pingNode_addr")
-    pongNode = PingPonger(node_name="pongNode", address="pongNode_addr")
-
-    # Link nodes and NodeGate
-    pingNode.set_gate(nodeGate)
-    pongNode.set_gate(nodeGate)  # pingNode sends messages to NodeGate
-    nodeGate.add_instance(pingNode)
-    nodeGate.add_instance(pongNode)
+   # 如果你是通过NodeGate spawn actor函数生成的Node，那么这个Node的地址中有一个NodeGate的地址
+    # 手动生成Node，则父亲就是None
     
-def test_pingpong_interaction():
+
     pingNode = PingPonger(node_name="pingNode", address="pingNode_addr")
     pongNode = PingPonger(node_name="pongNode", address="pongNode_addr")
-
-    # Setup connections between nodes through NodeGate
-    gate = NodeGate()
-    pingNode.set_gate(gate)
-    pongNode.set_gate(gate)  # pingNode sends messages to NodeGate
-    gate.add_instance(pingNode)
-    gate.add_instance(pongNode)
-
-    # Simulate message passing
-    message_success = Message(message_name="PingMessage", from_agent="pingNode", to_agent="pongNode")
-    pingNode.send(message_success)  # This should trigger pongNode to send a pong response
-
-    # Since we're simulating, we might just print outputs in handlers or check state changes
-    # For a more thorough testing environment, we might want to capture outputs or states
+    # mock 一下pingNode pongNode的NodeGate地址
+    pingNode._address_book = mock.Mock(return_value = {"mock_gate_node"}
+    pongNode._address_book = mock.Mock(return_value = {"mock_gate_node"})                                   
+    
+    pingNode.broadcast_ping(TestPingMessage)
+    pongNode._mailbox = mock.Mock(return_value = [TestPingMessage])
+    # 我实现了acoto r send函数，定义send(to_addr, messacage)
+    # actor1(router), actor2(node gate)
+    # actor1.send(to_addr, message), actor2
+    # 
+    
+    
+    for i in range(0,3):
+        # Test successful transmission
+        nodeGate.set_success_rate(1.0)  # Ensure 100% success rate for this test part
+        message_success = Message(message_name="PingMessage", from_agent="pingNode", to_agent="pongNode")
+        pingNode.send(message_success)
 
 
 
