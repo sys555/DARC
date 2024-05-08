@@ -8,7 +8,7 @@ from test_base import PingPonger
 
 def test_pingpong():
     nodeGate = NodeGate()
-    
+
     pingNode = PingPonger(node_name="pingNode", address="pingNode_addr")
     pongNode = PingPonger(node_name="pongNode", address="pongNode_addr")
 
@@ -18,23 +18,25 @@ def test_pingpong():
     nodeGate.add_instance(pingNode)
     nodeGate.add_instance(pongNode)
     
-    for i in range(0,3):
-        # Test successful transmission
-        nodeGate.set_success_rate(1.0)  # Ensure 100% success rate for this test part
-        message_success = Message(message_name="PingMessage", from_agent="pingNode", to_agent="pongNode")
-        pingNode.send(message_success)
+def test_pingpong_interaction():
+    pingNode = PingPonger(node_name="pingNode", address="pingNode_addr")
+    pongNode = PingPonger(node_name="pongNode", address="pongNode_addr")
 
-    for i in range(0, 2):
-        # Test failed transmission
-        nodeGate.set_success_rate(0.0)  # Ensure 0% success rate for this part
-        message_failure = Message(message_name="PingMessage", from_agent="pingNode", to_agent="pongNode")
-        pingNode.send(message_failure)
+    # Setup connections between nodes through NodeGate
+    gate = NodeGate()
+    pingNode.set_gate(gate)
+    pongNode.set_gate(gate)  # pingNode sends messages to NodeGate
+    gate.add_instance(pingNode)
+    gate.add_instance(pongNode)
 
-    # Check results
-    success_messages = [msg for msg, status in nodeGate.messages if status == "success"]
-    failed_messages = [msg for msg, status in nodeGate.messages if status == "failure"]
-    print("Successes:", len(success_messages))
-    print("Failures:", len(failed_messages))
+    # Simulate message passing
+    message_success = Message(message_name="PingMessage", from_agent="pingNode", to_agent="pongNode")
+    pingNode.send(message_success)  # This should trigger pongNode to send a pong response
+
+    # Since we're simulating, we might just print outputs in handlers or check state changes
+    # For a more thorough testing environment, we might want to capture outputs or states
+
+
 
 # ## scene: A -> B
 # def test_scene0():

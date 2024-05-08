@@ -15,7 +15,6 @@ TestPingMessage = PingMessage(
     task_id=uuid.uuid4(),
 )
 
-
 class PingPonger(Node):
     def __init__(self, node_name, address):
         super().__init__(node_name, address)
@@ -41,4 +40,8 @@ class PingPonger(Node):
             task_id=message.task_id,
         )
         self.send(pong_message)
+    
+    @Node.cast("PongMessage")
+    def handle_pong(self, message: Message):
+        print(f"I got that you are {message.content}")
         

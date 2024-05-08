@@ -12,6 +12,7 @@ isort = "^5.13.2"
 black = "^24.4.2"
 mypy = "^1.10.0"
 pytest = "^8.2.0"
+pykka = "^4.0.2"
 
 
 [tool.poetry.group.dev.dependencies]

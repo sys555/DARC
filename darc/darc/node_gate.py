@@ -20,7 +20,7 @@ class NodeGate(AbstractActor):
         self.success_rate = rate
     
     def add_instance(self, instance):
-        self._instance[instance.node_name] = instance
+        self._instance[instance._node_name] = instance
         
     def _broadcast(self):
         pass

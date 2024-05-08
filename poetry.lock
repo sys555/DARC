@@ -504,6 +504,20 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "pykka"
+version = "4.0.2"
+description = "Pykka is a Python implementation of the actor model"
+optional = false
+python-versions = ">=3.8.0,<4.0.0"
+files = [
+    {file = "pykka-4.0.2-py3-none-any.whl", hash = "sha256:100f9ceb5b977aad5eb7b3165d0989d539eff685a5d77b3f733e7c3fe704fd7b"},
+    {file = "pykka-4.0.2.tar.gz", hash = "sha256:05e687c426922b0084d79f22a6c1813e0c4e0c59d8f860aa32c18c5f6127e276"},
+]
+
+[package.dependencies]
+typing-extensions = {version = ">=4.0.0,<5.0.0", markers = "python_version < \"3.10\""}
+
+[[package]]
 name = "pytest"
 version = "8.2.0"
 description = "pytest: simple powerful testing with Python"
@@ -722,4 +736,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "b50810e62e056b60f0eaf279dc20ee9e261c3f69017661e5f0d0c7bb539b5322"
+content-hash = "41d2d2492d4dd9e93388d853e89c664bf265afcb8e8e5146f569a8a17e152836"

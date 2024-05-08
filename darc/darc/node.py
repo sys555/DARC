@@ -48,12 +48,13 @@ class Preprocessor(metaclass=ABCMeta):
 class Node(AbstractActor):
     def __init__(self, node_name, address, preprocessor=None):
         super().__init__()
-        self.node_name = node_name
-        self.address = address
+        self._node_name = node_name
+        self._addr = address
         self.handlers: Dict[str, Callable] = {}
         self.gate = None
         self.preprocessor = preprocessor
         self._setup_handlers()
+        self.memory = []
 
     def _setup_handlers(self):
         for name in dir(self):
@@ -66,6 +67,7 @@ class Node(AbstractActor):
         self.gate = gate
 
     def recv(self, message: Message):
+        self.memory.append(message)
         if self.preprocessor and self.preprocessor.pre_process(self, message):
             handler = self.handlers.get(message.message_name, None)
             if handler:
