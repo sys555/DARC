@@ -2,8 +2,8 @@ from darc.darc.node import Node
 
 
 class Evaluator(Node):
-    def __init__(self, id=None, mode=None):
-        super().__init__(id)
+    def __init__(self, mode=None):
+        super().__init__()
         self.mode = mode
 
     @Node.process("evaluate")

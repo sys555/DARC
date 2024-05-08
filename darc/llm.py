@@ -2,8 +2,8 @@ from darc.darc.node import Node
 
 
 class LLM_with_PPL(Node):
-    def __init__(self, id=None, llm="GPT-4"):
-        super().__init__(id)
+    def __init__(self, llm="GPT-4"):
+        super().__init__()
         self.llm = llm
 
     @Node.process("generate")
