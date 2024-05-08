@@ -2,10 +2,11 @@ from darc.darc.node import Node
 
 
 class DatasetDB(Node):
-    def __init__(self, id, db=None):
-        super().__init__(id)
-        self.database = db
+    def __init__(self, db):
+        super().__init__()
+        self.db = db
 
     @Node.process("query")
-    def execute_query(self, query_string):
-        return f"Results for {query_string} from {self.database}"
+    def handle_query(self, query):
+        print(f"Handling query in {self.db}: {query}")
+        return f"Query results for {query} from {self.db}"

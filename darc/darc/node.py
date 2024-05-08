@@ -1,30 +1,30 @@
-class NodeMeta(type):
-    def __new__(cls, name, bases, attrs):
-        new_class = super(NodeMeta, cls).__new__(cls, name, bases, attrs)
-        new_class.process_handlers = {}
-        for key, value in attrs.items():
-            if hasattr(value, "_message_type"):
-                new_class.process_handlers[value._message_type] = value
-        return new_class
+from typing import Any, Callable, Dict, List
 
 
-class Node(metaclass=NodeMeta):
-    def __init__(self, id):
-        self.id = id
+class Node:
+    _id_counter: int = 0
+    message_handlers: Dict[str, List[Callable[..., Any]]] = (
+        {}
+    )  # Class-level attribute shared by all instances
 
-    @staticmethod
-    def process(message_type):
-        def decorator(func):
-            func._message_type = message_type
+    def __init__(self) -> None:
+        self.id: int = Node._id_counter
+        Node._id_counter += 1
+
+    @classmethod
+    def process(cls, message_type: str) -> Callable:
+        def decorator(func: Callable) -> Callable:
+            if message_type not in cls.message_handlers:
+                cls.message_handlers[message_type] = []
+            cls.message_handlers[message_type].append(func)
             return func
 
         return decorator
 
-    def handle_message(self, message_type, *args, **kwargs):
-        if message_type in self.process_handlers:
-            method = getattr(
-                self, self.process_handlers[message_type].__name__
-            )
-            return method(*args, **kwargs)
-        else:
-            raise ValueError(f"No handler for message type {message_type}")
+    def handle_message(
+        self, message_type: str, *args: Any, **kwargs: Any
+    ) -> Any:
+        if message_type in self.message_handlers:
+            for handler in self.message_handlers[message_type]:
+                return handler(self, *args, **kwargs)
+        raise ValueError(f"No handler for message type: {message_type}")
