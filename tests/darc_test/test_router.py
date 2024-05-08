@@ -22,7 +22,7 @@ class TestRouter(unittest.TestCase):
             [("ping_pong_node_gate", "test_ping_pong_node_gate_addr")]
         )
         self.alice_bob_router._address_book = mock.Mock(
-            return_value={"test_ping_pong_node_gate_addr": self.pingpong_node_gate}
+            return_value={"test_ping_pong_node_gate_addr"}
         )
 
     def test_send(self):

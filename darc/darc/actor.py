@@ -3,7 +3,7 @@ from abc import ABCMeta
 
 class AbstractActor(metaclass=ABCMeta):
     def __init__(self):
-        self._address_book = dict()
+        self._address_book = set()
         self._message_box = []
 
     def recv(self):

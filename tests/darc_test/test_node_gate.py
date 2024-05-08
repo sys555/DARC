@@ -19,11 +19,7 @@ class TestNodeGate(unittest.TestCase):
 
     def test_spawn_new_actor(self):
         self.node_gate._address_book = mock.Mock(
-            return_value={
-                "alice_addr": self.alice,
-                "bob_addr": self.bob,
-                "cindy_addr": self.cindy,
-            }
+            return_value={"alice_addr", "bob_addr", "cindy_addr"}
         )
 
     def test_send(self):
