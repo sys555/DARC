@@ -33,12 +33,20 @@ def setup_graph():
             (Evaluator, LeaderBoard),
         ],
         "args": [
-            (DatasetDB, 1, {"db": "NormalQ"}),
+            (
+                DatasetDB,
+                1,
+                {"db": "NormalQ"},
+            ),  # 实例化一个参数为{"db": "NormalQ"}的DatasetDB对象
             (DatasetDB, 1, {"db": "NormalA"}),
             (DatasetDB, 1, {"db": "BadQ"}),
             (DatasetDB, 1, {"db": "BadA"}),
             (Evaluator, 1, {"mode": "Attack"}),
-            (LLM_with_PPL, 2, {"llm": "GPT4"}),
+            (
+                LLM_with_PPL,
+                2,
+                {"llm": "GPT4"},
+            ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
         ],
     }
     return Graph.init(config)
@@ -49,7 +57,7 @@ def test_graph_initialization(setup_graph):
     assert isinstance(setup_graph, Graph)
     assert (
         len(setup_graph.nodes) == 7
-    )  # 确保所有节点都已初始化,其中LLM节点被初始化两份，用于流量均衡，所以一共7个节点
+    )  # 确保所有节点都已初始化， 根据config的args参数，一共7个节点
 
 
 # 测试节点查找功能
