@@ -3,14 +3,12 @@ from unittest.mock import Mock, patch, MagicMock
 from darc.darc.node import Node
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
-import logging
+from loguru import logger
 
 class Actor(AbstractActor):
     def __init__(self, name):
         super().__init__()
         self.name = name
-        # 测试跟踪
-        self.received_messages = []  # Add this to track received messages
         
     def register_actor(self, actor):
         # Register new actor to the address book and instance dictionary
@@ -18,8 +16,6 @@ class Actor(AbstractActor):
         self._instance[actor.actor_ref.actor_urn] = actor.actor_ref
 
     def on_receive(self, message):
-        # 测试跟踪
-        self.received_messages.append(message)  # Log each received message
         if message.to_agent in self._address_book:
             self.send(self._instance[self._address_book[message.to_agent]], message)
         else:
@@ -57,7 +53,7 @@ class TestActorCommunication:
         time.sleep(2)
 
         # # Verify that each actor received the correct message
-        assert len(alice.received_messages.get()) == 1
-        assert alice.received_messages.get()[0] == message_to_alice
-        assert len(bob.received_messages.get()) == 1
-        assert bob.received_messages.get()[0] == message_to_bob
+        assert len(alice._mesasge_box.get()) == 1
+        assert alice._mesasge_box.get()[0] == message_to_alice
+        assert len(bob._mesasge_box.get()) == 1
+        assert bob._mesasge_box.get()[0] == message_to_bob
