@@ -11,14 +11,10 @@ class AbstractActor(pykka.ThreadingActor):
         self._instance: Dict[str, pykka.ThreadingActor] = dict() # addr -> pykka actor_ref
         
     def on_receive(self, message):
-        try:
-            if message.to_agent in self._address_book:
-                self.send(self._instance[self._address_book[message.to_agent]], message)
-            else:
-                ...
-        except Exception as e:
-            logger = logging.getLogger(__name__)
-            logger.error("node", e)
+        if message.to_agent in self._address_book:
+            self.send(self._instance[self._address_book[message.to_agent]], message)
+        else:
+            ...
 
     def send(self, to_agent, message):
         to_agent.tell(message)

@@ -46,13 +46,12 @@ class Preprocessor(metaclass=ABCMeta):
         return True  # Default behavior to always process messages
     
 class Node(AbstractActor):
-    def __init__(self, node_name, address, preprocessor=None):
+    def __init__(self, node_name, address):
         super().__init__()
         self._node_name = node_name
         self._addr = address
         self.handlers: Dict[str, Callable] = {}
-        self.gate = None
-        self.preprocessor = preprocessor
+        self.preprocessor = DefaultPreprocessor()
         self._setup_handlers()
         self.memory = []
 
@@ -63,9 +62,6 @@ class Node(AbstractActor):
                 for message_name in method._message_names:
                     self.handlers[message_name] = method
 
-    def set_gate(self, gate):
-        self.gate = gate
-
     def recv(self, message: Message):
         self.memory.append(message)
         if self.preprocessor and self.preprocessor.pre_process(self, message):
@@ -75,7 +71,7 @@ class Node(AbstractActor):
 
     def send(self, message: Message):
         # All messages are sent to the 'gate' regardless of the 'to_agent' value.
-        if self.gate and hasattr(self.gate, 'recv'):
+        if hasattr(self.gate, 'recv'):
             self.gate.recv(message)
         else:
             print("Gate is not set or does not have a 'recv' method.")
