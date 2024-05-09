@@ -53,7 +53,6 @@ class Node(AbstractActor):
         self.handlers: Dict[str, Callable] = {}
         self.preprocessor = DefaultPreprocessor()
         self._setup_handlers()
-        self.memory = []
 
     def _setup_handlers(self):
         for name in dir(self):
@@ -63,7 +62,7 @@ class Node(AbstractActor):
                     self.handlers[message_name] = method
 
     def recv(self, message: Message):
-        self.memory.append(message)
+        self._message_box.append(message)
         if self.preprocessor and self.preprocessor.pre_process(self, message):
             handler = self.handlers.get(message.message_name, None)
             if handler:

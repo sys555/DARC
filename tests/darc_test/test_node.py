@@ -190,9 +190,8 @@ def test_scene1(scene1):
     first_call_args = gather_calls[0][0]
     second_call_args = gather_calls[1][0]
     
-    # C memory 记录信息无误
-    assert AtoC_msg in C.memory
-    assert BtoC_msg in C.memory
+    assert AtoC_msg in C._message_box
+    assert BtoC_msg in C._message_box
     
     # 仅接受到 AtoC_msg.content or BtoC_msg.content
     # returns False
