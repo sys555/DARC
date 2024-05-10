@@ -63,15 +63,15 @@ def test_graph_initialization(setup_graph):
 # 测试节点查找功能
 @pytest.fixture
 def node_ids(setup_graph):
-    dataset_nodes = setup_graph.find_type("DatasetDB")
+    attacker_nodes = setup_graph.find_type("Attacker")
     leaderboard_nodes = setup_graph.find_type("LeaderBoard")
-    assert dataset_nodes is not None
+    assert attacker_nodes is not None
     assert leaderboard_nodes is not None
-    assert isinstance(dataset_nodes[0], DatasetDB)
+    assert isinstance(attacker_nodes[0], Attacker)
     assert isinstance(leaderboard_nodes[0], LeaderBoard)
 
     return {
-        "dataset_node_id": dataset_nodes[0].id if dataset_nodes else None,
+        "attacker_node_id": attacker_nodes[0].id if attacker_nodes else None,
         "leaderboard_node_id": (
             leaderboard_nodes[0].id if leaderboard_nodes else None
         ),
@@ -79,7 +79,7 @@ def node_ids(setup_graph):
 
 
 def test_find_node_types(node_ids):
-    assert node_ids["dataset_node_id"] is not None
+    assert node_ids["attacker_node_id"] is not None
     assert node_ids["leaderboard_node_id"] is not None
 
 
@@ -87,7 +87,7 @@ def test_find_node_types(node_ids):
 @pytest.fixture
 def task(setup_graph, node_ids):
     task = Task(setup_graph)
-    task.set_entry_node(node_ids["dataset_node_id"])
+    task.set_entry_node(node_ids["attacker_node_id"])
     task.set_exit_node(node_ids["leaderboard_node_id"])
     return task
 
@@ -100,7 +100,7 @@ def test_task_initialization(task):
 # 测试设置入口和出口节点
 def test_set_entry_and_exit_nodes(task, node_ids):
     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
-    assert task.entry_node == node_ids["dataset_node_id"]
+    assert task.entry_node == node_ids["attacker_node_id"]
     assert task.exit_node == node_ids["leaderboard_node_id"]
 
 

@@ -6,7 +6,6 @@ class DatasetDB(Node):
         super().__init__()
         self.db: str = db
 
-    @Node.process("query")
+    @Node.process("Attacker")
     def handle_query(self, query: str) -> str:
-        print(f"Handling query in {self.db}: {query}")
-        return f"Query results for {query} from {self.db}"
+        return f"Normal for {query} from {self.db}"
