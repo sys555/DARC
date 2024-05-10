@@ -25,7 +25,9 @@ class DatasetDB(Node):
         return msgs
 
     @Node.process("Evaluator:DatasetDB")
-    def handle_Evaluator_query(self, input_content: str) -> Optional[Message]: # 可能有返回值，也可能没有
+    def handle_Evaluator_query(
+        self, input_content: str
+    ) -> Optional[Message]:  # 可能有返回值，也可能没有
         # input_content 是SQL query
         # output_content 是query的结果
         table = self.parse_SQL_content(input_content)
@@ -36,16 +38,17 @@ class DatasetDB(Node):
             )
             return Message2Evaluator
         elif table == "Dangerous":
-            self.excute_SQL(input_content) # 直接执行SQL 无需返回值
+            self.excute_SQL(input_content)  # 直接执行SQL 无需返回值
         else:
             raise NotImplementedError
 
-    def parse_SQL_content(self, content:str):
+    def parse_SQL_content(self, content: str):
         # 解析SQL语句中访问的不同的table，执行不同的逻辑
         import numpy as np
+
         use_table = np.random.choice("Norlmal", "Dangerous")
         return use_table
-    
-    def excute_SQL(sql:str):
+
+    def excute_SQL(sql: str):
         # 假设这里有一段执行SQL的逻辑
         return f"result from {sql}"

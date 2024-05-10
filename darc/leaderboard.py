@@ -11,4 +11,4 @@ class LeaderBoard(Node):
     @Node.process("Evaluator:LeaderBoard")
     def update_leaderboard(self, entry: str) -> None:
         score_record = f"Updating leaderboard with new entry: {entry}"
-        self.leaderboard.append(score_record) 
+        self.leaderboard.append(score_record)
