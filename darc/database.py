@@ -13,8 +13,7 @@ class DatasetDB(Node):
         # input_content 是正常Q的SQL query
         # output_content是DB中的正常Q
         msgs = []
-        table = "NormalQ"
-        output_content = f"Normal Q for {input_content} from {table}"
+        output_content = self.excute_SQL(input_content)
         Message2Attacker = Message(
             message_name="DatasetDB:Attacker", content=output_content
         )
@@ -27,15 +26,26 @@ class DatasetDB(Node):
 
     @Node.process("Evaluator:DatasetDB")
     def handle_Evaluator_query(self, input_content: str) -> Message:
-        # input_content 是危险QA对应的正常A的SQL query，根据id进行匹配
-        # output_content 是DB中对应的正常A
-        if 
-        table = "Normal_A"
-        output_content = f"Normal A for {input_content} from {table}"
-        Message2Evaluator = Message(
-            message_name="DatasetDB:Evaluator", content=output_content
-        )
-        return Message2Evaluator
+        # input_content 是SQL query
+        # output_content 是query的结果
+        table = self.parse_SQL_content(input_content)
+        if table == "Norlmal":
+            output_content = self.excute_SQL(input_content)
+            Message2Evaluator = Message(
+                message_name="DatasetDB:Evaluator", content=output_content
+            )
+            return Message2Evaluator
+        elif table == "Dangerous":
+            self.excute_SQL(input_content) # 直接执行SQL 无需返回值
+        else:
+            raise NotImplementedError
 
-    def parse_SQL_content(content:str):
-        use_table = ("Norlmal_A", "Dang")
+    def parse_SQL_content(self, content:str):
+        # 解析SQL语句中访问的不同的table，执行不同的逻辑
+        import numpy as np
+        use_table = np.random.choice("Norlmal", "Dangerous")
+        return use_table
+    
+    def excute_SQL(sql:str):
+        # 假设这里有一段执行SQL的逻辑
+        return f"result from {sql}"
