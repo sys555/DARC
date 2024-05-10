@@ -4,21 +4,27 @@ import pykka
 from darc.darc.message import Message
 import logging
 
+@pykka.traversable
 class AbstractActor(pykka.ThreadingActor):
     def __init__(self):
         super().__init__()
-        self._address_book: Dict[str, str] = dict()    # name -> addr
-        self._instance: Dict[str, pykka.ThreadingActor] = dict() # addr -> pykka actor_ref
-        self._message_box = []
+        self.address_book: Dict[str, str] = dict()    # name -> addr
+        self.instance: Dict[str, pykka.ThreadingActor] = dict() # addr -> pykka actor_ref
+        self.message_box = []
         
-    def on_receive(self, message):
-        if message.to_agent in self._address_book:
-            self.send(self._instance[self._address_book[message.to_agent]], message)
+    def on_receive(self, message: Message):
+        self.message_box.append(message)
+        # process
+        # send
+
+    def send(self, message):
+        # logging.info("send")
+        # logging.info(message.to_agent)
+        # logging.info(self.address_book[message.to_agent])
+        if message.to_agent in self.address_book and self.address_book[message.to_agent] in self.instance:
+            self.instance[self.address_book[message.to_agent]].tell(message)
         else:
             ...
-
-    def send(self, to_agent, message):
-        to_agent.tell(message)
 
     def spawn_new_actor(self):
         raise NotImplementedError
