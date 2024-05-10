@@ -36,18 +36,14 @@ def setup_graph():
             (
                 DatasetDB,
                 1,
-                {"db": "NormalQ"},
-            ),  # 实例化一个参数为{"db": "NormalQ"}的DatasetDB对象
-            (DatasetDB, 1, {"db": "NormalA"}),
-            (DatasetDB, 1, {"db": "BadQ"}),
-            (DatasetDB, 1, {"db": "BadA"}),
-            (Evaluator, 1, {"mode": "Attack"}),
+                {"db": "chanllenge"},
+            ),  # 实例化一个参数为{"db": "chanllenge"}的DatasetDB对象
             (
                 LLM_with_PPL,
                 2,
                 {"llm": "GPT4"},
             ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
-        ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个实例
+        ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个默认实例
     }
     return Graph.init(config)
 
@@ -100,8 +96,8 @@ def test_task_initialization(task):
 # 测试设置入口和出口节点
 def test_set_entry_and_exit_nodes(task, node_ids):
     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
-    assert task.entry_node == node_ids["attacker_node_id"]
-    assert task.exit_node == node_ids["leaderboard_node_id"]
+    assert task.entry_node == node_ids["attacker_node_id"] #向entry_node注入消息
+    assert task.exit_node == node_ids["leaderboard_node_id"] # 观察exit_node的改动
 
 
 # 测试任务的执行
