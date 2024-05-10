@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from darc.darc.message import Message
 from darc.darc.node import Node
@@ -25,7 +25,7 @@ class DatasetDB(Node):
         return msgs
 
     @Node.process("Evaluator:DatasetDB")
-    def handle_Evaluator_query(self, input_content: str) -> Message:
+    def handle_Evaluator_query(self, input_content: str) -> Optional[Message]: # 可能有返回值，也可能没有
         # input_content 是SQL query
         # output_content 是query的结果
         table = self.parse_SQL_content(input_content)

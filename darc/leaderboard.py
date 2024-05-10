@@ -8,8 +8,7 @@ class LeaderBoard(Node):
         super().__init__()
         self.leaderboard: List[str] = []
 
-    @Node.process("update_leaderboard")
-    def update_leaderboard(self, entry: str) -> str:
-        print(f"Updating leaderboard with new entry: {entry}")
-        self.leaderboard.append(entry)
-        return f"Updated leaderboard: {self.leaderboard}"
+    @Node.process("Evaluator:LeaderBoard")
+    def update_leaderboard(self, entry: str) -> None:
+        score_record = f"Updating leaderboard with new entry: {entry}"
+        self.leaderboard.append(score_record) 
