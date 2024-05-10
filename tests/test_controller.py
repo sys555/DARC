@@ -52,8 +52,8 @@ def setup_graph():
 def test_graph_initialization(setup_graph):
     assert isinstance(setup_graph, Graph)
     assert (
-        len(setup_graph.nodes) == 10
-    )  # 确保所有节点都已初始化， 根据config的args参数，一共10个节点
+        len(setup_graph.nodes) == 7
+    )  # 确保所有节点都已初始化， 根据config的args参数，一共7个节点 6类节点，其中llm有两个
 
 
 # 测试节点查找功能

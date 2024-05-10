@@ -1,5 +1,5 @@
 from typing import List
-
+import json
 from darc.darc.message import Message
 from darc.darc.node import Node
 
@@ -11,11 +11,12 @@ class Evaluator(Node):
 
     @Node.process("(LLM_with_PPL:Evaluator)&&(DatasetDB:Evaluator)")
     def evaluate_data(self, input_content: List[str]) -> List[Message]:
-        # input_content有两个部分，分别是来自LLM_with_PPL和来自DatasetDB的消息， Evaluator需要合并两个消息进行处理
+        # input_content有两个部分，分别是来自LLM_with_PPL和来自DatasetDB的消息，
+        # Evaluator需要合并两个消息进行处理
         msg = []
         if self.mode == "Attack":
             thres = 0.6
-            attacker_q, responce = input_content[0]
+            attacker_q, responce = json.loads(input_content[0])
             normal_a = input_content[1]
             score = self.score(attacker_q, responce, normal_a)
             msg.append(

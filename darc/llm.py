@@ -1,5 +1,5 @@
-from typing import List
-
+from typing import List, Optional
+import json
 from darc.darc.message import Message
 from darc.darc.node import Node
 
@@ -12,16 +12,14 @@ class LLM_with_PPL(Node):
         self.llm_batch_msg = []
 
     @Node.process("Filter:LLM_with_PPL")
-    def generate_text(self, attacker_Q: str) -> List[Message]:
+    def generate_text(self, attacker_Q: str) -> Optional[List[Message]]:
         # 输入content为攻击Q，输出content为LLM的A以及原始的攻击Q的合并消息
         msg = []
-        output_content = []
         responces = self.llm(attacker_Q)
         if responces is not None:
-            for i, attacker_q in attacker_Q:
-                output_content.append(
-                    [attacker_q, responces[i]]
-                )  # 将Q和对应的A以某种用户定义的形式进行拼接
+            for i, attacker_q in enumerate(attacker_Q):
+                output_content = json.dumps([attacker_q, responces[i]])
+                # 将Q和对应的A以某种用户定义的形式进行拼接
                 msg.append(
                     Message(
                         message_name="LLM_with_PPL:Evaluator",
@@ -29,6 +27,8 @@ class LLM_with_PPL(Node):
                     )
                 )
             return msg
+        else:
+            return None
 
     # LLM函数内部支持batch操作
     def llm(self, inp: str):

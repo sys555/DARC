@@ -21,7 +21,7 @@ class Filter(Node):
             )
         return msg
 
-    def diff(A, B):
+    def diff(self, A, B):
         import random
 
         return random.random()

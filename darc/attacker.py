@@ -1,5 +1,3 @@
-from typing import List
-
 from darc.darc.message import Message
 from darc.darc.node import Node
 

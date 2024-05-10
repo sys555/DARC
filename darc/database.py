@@ -39,6 +39,7 @@ class DatasetDB(Node):
             return Message2Evaluator
         elif table == "Dangerous":
             self.excute_SQL(input_content)  # 直接执行SQL 无需返回值
+            return None
         else:
             raise NotImplementedError
 
@@ -46,9 +47,9 @@ class DatasetDB(Node):
         # 解析SQL语句中访问的不同的table，执行不同的逻辑
         import numpy as np
 
-        use_table = np.random.choice("Norlmal", "Dangerous")
+        use_table = np.random.choice(["Norlmal", "Dangerous"])
         return use_table
 
-    def excute_SQL(sql: str):
+    def excute_SQL(self, sql: str):
         # 假设这里有一段执行SQL的逻辑
         return f"result from {sql}"
