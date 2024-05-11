@@ -65,9 +65,9 @@ class TestDespetch():
     def test_despetch(self, scene2):
         a, b, c, d = scene2
         initial_data = "DB data"
-        msg = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = initial_data)
+        AtoB_msg = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = initial_data)
         
-        a.send(msg)
+        a.send(AtoB_msg)
         
         import time
         time.sleep(4)
