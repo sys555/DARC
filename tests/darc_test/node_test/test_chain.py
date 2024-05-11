@@ -1,13 +1,9 @@
 import pytest
 import pykka
-from loguru import logger
 from unittest.mock import Mock, MagicMock, patch
 from darc.darc.node import Node, message_handler
 from darc.darc.message import Message
 import logging
-
-# 设置日志记录器的配置，包括日志级别和日志输出格式
-logger.add("test.log", level="INFO", format="{time} {level} {message}")
 
 class B(Node):
     def __init__(self, node_name, address) -> None:
@@ -58,6 +54,7 @@ class TestChain():
         BtoC_msg = Message(message_name = 'B:C', from_agent = 'B_0', to_agent = "C_0", content = f'B[A:B[{initial_data}]]')
         logging.info(c.message_box.get()[0])
         logging.info(BtoC_msg)
+        
         # 通过 判断 c 的邮箱中是否有与 BtoC_msg 完全相同的元素
         # 判断C 是否接收到的 B 处理后发送的消息 BtoC_msg
         assert any(

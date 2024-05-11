@@ -1,31 +1,9 @@
-# # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
-# def test_scene3(scene3):
-#     A, B, C = scene3
-    
-#     AtoB_msg = Message(message_name = "attack", from_agent = "A_0", to_agent = "B_0", content = "attack Q", tast_id = 1)
-#     BtoC_msg = Message(message_name = 'attack', from_agent = 'B_0', to_agent = "C_0", content = 'rejected Q', tast_id = 1)
-#     BtoD_msg = Message(message_name = 'attack', from_agent = 'B_0', to_agent = "D_0", content = 'accepted Q', task_id = 1)
-    
-#     A.send(AtoB_msg)
-    
-#     import time
-#     time.sleep(2)
-    
-#     # # C 是否接收到的 B 处理后发送的消息 BtoC_msg
-#     # B.on_receive.assert_called_once_with(BtoC_msg)
-#     # # 
-#     # C.on_receive.assert_called_once_with(BtoD_msg)
-
 import pytest
 import pykka
-from loguru import logger
 from unittest.mock import Mock, MagicMock, patch
 from darc.darc.node import Node, message_handler
 from darc.darc.message import Message
 import logging
-
-# 设置日志记录器的配置，包括日志级别和日志输出格式
-logger.add("test.log", level="INFO", format="{time} {level} {message}")
 
 class B(Node):
     def __init__(self, node_name, address) -> None:
@@ -78,28 +56,28 @@ def scene3():
     b.stop()
     c.stop()
     
-class TestDespetch():
+class TestCondition():
     # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
-    def test_scene3(self, scene3):
+    def test_pass(self, scene3):
         a, b, c = scene3
         initail_data_a_pass = "attack Q"
         initial_data_a_back = "attackattackattackattack"
         AtoB_msg_pass = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initail_data_a_pass}", task_id = 0)
         
-        AtoB_msg_back = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initial_data_a_back}", task_id = 1)
+        # AtoB_msg_back = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initial_data_a_back}", task_id = 1)
         
         a.send(AtoB_msg_pass)
-        a.send(AtoB_msg_back)
+        # a.send(AtoB_msg_back)
         
         import time
         time.sleep(4)
         
         BtoC_msg = Message(message_name = 'B:C', from_agent = 'B_0', to_agent = "C_0", content = f'B[A:B[{initail_data_a_pass}]]', task_id = 0)
         BtoA_msg = Message(message_name = 'B:A', from_agent = 'B_0', to_agent = "A_0", content = f'B[A:B[{initial_data_a_back}]]', task_id = 1)
-        logging.info(c.message_box.get()[0])
-        logging.info(BtoC_msg)
-        # 通过 判断 c, d 的邮箱中是否有与 BtoC_msg, BtoD_msg 完全相同的元素
-        # 判断 c, d 是否接收到的 b 处理后发送的消息 BtoC_msg, BtoD_msg
+        
+        # a -> b -> c
+        # 1. c 中 有 与 BtoC_msg 相同的消息
+        # 2. a 中 没有 与 BtoA_msg 相同的消息
         assert any(
             BtoC_msg.message_name == msg.message_name and
             BtoC_msg.from_agent == msg.from_agent and
@@ -107,4 +85,45 @@ class TestDespetch():
             BtoC_msg.content == msg.content
             for msg in c.message_box.get()
         )
+        assert not any(
+            BtoA_msg.message_name == msg.message_name and
+            BtoA_msg.from_agent == msg.from_agent and
+            BtoA_msg.to_agent == msg.to_agent and
+            BtoA_msg.content == msg.content
+            for msg in a.message_box.get()
+        )
 
+    def test_back(self, scene3):
+        a, b, c = scene3
+        initail_data_a_pass = "attack Q"
+        initial_data_a_back = "attackattackattackattack"
+        # AtoB_msg_pass = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initail_data_a_pass}", task_id = 0)
+        
+        AtoB_msg_back = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initial_data_a_back}", task_id = 1)
+        
+        # a.send(AtoB_msg_pass)
+        a.send(AtoB_msg_back)
+        
+        import time
+        time.sleep(4)
+        
+        BtoC_msg = Message(message_name = 'B:C', from_agent = 'B_0', to_agent = "C_0", content = f'B[A:B[{initail_data_a_pass}]]', task_id = 0)
+        BtoA_msg = Message(message_name = 'B:A', from_agent = 'B_0', to_agent = "A_0", content = f'B[A:B[{initial_data_a_back}]]', task_id = 1)
+        
+        # a -> c -> a
+        # 1. c 中 没有 与 BtoC_msg 相同的消息
+        # 2. a 中 有 与 BtoA_msg 相同的消息
+        assert not any(
+            BtoC_msg.message_name == msg.message_name and
+            BtoC_msg.from_agent == msg.from_agent and
+            BtoC_msg.to_agent == msg.to_agent and
+            BtoC_msg.content == msg.content
+            for msg in c.message_box.get()
+        )
+        assert any(
+            BtoA_msg.message_name == msg.message_name and
+            BtoA_msg.from_agent == msg.from_agent and
+            BtoA_msg.to_agent == msg.to_agent and
+            BtoA_msg.content == msg.content
+            for msg in a.message_box.get()
+        )

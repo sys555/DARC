@@ -2,7 +2,6 @@ from abc import abstractmethod, ABCMeta
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
 from typing import Any, Callable, Dict, List
-from darc.darc.node_gate import NodeGate
 import json
 import logging
 
