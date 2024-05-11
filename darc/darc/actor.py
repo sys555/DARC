@@ -14,13 +14,10 @@ class AbstractActor(pykka.ThreadingActor):
         
     def on_receive(self, message: Message):
         self.message_box.append(message)
-        # process
-        # send
+        ## user defined process & call send
+        ...
 
     def send(self, message):
-        # logging.info("send")
-        # logging.info(message.to_agent)
-        # logging.info(self.address_book[message.to_agent])
         if message.to_agent in self.address_book and self.address_book[message.to_agent] in self.instance:
             self.instance[self.address_book[message.to_agent]].tell(message)
         else:

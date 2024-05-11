@@ -10,17 +10,6 @@ class Actor(AbstractActor):
         super().__init__()
         self.name = name
         self.addr = addr
-        
-    def register_actor(self, actor):
-        # Register new actor to the address book and instance dictionary
-        actor = actor.proxy()
-        print(actor.name.get())
-        print(actor.addr.get())
-        logging.info(actor.name.get())
-        logging.info(actor.addr.get())
-        # self._address_book[actor.name.get()] = actor.addr.get()  # Assuming URN or some identifier
-        # self._instance[actor.addr.get()] = actor.actor_ref
-    
             
 @pytest.fixture
 def alice_and_bob():

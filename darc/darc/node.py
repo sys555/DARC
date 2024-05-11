@@ -12,37 +12,6 @@ def message_handler(message_names):
     return decorator
 
 class Preprocessor(metaclass=ABCMeta):
-    @abstractmethod
-    def pre_process(self, message: Message) -> bool:
-        pass
-
-class DefaultPreprocessor(Preprocessor):
-    def pre_process(self, message: Message) -> bool:
-        message.content = f"Processed content: {message.content}"
-        return True
-
-# class GatherPreprocessor(Preprocessor):
-#     def __init__(self):
-#         self.messages = defaultdict(list)
-
-#     def pre_process(self, actor, message: Message) -> bool:
-#         # Assume the message content is a JSON string with a task_id
-#         content = json.loads(message.content)
-#         task_id = content['task_id']
-#         self.messages[task_id].append(content['data'])
-
-#         # Check if all parts are gathered, for demonstration assume a fixed number
-#         if len(self.messages[task_id]) >= 3:  # Assuming we wait for 3 parts
-#             # When all parts are gathered, we call the process method
-#             full_message = ' '.join(self.messages[task_id])
-#             processed_data = actor.process(full_message)
-#             actor.send(Message(content=processed_data, to_actor=message._to))
-#             del self.messages[task_id]  # Clear the gathered messages for this task_id
-#             return False  # Indicates that the message should not be processed further
-#         return False  # Processing is not complete, do not call process yet
-
-
-class Preprocessor(metaclass=ABCMeta):
     def pre_process(self, actor, message: Message) -> bool:
         return True  # Default behavior to always process messages
     
@@ -65,24 +34,16 @@ class Node(AbstractActor):
     def on_receive(self, message: Message):
         logging.info(message)
         self.message_box.append(message)
-        # if self.preprocessor and self.preprocessor.pre_process(self, message):
-            # handler = self.message_handlers.get(message.message_name, None)
-            # if handler:
-                # handler(self, message)
-        # pre_process : gather
-        # cast
         # 最先匹配
         message_list = self.handle_message(message)
         for message in message_list:
             message.to_agent = self.parse_and_lookup_name(message)
             message.from_agent = self.node_name
-        logging.info(message_list)
         for msg in message_list:
             if msg.to_agent == None:
                 ## 广播
                 ...
             else:
-                logging.info(msg)
                 self.send(msg)
     
     def parse_and_lookup_name(self, message: Message):
@@ -114,8 +75,6 @@ class Node(AbstractActor):
         self, message: Message, *args: Any, **kwargs: Any
     ) -> Any:
         res = self.check_message_types(message)
-        logging.info(self.node_name)
-        logging.info(res)
         if len(res) != 0 and message.message_name in self.message_handlers:
             for handler in self.message_handlers[message.message_name]:
                 return handler(self, res)
