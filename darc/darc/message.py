@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import uuid
+from dataclasses import dataclass
 from typing import Union
 
 
@@ -32,4 +32,3 @@ class Message:
             task_id=task_id,
             broadcasting=broadcasting,
         )
-

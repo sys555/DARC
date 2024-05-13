@@ -1,5 +1,6 @@
-from typing import List, Optional
 import json
+from typing import List, Optional
+
 from darc.darc.message import Message
 from darc.darc.node import Node
 
@@ -11,7 +12,7 @@ class LLM_with_PPL(Node):
         self.num_llm_batch = 32
         self.llm_batch_msg = []
 
-    @Node.process("Filter:LLM_with_PPL")
+    @Node.process(["Filter:LLM_with_PPL"])
     def generate_text(self, attacker_Q: str) -> Optional[List[Message]]:
         # 输入content为攻击Q，输出content为LLM的A以及原始的攻击Q的合并消息
         msg = []
