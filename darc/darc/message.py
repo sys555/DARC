@@ -1,15 +1,15 @@
-import uuid
 from dataclasses import dataclass
+import uuid
 from typing import Union
 
 
 @dataclass
 class Message:
     message_name: str
-    content: str
     message_id: Union[uuid.UUID, str] = "None"
     from_agent: str = "None"
     to_agent: str = "None"
+    content: str = "None"
     task_id: str = "None"
     broadcasting: bool = True
 
@@ -32,3 +32,4 @@ class Message:
             task_id=task_id,
             broadcasting=broadcasting,
         )
+
