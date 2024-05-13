@@ -77,6 +77,8 @@ class Node(AbstractActor):
         res = self.check_message_types(message)
         if len(res) != 0 and message.message_name in self.message_handlers:
             for handler in self.message_handlers[message.message_name]:
+                if len(res) == 1:
+                    res = res[0]
                 return handler(self, res)
         ## 没有处理方法返回空消息队列
         return []
