@@ -1,7 +1,7 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node, message_handler
+from darc.darc.node import Node
 from darc.darc.message import Message
 import logging
 
@@ -117,3 +117,4 @@ class TestGather():
 
         # 检查 D 中邮箱是否为空
         assert not d.message_box.get()
+        
