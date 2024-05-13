@@ -67,7 +67,8 @@ class Node(AbstractActor):
                 if message_type not in cls.message_handlers:
                     cls.message_handlers[message_type] = []
                 cls.message_handlers[message_type].append(func)
-
+            return func
+        return decorator
 
     def __init__(self) -> None:
         self.id: int = Node._id_counter
