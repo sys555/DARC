@@ -32,3 +32,4 @@ class Message:
             task_id=task_id,
             broadcasting=broadcasting,
         )
+
