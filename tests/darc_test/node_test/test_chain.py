@@ -58,7 +58,7 @@ class TestChain:
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
         BtoC_msg = Message(
             message_name="B:C",
@@ -66,8 +66,9 @@ class TestChain:
             to_agent="C_0",
             content=f"B[A:B[{initial_data}]]",
         )
-        logging.info(c.message_box.get()[0])
-        logging.info(BtoC_msg)
+
+        logging.info(b.message_box.get())
+        logging.info(c.message_box.get())
 
         # 通过 判断 c 的邮箱中是否有与 BtoC_msg 完全相同的元素
         # 判断C 是否接收到的 B 处理后发送的消息 BtoC_msg

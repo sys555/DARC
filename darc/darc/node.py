@@ -1,17 +1,8 @@
-import logging
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List
 
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
-
-
-def message_handler(message_names):
-    def decorator(func):
-        func._message_names = message_names
-        return func
-
-    return decorator
 
 
 class Preprocessor(metaclass=ABCMeta):
@@ -25,6 +16,7 @@ class Node(AbstractActor):
         {}
     )  # Class-level attribute shared by all instances
     message_types: List[List[str]] = []
+    handler_call_by_message_types: Dict[Callable, List[str]] = {}
 
     def __init__(self, node_name: str = "", address: str = ""):
         super().__init__()
@@ -33,12 +25,16 @@ class Node(AbstractActor):
 
         self.node_name = node_name
         self.addr = address
+        # message name : handler
         self.handlers: Dict[str, Callable] = {}
+        # message name : [message, ...]
+        self.message_map: Dict[str, List[Message]] = {}
 
     def on_receive(self, message: Message):
-        logging.info(message)
         self.message_box.append(message)
-        # 最先匹配
+        if message.message_name not in self.message_map:
+            self.message_map[message.message_name] = []
+        self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
         for message in message_list:
             message.to_agent = self.parse_and_lookup_name(message)
@@ -50,6 +46,7 @@ class Node(AbstractActor):
             else:
                 self.send(msg)
 
+    # 根据 message name "构造" from_agent, to_agent
     def parse_and_lookup_name(self, message: Message):
         parts = message.message_name.split(":")
         # 遍历分割后的部分，查找在address_book中第一个匹配的key，并返回对应的value
@@ -67,10 +64,13 @@ class Node(AbstractActor):
     def process(cls, message_type_list: List[str]) -> Callable:
         def decorator(func: Callable) -> Callable:
             cls.message_types.append(message_type_list)
+            if func not in cls.handler_call_by_message_types:
+                cls.handler_call_by_message_types[func] = []
             for message_type in message_type_list:
                 if message_type not in cls.message_handlers:
                     cls.message_handlers[message_type] = []
                 cls.message_handlers[message_type].append(func)
+                cls.handler_call_by_message_types[func].append(message_type)
             return func
 
         return decorator
@@ -78,59 +78,31 @@ class Node(AbstractActor):
     def handle_message(
         self, message: Message, *args: Any, **kwargs: Any
     ) -> Any:
-        res = self.check_message_types(message)
-        if len(res) != 0 and message.message_name in self.message_handlers:
-            for handler in self.message_handlers[message.message_name]:
-                return handler(self, res)
-        # 没有处理方法返回空消息队列
-        return []
-        # raise ValueError(f"No handler for message type: {message_type}")
-
-    def check_message_types(self, message):
-        # 初始化用于存储打包消息的列表
-        packed_messages = []
-
-        # 初始化用于存储已经打包的消息类型的集合
-        packed_message_types = set()
-
-        # 遍历 message_types 中的每个子列表 sub_list
-        for sub_list in self.message_types:
-            # 检查 message 的 message_name 是否在 sub_list 中
-            if message.message_name in sub_list:
-                # 检查 sub_list 中其他的 message_name 是否在 message_box 中
-                if all(
-                    any(
-                        msg.message_name == msg_type
-                        and msg.task_id == message.task_id
-                        for msg in self.message_box
-                    )
-                    for msg_type in sub_list
-                    if msg_type != message.message_name
-                ):
-                    # 在 message_box 中找到符合条件的消息并打包
-                    for msg_type in sub_list:
-                        if (
-                            msg_type != message.message_name
-                            and (msg_type, message.task_id)
-                            not in packed_message_types
-                        ):
-                            # 添加符合条件的消息到打包列表中
-                            packed_messages.extend(
-                                [
-                                    msg.content
-                                    for msg in self.message_box
-                                    if msg.message_name == msg_type
-                                    and msg.task_id == message.task_id
-                                ]
-                            )
-                            # 记录已经打包的消息类型和任务ID
-                            packed_message_types.add(
-                                (msg_type, message.task_id)
-                            )
-
-                    # 最后添加 message 本身到打包列表中
-                    packed_messages.append(message.content)
-
-                    return packed_messages  # 返回打包后的消息列表
-
-        return packed_messages  # 如果没有符合条件的消息，则返回空列表
+        handled_messages = []
+        if message.message_name not in self.message_handlers:
+            # 无处理方法
+            return []
+        # 消息可触发多个处理方法
+        for handler in self.message_handlers[message.message_name]:
+            # 该处理方法所需的所有message
+            type_list = Node.handler_call_by_message_types[handler]
+            message_list = []
+            # 逆序, 取新消息
+            # TODO: message_map 更新策略, 同task id, message_name, 新消息覆盖旧消息
+            # 按 type 顺序排 content
+            for type in type_list:
+                if type not in self.message_map:
+                    # 没有相关历史消息
+                    break
+                # 从最新的开始找 message
+                for past_message in reversed(self.message_map[type]):
+                    if message.task_id == past_message.task_id:
+                        message_list.append(past_message)
+            if len(message_list) != len(type_list):
+                # 当前 task 的所有前置消息未到达
+                continue
+            else:
+                contents = [message.content for message in message_list]
+                messages = handler(self, contents)
+                handled_messages.extend(messages)
+        return handled_messages

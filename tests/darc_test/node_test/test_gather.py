@@ -14,7 +14,7 @@ class C(Node):
 
     @Node.process(["A:C", "B:C"])
     def handle_A2B(self, data: [str]) -> list:
-        result = f"C[A:C,B:C[{data}]]"
+        result = f"C[A:C,B:C{data}]"
         Message2D = Message(message_name="C:D", content=result)
         msgs = []
         msgs.append(Message2D)
@@ -90,7 +90,7 @@ class TestGather:
             message_name="C:D",
             from_agent="C_0",
             to_agent="D_0",
-            content=f"C[A:C,B:C[['{initial_data_a}', '{initail_data_b}']]]",
+            content=f"C[A:C,B:C['{initial_data_a}', '{initail_data_b}']]",
             task_id=0,
         )
 
