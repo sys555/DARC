@@ -68,9 +68,7 @@ def node_ids(setup_graph):
 
     return {
         "attacker_node_id": attacker_nodes[0].id if attacker_nodes else None,
-        "leaderboard_node_id": (
-            leaderboard_nodes[0].id if leaderboard_nodes else None
-        ),
+        "leaderboard_node_id": (leaderboard_nodes[0].id if leaderboard_nodes else None),
     }
 
 
@@ -96,12 +94,8 @@ def test_task_initialization(task):
 # 测试设置入口和出口节点
 def test_set_entry_and_exit_nodes(task, node_ids):
     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
-    assert (
-        task.entry_node == node_ids["attacker_node_id"]
-    )  # 向entry_node注入消息
-    assert (
-        task.exit_node == node_ids["leaderboard_node_id"]
-    )  # 观察exit_node的改动
+    assert task.entry_node == node_ids["attacker_node_id"]  # 向entry_node注入消息
+    assert task.exit_node == node_ids["leaderboard_node_id"]  # 观察exit_node的改动
 
 
 # 测试任务的执行

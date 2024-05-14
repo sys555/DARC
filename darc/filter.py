@@ -16,9 +16,7 @@ class Filter(Node):
         if self.diff(Attacker_Q, Normal_Q) > thres:
             msg = Message(message_name="Filter:Attacker", content=Normal_Q)
         else:
-            msg = Message(
-                message_name="Filter:LLM_with_PPL", content=Attacker_Q
-            )
+            msg = Message(message_name="Filter:LLM_with_PPL", content=Attacker_Q)
         return msg
 
     def diff(self, A, B):
