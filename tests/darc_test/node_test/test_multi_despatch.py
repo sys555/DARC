@@ -76,15 +76,15 @@ class TestDespetch:
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
-        BtoC_msg = Message(
+        b_to_c_message = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
             content=f"B[A:B[{initial_data}]]",
         )
-        BtoD_msg = Message(
+        b_to_d_message = Message(
             message_name="B:D",
             from_agent="B_0",
             to_agent="D_0",
@@ -93,18 +93,5 @@ class TestDespetch:
 
         # 1. c 邮箱中有 与 BtoC_msg 相同的消息
         # 2. d 邮箱中有 与 BtoD_msg 相同的消息
-        assert any(
-            BtoC_msg.message_name == msg.message_name
-            and BtoC_msg.from_agent == msg.from_agent
-            and BtoC_msg.to_agent == msg.to_agent
-            and BtoC_msg.content == msg.content
-            for msg in c.message_box.get()
-        )
-
-        assert any(
-            BtoD_msg.message_name == msg.message_name
-            and BtoD_msg.from_agent == msg.from_agent
-            and BtoD_msg.to_agent == msg.to_agent
-            and BtoD_msg.content == msg.content
-            for msg in d.message_box.get()
-        )
+        assert c.message_in_inbox(b_to_c_message).get() == True
+        assert d.message_in_inbox(b_to_d_message).get() == True

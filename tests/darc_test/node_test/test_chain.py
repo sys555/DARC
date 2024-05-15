@@ -47,35 +47,26 @@ class TestChain:
     def test_scene0(self, scene0):
         a, b, c = scene0
         initial_data = "DB data"
-        AtoB_msg = Message(
+        a_to_b_msg = Message(
             message_name="A:B",
             from_agent="A_0",
             to_agent="B_0",
             content=initial_data,
         )
 
-        a.send(AtoB_msg)
+        a.send(a_to_b_msg)
 
         import time
 
-        time.sleep(2)
+        time.sleep(1)
 
-        BtoC_msg = Message(
+        b_to_c_msg = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
             content=f"B[A:B[{initial_data}]]",
         )
 
-        logging.info(b.message_box.get())
-        logging.info(c.message_box.get())
-
         # 通过 判断 c 的邮箱中是否有与 BtoC_msg 完全相同的元素
         # 判断C 是否接收到的 B 处理后发送的消息 BtoC_msg
-        assert any(
-            BtoC_msg.message_name == msg.message_name
-            and BtoC_msg.from_agent == msg.from_agent
-            and BtoC_msg.to_agent == msg.to_agent
-            and BtoC_msg.content == msg.content
-            for msg in c.message_box.get()
-        )
+        assert c.message_in_inbox(b_to_c_msg).get() is True

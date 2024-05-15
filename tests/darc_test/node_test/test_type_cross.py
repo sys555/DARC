@@ -49,7 +49,7 @@ def config():
 def test_type_cross(config):
     # C : [["A:C", "B:C"],["A:C"]]
     # 期望消息流动顺序如下:
-    # 1. A->C; 2. B->C and C->B; 4. C->A
+    # 1. A->C; 2. B->C and C->B; 3. C->A
     a, b, c = config
 
     a_to_c_message = Message(
@@ -65,8 +65,58 @@ def test_type_cross(config):
         content="b_to_c_message",
     )
 
+    c_to_a_message = Message(
+        message_name="C:A",
+        from_agent="C_0",
+        to_agent="A_0",
+        content="C[A:C,B:C['a_to_c_message', 'b_to_c_message']]",
+    )
+    c_to_b_message = Message(
+        message_name="C:B",
+        from_agent="C_0",
+        to_agent="B_0",
+        content="C[A:C['a_to_c_message']]",
+    )
+
+    # 1. a->c
     a.send(a_to_c_message)
+
+    import time
+
+    time.sleep(1)
+
+    # 2. c->b
+    assert b.message_in_inbox(c_to_b_message).get() == True
+
+    # 2. b->c
     b.send(b_to_c_message)
+
+    import time
+
+    time.sleep(1)
+
+    # 4. c->a
+    assert a.message_in_inbox(c_to_a_message).get() == True
+
+
+def test_type_cross_other_order(config):
+    # C : [["A:C", "B:C"],["A:C"]]
+    # 期望消息流动顺序如下:
+    # 1. B->C; 2. A->C; 3. C->B and C->A
+    a, b, c = config
+
+    a_to_c_message = Message(
+        message_name="A:C",
+        from_agent="A_0",
+        to_agent="C_0",
+        content="a_to_c_message",
+    )
+    b_to_c_message = Message(
+        message_name="B:C",
+        from_agent="B_0",
+        to_agent="C_0",
+        content="b_to_c_message",
+    )
 
     c_to_a_message = Message(
         message_name="C:A",
@@ -81,29 +131,18 @@ def test_type_cross(config):
         content="C[A:C['a_to_c_message']]",
     )
 
+    # 1. b->c
+    b.send(b_to_c_message)
+
     import time
 
-    time.sleep(4)
+    time.sleep(1)
 
-    # logging.info(c.message_map.get())
-    # logging.info(c.handler_call_by_message_types.get())
+    # 2. a->c
+    a.send(a_to_c_message)
 
-    # logging.info(c.message_box.get())
-    logging.info(a.message_box.get())
-    logging.info(b.message_box.get())
-    logging.info(c_to_a_message)
-    assert any(
-        c_to_a_message.message_name == msg.message_name
-        and c_to_a_message.from_agent == msg.from_agent
-        and c_to_a_message.to_agent == msg.to_agent
-        and c_to_a_message.content == msg.content
-        for msg in a.message_box.get()
-    )
+    time.sleep(1)
 
-    assert any(
-        c_to_b_message.message_name == msg.message_name
-        and c_to_b_message.from_agent == msg.from_agent
-        and c_to_b_message.to_agent == msg.to_agent
-        and c_to_b_message.content == msg.content
-        for msg in b.message_box.get()
-    )
+    # 3. c->a and c->b
+    assert a.message_in_inbox(c_to_a_message).get() == True
+    assert b.message_in_inbox(c_to_b_message).get() == True

@@ -64,14 +64,14 @@ class TestGather:
         a, b, c, d = scene1
         initial_data_a = "DB data"
         initail_data_b = "attack data"
-        AtoC_msg = Message(
+        a_to_c_message = Message(
             message_name="A:C",
             from_agent="A_0",
             to_agent="C_0",
             content=f"{initial_data_a}",
             task_id=0,
         )
-        BtoC_msg = Message(
+        b_to_c_message = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
@@ -79,14 +79,14 @@ class TestGather:
             task_id=0,
         )
 
-        a.send(AtoC_msg)
-        b.send(BtoC_msg)
+        a.send(a_to_c_message)
+        b.send(b_to_c_message)
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
-        CtoD_msg = Message(
+        c_to_d_message = Message(
             message_name="C:D",
             from_agent="C_0",
             to_agent="D_0",
@@ -95,27 +95,21 @@ class TestGather:
         )
 
         # d 邮箱中有 CtoD_msg, 证明 b 收到了 AtoC_msg、BtoC_msg 并进行处理
-        assert any(
-            CtoD_msg.message_name == msg.message_name
-            and CtoD_msg.from_agent == msg.from_agent
-            and CtoD_msg.to_agent == msg.to_agent
-            and CtoD_msg.content == msg.content
-            for msg in d.message_box.get()
-        )
+        assert d.message_in_inbox(c_to_d_message).get() == True
 
     ## 不同task id 不会触发 C 发送消息
     def test_dif_task_id(self, scene1):
         a, b, c, d = scene1
         initial_data_a = "DB data"
         initail_data_b = "attack data"
-        AtoC_msg = Message(
+        a_to_c_message = Message(
             message_name="A:C",
             from_agent="A_0",
             to_agent="C_0",
             content=f"{initial_data_a}",
             task_id=0,
         )
-        BtoC_msg = Message(
+        b_to_c_message = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
@@ -123,32 +117,19 @@ class TestGather:
             task_id=2,
         )
 
-        a.send(AtoC_msg)
-        b.send(BtoC_msg)
+        a.send(a_to_c_message)
+        b.send(b_to_c_message)
 
         import time
 
-        time.sleep(4)
+        time.sleep(1)
 
         # 1. C 中有 AtoC_msg、BtoC_msg
         # 2. D 邮箱为空
         # 检查 C 中是否有与 AtoC_msg、BtoC_msg 属性相同的消息
-        assert any(
-            msg.message_name == AtoC_msg.message_name
-            and msg.from_agent == AtoC_msg.from_agent
-            and msg.to_agent == AtoC_msg.to_agent
-            and msg.content == AtoC_msg.content
-            and msg.task_id == AtoC_msg.task_id
-            for msg in c.message_box.get()
-        )
-        assert any(
-            msg.message_name == BtoC_msg.message_name
-            and msg.from_agent == BtoC_msg.from_agent
-            and msg.to_agent == BtoC_msg.to_agent
-            and msg.content == BtoC_msg.content
-            and msg.task_id == BtoC_msg.task_id
-            for msg in c.message_box.get()
-        )
+
+        assert c.message_in_inbox(a_to_c_message).get() == True
+        assert c.message_in_inbox(b_to_c_message).get() == True
 
         # 检查 D 中邮箱是否为空
-        assert not d.message_box.get()
+        assert not d.message_map.get()

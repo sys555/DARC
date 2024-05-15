@@ -81,40 +81,28 @@ class TestCondition:
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
-        BtoC_msg = Message(
+        b_to_c_msg = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
             content=f"B[A:B[{initail_data_a_pass}]]",
             task_id=0,
         )
-        BtoA_msg = Message(
+        b_to_a_msg = Message(
             message_name="B:A",
             from_agent="B_0",
             to_agent="A_0",
             content=f"B[A:B[{initial_data_a_back}]]",
-            task_id=1,
+            task_id=0,
         )
 
         # a -> b -> c
         # 1. c 中 有 与 BtoC_msg 相同的消息
         # 2. a 中 没有 与 BtoA_msg 相同的消息
-        assert any(
-            BtoC_msg.message_name == msg.message_name
-            and BtoC_msg.from_agent == msg.from_agent
-            and BtoC_msg.to_agent == msg.to_agent
-            and BtoC_msg.content == msg.content
-            for msg in c.message_box.get()
-        )
-        assert not any(
-            BtoA_msg.message_name == msg.message_name
-            and BtoA_msg.from_agent == msg.from_agent
-            and BtoA_msg.to_agent == msg.to_agent
-            and BtoA_msg.content == msg.content
-            for msg in a.message_box.get()
-        )
+        assert c.message_in_inbox(b_to_c_msg).get() == True
+        assert a.message_in_inbox(b_to_a_msg).get() == False
 
     def test_back(self, scene3):
         a, b, c = scene3
@@ -122,7 +110,7 @@ class TestCondition:
         initial_data_a_back = "attackattackattackattack"
         # AtoB_msg_pass = Message(message_name = "A:B", from_agent = "A_0", to_agent = "B_0", content = f"{initail_data_a_pass}", task_id = 0)
 
-        AtoB_msg_back = Message(
+        a_to_b_msg_back = Message(
             message_name="A:B",
             from_agent="A_0",
             to_agent="B_0",
@@ -131,20 +119,20 @@ class TestCondition:
         )
 
         # a.send(AtoB_msg_pass)
-        a.send(AtoB_msg_back)
+        a.send(a_to_b_msg_back)
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
-        BtoC_msg = Message(
+        b_to_c_msg = Message(
             message_name="B:C",
             from_agent="B_0",
             to_agent="C_0",
             content=f"B[A:B[{initail_data_a_pass}]]",
-            task_id=0,
+            task_id=1,
         )
-        BtoA_msg = Message(
+        b_to_a_msg = Message(
             message_name="B:A",
             from_agent="B_0",
             to_agent="A_0",
@@ -155,17 +143,5 @@ class TestCondition:
         # a -> c -> a
         # 1. c 中 没有 与 BtoC_msg 相同的消息
         # 2. a 中 有 与 BtoA_msg 相同的消息
-        assert not any(
-            BtoC_msg.message_name == msg.message_name
-            and BtoC_msg.from_agent == msg.from_agent
-            and BtoC_msg.to_agent == msg.to_agent
-            and BtoC_msg.content == msg.content
-            for msg in c.message_box.get()
-        )
-        assert any(
-            BtoA_msg.message_name == msg.message_name
-            and BtoA_msg.from_agent == msg.from_agent
-            and BtoA_msg.to_agent == msg.to_agent
-            and BtoA_msg.content == msg.content
-            for msg in a.message_box.get()
-        )
+        assert c.message_in_inbox(b_to_c_msg).get() == False
+        assert a.message_in_inbox(b_to_a_msg).get() == True

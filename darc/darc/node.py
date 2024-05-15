@@ -36,9 +36,10 @@ class Node(AbstractActor):
             self.message_map[message.message_name] = []
         self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
-        for message in message_list:
-            message.to_agent = self.parse_and_lookup_name(message)
-            message.from_agent = self.node_name
+        for message_item in message_list:
+            message_item.to_agent = self.parse_and_lookup_name(message_item)
+            message_item.from_agent = self.node_name
+            message_item.task_id = message.task_id
         for msg in message_list:
             if msg.to_agent is None:
                 # 广播
@@ -106,3 +107,10 @@ class Node(AbstractActor):
                 messages = handler(self, contents)
                 handled_messages.extend(messages)
         return handled_messages
+
+    def message_in_inbox(self, message: Message):
+        if message.message_name in self.message_map:
+            for item in self.message_map[message.message_name]:
+                if item.__dict__ == message.__dict__:
+                    return True
+        return False
