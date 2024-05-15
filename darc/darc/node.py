@@ -71,8 +71,8 @@ class Node(AbstractActor):
                 if message_type not in cls.message_handlers:
                     cls.message_handlers[message_type] = []
                 cls.message_handlers[message_type].append(func)
-        return decorator
 
+        return decorator
 
     def handle_message(self, message: Message, *args: Any, **kwargs: Any) -> Any:
         res = self.check_message_types(message)

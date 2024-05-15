@@ -3,12 +3,10 @@ from typing import Dict, List, Union, Tuple, Set
 import pykka
 from .message import Message
 from .multi_addr import MultiAddr
-import logging
 
 
 @pykka.traversable
 class AbstractActor(pykka.ThreadingActor):
-
     def __init__(self):
         super().__init__()
         self._address_book: Set[str] = set()  # name -> addr
@@ -22,12 +20,12 @@ class AbstractActor(pykka.ThreadingActor):
         raise NotImplementedError
 
     def send(self, message: "Message", next_hop_address: List | str = []):
-        if isinstance(next_hop_address, str):
-            self._instance[next_hop_address].tell(message)
+        if isinstance(next_hop_address, MultiAddr):
+            self._instance[next_hop_address].send(message)
 
         else:
             for next_actor_instance_addr in next_hop_address:
-                self._instance[next_actor_instance_addr].tell(message)
+                self._instance[next_actor_instance_addr].send(message)
 
     def spawn_new_actor(self, cls, args: Union[List, str]):
         raise NotImplementedError

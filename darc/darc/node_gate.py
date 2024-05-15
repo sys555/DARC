@@ -4,6 +4,8 @@ from darc.darc.message import Message
 from .actor import AbstractActor
 from .multi_addr import MultiAddr
 
+import copy
+
 
 class NodeGate(AbstractActor):
     __instance__: Dict[str, "NodeGate"] = {}
@@ -11,7 +13,7 @@ class NodeGate(AbstractActor):
 
     def __new__(cls, node_gate_type, *args, **kwargs):
         if node_gate_type not in cls.__instance__:
-            cls.__instance__[node_gate_type] = super().__new__()
+            cls.__instance__[node_gate_type] = super().__new__(cls)
         return cls.__instance__[node_gate_type]
 
     def __init__(self, node_gate_type, addr):
@@ -31,9 +33,11 @@ class NodeGate(AbstractActor):
 
     def on_receive(self, message: Message):
         self._message_box.append(message)
+        bak_message = copy.deepcopy(message)
+        bak_message.from_agent_type = self._node_type
         if message.from_agent_type == "Router":
             if message.to_agent != "None":
-                self.send(message, message.to_agent)
+                self.send(bak_message, message.to_agent)
             else:
                 linked_instance_list = [
                     _addr
@@ -41,9 +45,9 @@ class NodeGate(AbstractActor):
                     if _addr not in self._router_addr_dict.values()
                 ]
 
-                self.send(message, linked_instance_list)
+                self.send(bak_message, linked_instance_list)
         elif message.from_agent_type == "RealNode":
-            self.send(message, self._router_addr_dict[message.message_name])
+            self.send(bak_message, self._router_addr_dict[message.message_name])
 
         else:
             raise NotImplementedError

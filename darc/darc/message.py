@@ -19,7 +19,7 @@ class Message:
         message_id,
         from_agent,
         task_id,
-        from_agent_type,
+        from_agent_type="RealNode",
         to_agent="None",
         content="None",
         broadcasting=True,

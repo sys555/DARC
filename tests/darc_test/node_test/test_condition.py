@@ -56,10 +56,11 @@ def scene3():
     b.stop()
     c.stop()
 
+
 @pytest.mark.skip("兼容现有的代码")
 class TestCondition:
     # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
-    
+
     def test_pass(self, scene3):
         a, b, c = scene3
         initail_data_a_pass = "attack Q"
