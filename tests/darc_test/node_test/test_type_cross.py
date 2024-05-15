@@ -34,7 +34,7 @@ def config():
     a.proxy().link_node(c, "c_address")
     b.proxy().link_node(c, "c_address")
     c.proxy().link_node([a, b], ["a_address", "b_address"])
-    
+
     yield a.proxy(), b.proxy(), c.proxy()
 
     a.stop()
@@ -93,6 +93,7 @@ def test_type_cross(config):
 
     # 4. c->a
     assert a.message_in_inbox(c_to_a_message).get() == True
+
 
 def test_type_cross_other_order(config):
     # C : [["A:C", "B:C"],["A:C"]]

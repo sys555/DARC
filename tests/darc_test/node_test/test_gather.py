@@ -27,7 +27,7 @@ def scene1():
     b = Node.start(node_name="B_0", address="b_0_addr")
     c = C.start(node_name="C_0", address="c_0_addr")
     d = Node.start(node_name="D_0", address="d_0_addr")
-    
+
     a.proxy().link_node(c, "c_0_addr")
     b.proxy().link_node(c, "c_0_addr")
     c.proxy().link_node(d, "d_0_addr")

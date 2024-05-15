@@ -34,6 +34,7 @@ class NodeGate(AbstractActor):
 
     def on_receive(self, message: Message):
         import logging
+
         logging.info(message)
         self._message_box.append(message)
         if message.from_agent_type == "Router":

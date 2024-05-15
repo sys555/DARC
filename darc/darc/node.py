@@ -1,11 +1,12 @@
+import logging
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List
+
+import pykka
 
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
 
-import pykka
-import logging
 
 class Preprocessor(metaclass=ABCMeta):
     def pre_process(self, actor, message: Message) -> bool:
@@ -39,7 +40,7 @@ class Node(AbstractActor):
         self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
         for message_item in message_list:
-            if message_item.to_agent == 'None':
+            if message_item.to_agent == "None":
                 message_item.to_agent = self.random_choose(message_item)
             message_item.from_agent = self.address
             message_item.task_id = message.task_id
@@ -118,14 +119,20 @@ class Node(AbstractActor):
                     return True
         return False
 
-    def link_node(self, instance: List | pykka._ref.ActorRef = [], address: List | str = []):
+    def link_node(
+        self,
+        instance: List | pykka._ref.ActorRef = [],
+        address: List | str = [],
+    ):
         # 构建 self to instance 的实例关系, 关联码本与实例表)
         try:
             # 检查instance是否是Node类的实例
-            if isinstance(instance, pykka._ref.ActorRef):
+            if isinstance(instance, pykka._ref.ActorRef) and isinstance(
+                address, str
+            ):
                 self._address_book.add(address)
                 self._instance[address] = instance
-            else:
+            elif isinstance(instance, List) and isinstance(address, List):
                 for item_instance, addr in zip(instance, address):
                     self._address_book.add(addr)
                     self._instance[addr] = item_instance
