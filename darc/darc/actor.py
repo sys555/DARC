@@ -11,7 +11,7 @@ class AbstractActor(pykka.ThreadingActor):
 
     def __init__(self):
         super().__init__()
-        self._address_book: Set["MultiAddr"] = set()  # name -> addr
+        self._address_book: Set[str] = set()  # name -> addr
         self._instance = dict()  # addr
         self._message_box = []
         self._node_type = None

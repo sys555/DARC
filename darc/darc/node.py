@@ -65,7 +65,7 @@ class Node(AbstractActor):
 
     @classmethod
     def process(cls, message_type_list: List[str]) -> Callable:
-        def decorator(func: Callable) -> Callable:
+        def decorator(func: Callable):
             cls.message_types.append(message_type_list)
             for message_type in message_type_list:
                 if message_type not in cls.message_handlers:

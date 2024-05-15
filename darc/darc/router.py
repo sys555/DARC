@@ -17,12 +17,12 @@ class Router(AbstractActor):
         # 区分几个事情：
         # message只能发送给NodeGate，区分这个message是从哪个NodeGate发送过来
         if message.from_agent_type == self._node_gate_left:
-            self.on_send(
+            self.send(
                 message, self._node_gate_type_address_dict[self._node_gate_right]
             )
 
         elif message.from_agent_type == self._node_gate_right:
-            self.on_send(
+            self.send(
                 message, self._node_gate_type_address_dict[self._node_gate_left]
             )
 
