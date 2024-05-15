@@ -1,9 +1,8 @@
-from abc import ABCMeta
-from typing import Dict, List, Union, Tuple, Set
+from typing import List, Set, Union
+
 import pykka
+
 from .message import Message
-from .multi_addr import MultiAddr
-import logging
 
 
 @pykka.traversable
@@ -24,7 +23,6 @@ class AbstractActor(pykka.ThreadingActor):
     def send(self, message: "Message", next_hop_address: List | str = []):
         if isinstance(next_hop_address, str):
             self._instance[next_hop_address].tell(message)
-
         else:
             for next_actor_instance_addr in next_hop_address:
                 self._instance[next_actor_instance_addr].tell(message)

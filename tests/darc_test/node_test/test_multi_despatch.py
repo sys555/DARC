@@ -25,20 +25,15 @@ class B(Node):
 
 @pytest.fixture
 def scene2():
-    pytest.skip("兼容一下现有的actor类")
     a = Node.start(node_name="A_0", address="a_0_addr")
     b = B.start(node_name="B_0", address="b_0_addr")
     c = Node.start(node_name="C_0", address="c_0_addr")
     d = Node.start(node_name="D_0", address="d_0_addr")
 
-    a.proxy().address_book = {"B_0": "b_0_addr"}
-    b.proxy().address_book = {
-        "C_0": "c_0_addr",
-        "D_0": "d_0_addr",
-    }
-
-    a.proxy().instance = {"b_0_addr": b}
-    b.proxy().instance = {"c_0_addr": c, "d_0_addr": d}
+    a.proxy().link_node(b, b.proxy().address.get())
+    b.proxy().link_node(
+        [c, d], [c.proxy().address.get(), d.proxy().address.get()]
+    )
 
     yield a.proxy(), b.proxy(), c.proxy(), d.proxy()
 
@@ -64,46 +59,35 @@ class TestDespetch:
     # │  C  │ │  D  │ │ ... │
     # └─────┘ └─────┘ └─────┘
     def test_despetch(self, scene2):
-        pytest.skip("兼容一下现有的actor类")
         a, b, c, d = scene2
         initial_data = "DB data"
         AtoB_msg = Message(
-            message_name="A:B", from_agent="A_0", to_agent="B_0", content=initial_data
+            message_name="A:B",
+            from_agent="a_0_addr",
+            to_agent="b_0_addr",
+            content=initial_data,
         )
 
-        a.send(AtoB_msg)
+        a.send(AtoB_msg, AtoB_msg.to_agent)
 
         import time
 
-        time.sleep(4)
+        time.sleep(2)
 
-        BtoC_msg = Message(
+        b_to_c_message = Message(
             message_name="B:C",
-            from_agent="B_0",
-            to_agent="C_0",
+            from_agent="b_0_addr",
+            to_agent="c_0_addr",
             content=f"B[A:B[{initial_data}]]",
         )
-        BtoD_msg = Message(
+        b_to_d_message = Message(
             message_name="B:D",
-            from_agent="B_0",
-            to_agent="D_0",
+            from_agent="b_0_addr",
+            to_agent="d_0_addr",
             content=f"B[A:B[{initial_data}]]",
         )
 
         # 1. c 邮箱中有 与 BtoC_msg 相同的消息
         # 2. d 邮箱中有 与 BtoD_msg 相同的消息
-        assert any(
-            BtoC_msg.message_name == msg.message_name
-            and BtoC_msg.from_agent == msg.from_agent
-            and BtoC_msg.to_agent == msg.to_agent
-            and BtoC_msg.content == msg.content
-            for msg in c.message_box.get()
-        )
-
-        assert any(
-            BtoD_msg.message_name == msg.message_name
-            and BtoD_msg.from_agent == msg.from_agent
-            and BtoD_msg.to_agent == msg.to_agent
-            and BtoD_msg.content == msg.content
-            for msg in d.message_box.get()
-        )
+        assert c.message_in_inbox(b_to_c_message).get() == True
+        assert d.message_in_inbox(b_to_d_message).get() == True
