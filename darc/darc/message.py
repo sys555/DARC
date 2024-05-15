@@ -11,6 +11,7 @@ class Message:
     to_agent: str = "None"
     content: str = "None"
     task_id: str = "None"
+    from_agent_type: str = "None"
     broadcasting: bool = True
 
     def __call__(
@@ -18,6 +19,7 @@ class Message:
         message_id,
         from_agent,
         task_id,
+        from_agent_type,
         to_agent="None",
         content="None",
         broadcasting=True,
@@ -27,6 +29,7 @@ class Message:
             message_name=message_name,
             message_id=message_id,
             from_agent=from_agent,
+            from_agent_type=from_agent_type,
             to_agent=to_agent,
             content=content,
             task_id=task_id,

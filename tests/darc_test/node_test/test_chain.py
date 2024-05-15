@@ -9,12 +9,11 @@ import logging
 class B(Node):
     def __init__(self, node_name, address) -> None:
         super().__init__(node_name=node_name, address=address)
-        self.node_name = node_name
-        self.address = address
 
     @Node.process(["A:B"])
     def handle_A2B(self, data: [str]) -> str:
         result = f"B[A:B[{data[0]}]]"
+        Message2C = Message(message_name="B:C", content=result)
         Message2C = Message(message_name="B:C", content=result)
         msgs = []
         msgs.append(Message2C)
@@ -27,13 +26,8 @@ def scene0():
     b = B.start(node_name="B_0", address="b_0_addr")
     c = Node.start(node_name="C_0", address="c_0_addr")
 
-    a.proxy().address_book = {"B_0": "b_0_addr"}
-    b.proxy().address_book = {"C_0": "c_0_addr"}
-    c.proxy().address_book = {}
-
-    a.proxy().instance = {"b_0_addr": b}
-    b.proxy().instance = {"c_0_addr": c}
-    c.proxy().instance = {}
+    a.proxy().link_node(b, b.proxy().address.get())
+    b.proxy().link_node(c, c.proxy().address.get())
 
     yield a.proxy(), b.proxy(), c.proxy()
 
@@ -49,12 +43,12 @@ class TestChain:
         initial_data = "DB data"
         a_to_b_msg = Message(
             message_name="A:B",
-            from_agent="A_0",
-            to_agent="B_0",
+            from_agent="a_0_addr",
+            to_agent="b_0_addr",
             content=initial_data,
         )
 
-        a.send(a_to_b_msg)
+        a.send(a_to_b_msg, a_to_b_msg.to_agent)
 
         import time
 
@@ -62,8 +56,8 @@ class TestChain:
 
         b_to_c_msg = Message(
             message_name="B:C",
-            from_agent="B_0",
-            to_agent="C_0",
+            from_agent="b_0_addr",
+            to_agent="c_0_addr",
             content=f"B[A:B[{initial_data}]]",
         )
 

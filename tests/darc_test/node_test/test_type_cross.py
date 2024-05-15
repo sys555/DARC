@@ -31,14 +31,10 @@ def config():
     b = Node.start(node_name="B_0", address="b_address")
     c = C.start(node_name="C_0", address="c_address")
 
-    a.proxy().address_book = {"C_0": "c_address"}
-    b.proxy().address_book = {"C_0": "c_address"}
-    c.proxy().address_book = {"A_0": "a_address", "B_0": "b_address"}
-
-    a.proxy().instance = {"c_address": c}
-    b.proxy().instance = {"c_address": c}
-    c.proxy().instance = {"a_address": a, "b_address": b}
-
+    a.proxy().link_node(c, "c_address")
+    b.proxy().link_node(c, "c_address")
+    c.proxy().link_node([a, b], ["a_address", "b_address"])
+    
     yield a.proxy(), b.proxy(), c.proxy()
 
     a.stop()
@@ -54,32 +50,32 @@ def test_type_cross(config):
 
     a_to_c_message = Message(
         message_name="A:C",
-        from_agent="A_0",
-        to_agent="C_0",
+        from_agent="a_address",
+        to_agent="c_address",
         content="a_to_c_message",
     )
     b_to_c_message = Message(
         message_name="B:C",
-        from_agent="B_0",
-        to_agent="C_0",
+        from_agent="b_address",
+        to_agent="c_address",
         content="b_to_c_message",
     )
 
     c_to_a_message = Message(
         message_name="C:A",
-        from_agent="C_0",
-        to_agent="A_0",
+        from_agent="c_address",
+        to_agent="a_address",
         content="C[A:C,B:C['a_to_c_message', 'b_to_c_message']]",
     )
     c_to_b_message = Message(
         message_name="C:B",
-        from_agent="C_0",
-        to_agent="B_0",
+        from_agent="c_address",
+        to_agent="b_address",
         content="C[A:C['a_to_c_message']]",
     )
 
     # 1. a->c
-    a.send(a_to_c_message)
+    a.send(a_to_c_message, a_to_c_message.to_agent)
 
     import time
 
@@ -89,7 +85,7 @@ def test_type_cross(config):
     assert b.message_in_inbox(c_to_b_message).get() == True
 
     # 2. b->c
-    b.send(b_to_c_message)
+    b.send(b_to_c_message, b_to_c_message.to_agent)
 
     import time
 
@@ -97,7 +93,6 @@ def test_type_cross(config):
 
     # 4. c->a
     assert a.message_in_inbox(c_to_a_message).get() == True
-
 
 def test_type_cross_other_order(config):
     # C : [["A:C", "B:C"],["A:C"]]
@@ -107,39 +102,39 @@ def test_type_cross_other_order(config):
 
     a_to_c_message = Message(
         message_name="A:C",
-        from_agent="A_0",
-        to_agent="C_0",
+        from_agent="a_address",
+        to_agent="c_address",
         content="a_to_c_message",
     )
     b_to_c_message = Message(
         message_name="B:C",
-        from_agent="B_0",
-        to_agent="C_0",
+        from_agent="b_address",
+        to_agent="c_address",
         content="b_to_c_message",
     )
 
     c_to_a_message = Message(
         message_name="C:A",
-        from_agent="C_0",
-        to_agent="A_0",
+        from_agent="c_address",
+        to_agent="a_address",
         content="C[A:C,B:C['a_to_c_message', 'b_to_c_message']]",
     )
     c_to_b_message = Message(
         message_name="C:B",
-        from_agent="C_0",
-        to_agent="B_0",
+        from_agent="c_address",
+        to_agent="b_address",
         content="C[A:C['a_to_c_message']]",
     )
 
     # 1. b->c
-    b.send(b_to_c_message)
+    b.send(b_to_c_message, b_to_c_message.to_agent)
 
     import time
 
     time.sleep(1)
 
     # 2. a->c
-    a.send(a_to_c_message)
+    a.send(a_to_c_message, a_to_c_message.to_agent)
 
     time.sleep(1)
 

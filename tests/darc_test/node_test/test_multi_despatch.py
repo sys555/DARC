@@ -30,14 +30,8 @@ def scene2():
     c = Node.start(node_name="C_0", address="c_0_addr")
     d = Node.start(node_name="D_0", address="d_0_addr")
 
-    a.proxy().address_book = {"B_0": "b_0_addr"}
-    b.proxy().address_book = {
-        "C_0": "c_0_addr",
-        "D_0": "d_0_addr",
-    }
-
-    a.proxy().instance = {"b_0_addr": b}
-    b.proxy().instance = {"c_0_addr": c, "d_0_addr": d}
+    a.proxy().link_node(b, b.proxy().address.get())
+    b.proxy().link_node([c, d], [c.proxy().address.get(), d.proxy().address.get()])
 
     yield a.proxy(), b.proxy(), c.proxy(), d.proxy()
 
@@ -67,12 +61,12 @@ class TestDespetch:
         initial_data = "DB data"
         AtoB_msg = Message(
             message_name="A:B",
-            from_agent="A_0",
-            to_agent="B_0",
+            from_agent="a_0_addr",
+            to_agent="b_0_addr",
             content=initial_data,
         )
 
-        a.send(AtoB_msg)
+        a.send(AtoB_msg, AtoB_msg.to_agent)
 
         import time
 
@@ -80,14 +74,14 @@ class TestDespetch:
 
         b_to_c_message = Message(
             message_name="B:C",
-            from_agent="B_0",
-            to_agent="C_0",
+            from_agent="b_0_addr",
+            to_agent="c_0_addr",
             content=f"B[A:B[{initial_data}]]",
         )
         b_to_d_message = Message(
             message_name="B:D",
-            from_agent="B_0",
-            to_agent="D_0",
+            from_agent="b_0_addr",
+            to_agent="d_0_addr",
             content=f"B[A:B[{initial_data}]]",
         )
 

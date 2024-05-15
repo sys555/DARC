@@ -27,14 +27,10 @@ def scene1():
     b = Node.start(node_name="B_0", address="b_0_addr")
     c = C.start(node_name="C_0", address="c_0_addr")
     d = Node.start(node_name="D_0", address="d_0_addr")
-
-    a.proxy().address_book = {"C_0": "c_0_addr"}
-    b.proxy().address_book = {"C_0": "c_0_addr"}
-    c.proxy().address_book = {"D_0": "d_0_addr"}
-
-    a.proxy().instance = {"c_0_addr": c}
-    b.proxy().instance = {"c_0_addr": c}
-    c.proxy().instance = {"d_0_addr": d}
+    
+    a.proxy().link_node(c, "c_0_addr")
+    b.proxy().link_node(c, "c_0_addr")
+    c.proxy().link_node(d, "d_0_addr")
 
     yield a.proxy(), b.proxy(), c.proxy(), d.proxy()
 
@@ -66,21 +62,21 @@ class TestGather:
         initail_data_b = "attack data"
         a_to_c_message = Message(
             message_name="A:C",
-            from_agent="A_0",
-            to_agent="C_0",
+            from_agent="a_0_addr",
+            to_agent="c_0_addr",
             content=f"{initial_data_a}",
             task_id=0,
         )
         b_to_c_message = Message(
             message_name="B:C",
-            from_agent="B_0",
-            to_agent="C_0",
+            from_agent="b_0_addr",
+            to_agent="c_0_addr",
             content=f"{initail_data_b}",
             task_id=0,
         )
 
-        a.send(a_to_c_message)
-        b.send(b_to_c_message)
+        a.send(a_to_c_message, a_to_c_message.to_agent)
+        b.send(b_to_c_message, b_to_c_message.to_agent)
 
         import time
 
@@ -88,8 +84,8 @@ class TestGather:
 
         c_to_d_message = Message(
             message_name="C:D",
-            from_agent="C_0",
-            to_agent="D_0",
+            from_agent="c_0_addr",
+            to_agent="d_0_addr",
             content=f"C[A:C,B:C['{initial_data_a}', '{initail_data_b}']]",
             task_id=0,
         )
@@ -104,21 +100,21 @@ class TestGather:
         initail_data_b = "attack data"
         a_to_c_message = Message(
             message_name="A:C",
-            from_agent="A_0",
-            to_agent="C_0",
+            from_agent="a_0_addr",
+            to_agent="c_0_addr",
             content=f"{initial_data_a}",
             task_id=0,
         )
         b_to_c_message = Message(
             message_name="B:C",
-            from_agent="B_0",
-            to_agent="C_0",
+            from_agent="b_0_addr",
+            to_agent="c_0_addr",
             content=f"{initail_data_b}",
             task_id=2,
         )
 
-        a.send(a_to_c_message)
-        b.send(b_to_c_message)
+        a.send(a_to_c_message, a_to_c_message.to_agent)
+        b.send(b_to_c_message, b_to_c_message.to_agent)
 
         import time
 

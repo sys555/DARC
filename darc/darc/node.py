@@ -4,6 +4,8 @@ from typing import Any, Callable, Dict, List
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
 
+import pykka
+import logging
 
 class Preprocessor(metaclass=ABCMeta):
     def pre_process(self, actor, message: Message) -> bool:
@@ -22,40 +24,41 @@ class Node(AbstractActor):
         super().__init__()
         self.id: int = Node._id_counter
         Node._id_counter += 1
-
+        self._node_type = "RealNode"
         self.node_name = node_name
-        self.addr = address
+        self.address = address
         # message name : handler
         self.handlers: Dict[str, Callable] = {}
         # message name : [message, ...]
         self.message_map: Dict[str, List[Message]] = {}
 
     def on_receive(self, message: Message):
-        self.message_box.append(message)
+        self._message_box.append(message)
         if message.message_name not in self.message_map:
             self.message_map[message.message_name] = []
         self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
         for message_item in message_list:
-            message_item.to_agent = self.parse_and_lookup_name(message_item)
-            message_item.from_agent = self.node_name
+            if message_item.to_agent == 'None':
+                message_item.to_agent = self.random_choose(message_item)
+            message_item.from_agent = self.address
             message_item.task_id = message.task_id
         for msg in message_list:
             if msg.to_agent is None:
                 # 广播
                 ...
             else:
-                self.send(msg)
+                self.send(msg, msg.to_agent)
 
-    # 根据 message name "构造" from_agent, to_agent
-    def parse_and_lookup_name(self, message: Message):
+    # 随机从地址簿中选择一个目标类型的 node 地址
+    def random_choose(self, message: Message):
         parts = message.message_name.split(":")
         # 遍历分割后的部分，查找在address_book中第一个匹配的key，并返回对应的value
         to_type = parts[-1]
         # 遍历 address_book 中的键，找到第一个匹配的前缀为 to_type 的键值对，并返回对应的值
         # TODO: 匹配方式待改进
-        for key in self.address_book:
-            if key.startswith(to_type):
+        for key in self._address_book:
+            if key.lower().startswith(to_type.lower()):
                 return key
 
         # 如果没有找到匹配的key，则返回None或者其他适当的值
@@ -63,7 +66,7 @@ class Node(AbstractActor):
 
     @classmethod
     def process(cls, message_type_list: List[str]) -> Callable:
-        def decorator(func: Callable) -> Callable:
+        def decorator(func: Callable):
             cls.message_types.append(message_type_list)
             if func not in cls.handler_call_by_message_types:
                 cls.handler_call_by_message_types[func] = []
@@ -114,3 +117,17 @@ class Node(AbstractActor):
                 if item.__dict__ == message.__dict__:
                     return True
         return False
+
+    def link_node(self, instance: List | pykka._ref.ActorRef = [], address: List | str = []):
+        # 构建 self to instance 的实例关系, 关联码本与实例表)
+        try:
+            # 检查instance是否是Node类的实例
+            if isinstance(instance, pykka._ref.ActorRef):
+                self._address_book.add(address)
+                self._instance[address] = instance
+            else:
+                for item_instance, addr in zip(instance, address):
+                    self._address_book.add(addr)
+                    self._instance[addr] = item_instance
+        except BaseException as e:
+            logging.error(f"{str(e)} ")
