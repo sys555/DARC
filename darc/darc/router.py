@@ -20,12 +20,12 @@ class Router(AbstractActor):
         bak_message.from_agent_type = self._node_type
         # 区分几个事情：
         # message只能发送给NodeGate，区分这个message是从哪个NodeGate发送过来
-        if message.from_agent_type == self._node_gate_left:
+        if message.from_node_type_name == self._node_gate_left:
             self.send(
                 bak_message, self._node_gate_type_address_dict[self._node_gate_right]
             )
 
-        elif message.from_agent_type == self._node_gate_right:
+        elif message.from_node_type_name == self._node_gate_right:
             self.send(
                 bak_message, self._node_gate_type_address_dict[self._node_gate_left]
             )

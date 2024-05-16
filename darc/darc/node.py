@@ -32,23 +32,21 @@ class Node(AbstractActor):
         Node._id_counter += 1
         self._node_type = "RealNode"
         self.node_name = node_name
-        self.addr = address
+        self._node_addr = address.addr
         self.handlers: Dict[str, Callable] = {}
 
     def on_receive(self, message: Message):
         logging.info(message)
         self._message_box.append(message)
-        # 最先匹配
-        message_list = self.handle_message(message)
-        for message in message_list:
-            message.to_agent = self.parse_and_lookup_name(message)
-            message.from_agent = self.node_name
-        for msg in message_list:
-            if msg.to_agent == None:
-                ## 广播
-                ...
-            else:
-                self.send(msg)
+        # TODO callback
+
+    def on_send(self, message: Message):
+        self._message_box.append(message)
+        self._node_gate.on_receive(message)
+
+    def set_node_gate_addr(self, node_gate_addr, node_gate):
+        self._node_gate_addr = node_gate_addr
+        self._node_gate = node_gate
 
     def parse_and_lookup_name(self, message: Message):
         parts = message.message_name.split(":")

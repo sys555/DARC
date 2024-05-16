@@ -17,8 +17,8 @@ TestPingMessage = PingPongerMessage(
 
 
 class PingPonger(Node):
-    def __init__(self, node_name, address):
-        super().__init__(node_name, address)
+    def __init__(self, address, node_name):
+        super().__init__(address, node_name)
 
     def broadcast_ping(self):
         message_uid = uuid.uuid4()

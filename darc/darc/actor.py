@@ -21,11 +21,14 @@ class AbstractActor(pykka.ThreadingActor):
 
     def send(self, message: "Message", next_hop_address: List | str = []):
         if isinstance(next_hop_address, MultiAddr):
-            self._instance[next_hop_address].send(message)
+            self._instance[next_hop_address].on_receive(message)
+
+        elif isinstance(next_hop_address, str):
+            self._instance[next_hop_address].on_receive(message)
 
         else:
             for next_actor_instance_addr in next_hop_address:
-                self._instance[next_actor_instance_addr].send(message)
+                self._instance[next_actor_instance_addr].on_receive(message)
 
     def spawn_new_actor(self, cls, args: Union[List, str]):
         raise NotImplementedError
