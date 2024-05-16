@@ -1,19 +1,12 @@
 import unittest
 
-
-import os
-import sys
-
-sys.path.append("/home/PJLAB/chenliang/Desktop/AIlab/DARC")
-
-
 from darc.darc.router import Router
 from darc.darc.node_gate import NodeGate
 from darc.darc.multi_addr import MultiAddr
 from darc.darc.message import Message
 from darc.darc.node import Node
 
-# from tests.darc_test.test_base import TestPingMessage, PingPonger
+from tests.darc_test.test_base import PingPonger
 import copy
 import uuid
 
@@ -26,33 +19,6 @@ TestPingMessage = PingPongerMessage(
     content=f"broadcasting ... I am alice",
     task_id=uuid.uuid4(),
 )
-
-
-class PingPonger(Node):
-    def __init__(self, address, node_name):
-        super().__init__(address, node_name)
-
-    def broadcast_ping(self):
-        message_uid = uuid.uuid4()
-        task_id = uuid.uuid4()
-        ping_message = TestPingMessage(
-            message_id=message_uid,
-            from_agent=self._addr,
-            content=f"broadcasting ... I am {self._node_name}",
-            task_id=task_id,
-        )
-        return ping_message
-
-    @Node.process("PingMessage")
-    def pong(self, message: Message):
-        pong_message = TestPingMessage(
-            message_id=message.message_id,
-            from_agent=self._addr,
-            to_agent=message.from_agent,
-            content=f"hello, I am {self._node_name}",
-            task_id=message.task_id,
-        )
-        return pong_message
 
 
 class TestNodeGate(unittest.TestCase):

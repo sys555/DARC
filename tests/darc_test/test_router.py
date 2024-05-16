@@ -1,31 +1,15 @@
 import unittest
 
-import os
-import sys
-
-sys.path.append("/home/PJLAB/chenliang/Desktop/AIlab/DARC")
-
 from darc.darc.router import Router
 from darc.darc.node_gate import NodeGate
 from darc.darc.multi_addr import MultiAddr
 import uuid
 
-# from tests.darc_test.test_base import TestPingMessage
+from tests.darc_test.test_base import TestPingMessage
 
 import copy
 
 from darc.darc.message import Message
-
-
-PingPongerMessage = Message(message_name="PingPonger--PingPonger")
-
-
-TestPingMessage = PingPongerMessage(
-    message_id=uuid.uuid4(),
-    from_agent="alice_addr",
-    content=f"broadcasting ... I am alice",
-    task_id=uuid.uuid4(),
-)
 
 
 class TestRouter(unittest.TestCase):
