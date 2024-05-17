@@ -40,7 +40,7 @@ def scene1():
     d.stop()
 
 
-@pytest.mark.skip("兼容一下现有的actor类")
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestGather:
     # 多入度场景：
     #    ┌───────────┐     ┌───────────┐
