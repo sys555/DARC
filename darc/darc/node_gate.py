@@ -1,6 +1,6 @@
 from typing import Dict, Set
 
-from .message import Message
+from darc.darc.message import Message
 
 from .actor import AbstractActor
 from .multi_addr import MultiAddr
@@ -24,7 +24,9 @@ class NodeGate(AbstractActor):
             self._node_gate_type = node_gate_type
             self.__first_init__.add(node_gate_type)
 
-    def set_router_addr(self, node_gate_link_type, router_addr, router_instance):
+    def set_router_addr(
+        self, node_gate_link_type, router_addr, router_instance
+    ):
         if node_gate_link_type not in self._router_addr_dict:
             self._router_addr_dict[node_gate_link_type] = router_addr
             self._instance[router_addr] = router_instance

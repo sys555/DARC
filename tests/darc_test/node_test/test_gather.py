@@ -1,8 +1,8 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.node import Node
-from darc.message import Message
+from darc.darc.node import Node
+from darc.darc.message import Message
 import logging
 
 
@@ -40,7 +40,6 @@ def scene1():
     d.stop()
 
 
-# @pytest.mark.skip("兼容一下现有的actor类")
 class TestGather:
     # 多入度场景：
     #    ┌───────────┐     ┌───────────┐
