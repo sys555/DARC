@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-from darc.darc.node import Node
-from darc.darc.actor import AbstractActor
-from darc.darc.message import Message
+from darc.node import Node
+from darc.actor import AbstractActor
+from darc.message import Message
 import logging
 
 

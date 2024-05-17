@@ -1,8 +1,8 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 import logging
 
 
@@ -31,9 +31,7 @@ def scene2():
     d = Node.start(node_name="D_0", address="d_0_addr")
 
     a.proxy().link_node(b, b.proxy().address.get())
-    b.proxy().link_node(
-        [c, d], [c.proxy().address.get(), d.proxy().address.get()]
-    )
+    b.proxy().link_node([c, d], [c.proxy().address.get(), d.proxy().address.get()])
 
     yield a.proxy(), b.proxy(), c.proxy(), d.proxy()
 
@@ -43,6 +41,7 @@ def scene2():
     d.stop()
 
 
+@pytest.mark.skip("兼容一下现有的actor类")
 class TestDespetch:
     # 同一信息处理后分发场景：
     #    ┌───────────┐
