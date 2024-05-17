@@ -4,8 +4,8 @@ from typing import Any, Callable, Dict, List
 
 import pykka
 
-from darc.darc.actor import AbstractActor
-from darc.darc.message import Message
+from darc.actor import AbstractActor
+from darc.message import Message
 
 
 class Preprocessor(metaclass=ABCMeta):
@@ -15,9 +15,9 @@ class Preprocessor(metaclass=ABCMeta):
 
 class Node(AbstractActor):
     _id_counter: int = 0
-    message_handlers: Dict[str, List[Callable[..., Any]]] = (
-        {}
-    )  # Class-level attribute shared by all instances
+    message_handlers: Dict[
+        str, List[Callable[..., Any]]
+    ] = {}  # Class-level attribute shared by all instances
     message_types: List[List[str]] = []
     handler_call_by_message_types: Dict[Callable, List[str]] = {}
 
@@ -80,9 +80,7 @@ class Node(AbstractActor):
 
         return decorator
 
-    def handle_message(
-        self, message: Message, *args: Any, **kwargs: Any
-    ) -> Any:
+    def handle_message(self, message: Message, *args: Any, **kwargs: Any) -> Any:
         handled_messages = []
         if message.message_name not in self.message_handlers:
             # 无处理方法
@@ -127,9 +125,7 @@ class Node(AbstractActor):
         # 构建 self to instance 的实例关系, 关联码本与实例表)
         try:
             # 检查instance是否是Node类的实例
-            if isinstance(instance, pykka._ref.ActorRef) and isinstance(
-                address, str
-            ):
+            if isinstance(instance, pykka._ref.ActorRef) and isinstance(address, str):
                 self._address_book.add(address)
                 self._instance[address] = instance
             elif isinstance(instance, List) and isinstance(address, List):

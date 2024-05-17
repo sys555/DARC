@@ -1,8 +1,8 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 import logging
 
 
@@ -17,16 +17,12 @@ class B(Node):
         content = data[0]
         if self.sts(content):
             # pass, to C
-            Message2C = Message(
-                message_name="B:C", content=f"B[A:B[{content}]]"
-            )
+            Message2C = Message(message_name="B:C", content=f"B[A:B[{content}]]")
             msgs = []
             msgs.append(Message2C)
         else:
             # back, to A
-            Message2A = Message(
-                message_name="B:A", content=f"B[A:B[{content}]]"
-            )
+            Message2A = Message(message_name="B:A", content=f"B[A:B[{content}]]")
             msgs = []
             msgs.append(Message2A)
         return msgs
@@ -54,6 +50,7 @@ def scene3():
     c.stop()
 
 
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestCondition:
     # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
 

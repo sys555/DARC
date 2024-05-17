@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-from darc.darc.node import Node
-from darc.darc.actor import AbstractActor
-from darc.darc.message import Message
+from darc.node import Node
+from darc.actor import AbstractActor
+from darc.message import Message
 import logging
 
 
@@ -16,7 +16,6 @@ class Actor(AbstractActor):
 @pytest.fixture
 def alice_and_bob():
     # Start Alice and Bob actors
-    pytest.skip("兼容一下现有的actor类")
     alice = Actor.start("Alice", "100")
     bob = Actor.start("Bob", "200")
 
