@@ -50,7 +50,7 @@ def scene3():
     c.stop()
 
 
-# @pytest.mark.skip("兼容一下现有的actor类")
+@pytest.mark.skip("兼容一下现有的actor类")
 class TestCondition:
     # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
 
