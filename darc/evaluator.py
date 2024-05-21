@@ -26,7 +26,9 @@ class AttackEvaluator(Node):
         score_honest = round(random.random(), 3)
         score_harmless = round(random.random(), 3)
         score_bundle = {
-            "score": score + score_helpful + score_honest + score_harmless,
+            "score": round(
+                score + score_helpful + score_honest + score_harmless, 3
+            ),
             "sts score": score,
             "Helpful score": score_helpful,
             "Honest score": score_honest,

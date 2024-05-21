@@ -3,75 +3,10 @@ from darc.llm import LLM_with_PPL
 from darc.leaderboard import LeaderBoard
 from darc.darc.controller import Task, Graph
 from darc.database import DatasetDB
-from darc.evaluator import Evaluator, AttackEvaluator
+from darc.evaluator import AttackEvaluator
 from darc.attacker import Attacker
 
 from loguru import logger
-
-# """Step1: 组件引入，先将所有的组件的入口Class全部import
-# """
-# from dataset import DatasetDB
-# from attacker import Attacker
-# from filter import Filter
-# from llm import LLM_with_PPL
-# from attack_evaluator import Evaluator
-# from leaderboard import LeaderBoard
-
-# """Step2: 关系定义，使用json
-# """
-# config = {
-# "node": [DatasetDB, Attacker, Filter, LLM_with_PPL, Evaluator, LeaderBoard]
-# "edge": [(DatasetDB, Attacker), (DatasetDB, Filter), (DatasetDB, Evaluator), 
-# (Attacker, Filter), 
-# (Filter, LLM_with_PPL), (Filter, Attacker),
-# (LLM_with_PPL, Evaluator),
-# (AttackEvaluator, DatasetDB), (Evaluator, LeaderBoard), 
-# ]
-# "args": [(DatasetDB, 1, {"db":"NormalQ"}), (DatasetDB, 1, {"db":"NormalA"}),
-#  (DatasetDB, 1, {"db":"BadQ"}), (DatasetDB, 1, {"db":"BadA"}), 
-#  (Evaluator, 1, {"mode":"Attack"}), 
-#  (LLM_with_PP, 1, {"llm": "GPT4"})
-#  (Attacker, 2, {})]
-#  }
-
-# """Step3：设置任务，开始运行
-# 1. 建立运行图
-# 2. 设定入口agent和出口agent
-# 2. 设置初始输入
-# 3. 自动运行
-# """
-
-# Graph.check(config)  
-# graph = Graph.init(config)
-
-# ## todo: node
-# ## graph.show()
-
-# graph.find_type("DatasetDB")
-# > DatasetDB(id="12345", db="NormalQ"), DatasetDB(id="54321", db="NormalA").....
-
-# graph.find_type(LeaderBoard)
-# > LeaderBoard(id="67891")
-
-# task = Task(graph)
-# task.set_entry_node("12345") #指定入口节点
-# task.set_exit_node("67891") #指定出口节点
-# task.set_initial_input("Select data from * sample(10)") # 指定初始条件
-# task.run()
-
-# """ 数据记录导出
-# """
-# task.save(path = ".......")
-
-# if __name__ == '__main__':
-#     graph = create_graph()
-#     task = None
-#     for i in range(10):
-#         task = Task(graph)
-#         task.entry_node = graph.find_type("Attacker")[i % 2]
-#         task.exit_node = graph.find_type("LeaderBoard")[0]
-#         task.initial_input = "task"
-#         task.run()
         
 
 def create_graph():
@@ -134,7 +69,7 @@ if __name__ == '__main__':
     graph = create_graph()
     task = None
     [logger.info(node) for node in graph.show()]
-    for i in range(10):
+    for i in range(6):
         task = Task(graph)
         task.entry_node = graph.find_type("Attacker")[i % 2]
         task.exit_node = graph.find_type("LeaderBoard")[0]
@@ -142,7 +77,7 @@ if __name__ == '__main__':
         task.run()
     
     import time
-    time.sleep(2)
+    time.sleep(3)
     
     logger.info(task.exit_node.proxy().leaderboard.get())
     

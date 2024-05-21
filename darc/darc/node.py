@@ -40,8 +40,9 @@ class Node(AbstractActor):
 
     def on_receive(self, message: Message):
         logger.info(
-            f"【Task】: {message.task_id};【Message】: \
-            {message.message_name}; 【Node】: {self.node_name}"
+            f"【Task】{message.task_id[:8]};\
+【Message】{message.message_name:30};\
+【Node】{self.node_name:24} ;【Content】{message.content}"
         )
         self._message_box.append(message)
         if message.message_name not in self.message_map:
@@ -53,6 +54,7 @@ class Node(AbstractActor):
                 message_item.to_agent = self.latest_match(message_item)
             message_item.from_agent = self.address
             message_item.task_id = message.task_id
+            # message_item.content.append(message.task_id)
         for msg in message_list:
             if msg.to_agent is None:
                 # 广播
@@ -92,6 +94,9 @@ class Node(AbstractActor):
     def handle_message(
         self, message: Message, *args: Any, **kwargs: Any
     ) -> Any:
+        import time
+
+        time.sleep(0.2)
         handled_messages = []
         if message.message_name not in self.message_handlers:
             # 无处理方法
@@ -117,6 +122,7 @@ class Node(AbstractActor):
                 continue
             else:
                 contents = [message.content for message in message_list]
+                contents.append(message.task_id)
                 messages = handler(self, contents)
                 if messages is not None:
                     handled_messages.extend(messages)

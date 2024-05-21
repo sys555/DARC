@@ -29,5 +29,8 @@ class Attacker(Node):
     @Node.process(["Task:Attacker"])
     def handle_initial(self, initial_data: List[str]):
         content = initial_data[0]
-        msg = Message(message_name="Attacker:DatasetDB", content=content)
+        msg = Message(
+            message_name="Attacker:DatasetDB",
+            content="select * from *" + content,
+        )
         return [msg]
