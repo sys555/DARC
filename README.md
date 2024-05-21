@@ -123,9 +123,11 @@ if __name__ == '__main__':
         task.initial_input = "task"
         task.run()
     
+    # 等待 Actor 数据处理与消息流通
     import time
     time.sleep(3)
     
+    # 获取并记录出口节点，即 LeaderBoard 节点，的数据
     logger.info(task.exit_node.proxy().leaderboard.get())
 
 
