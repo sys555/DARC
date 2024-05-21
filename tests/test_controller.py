@@ -5,6 +5,11 @@
 # from darc.llm import LLM_with_PPL
 # from darc.leaderboard import LeaderBoard
 # from darc.darc.controller import Task, Graph
+# from darc.database import DatasetDB
+# from darc.evaluator import AttackEvaluator
+# from darc.attacker import Attacker
+
+# import logging
 
 
 # # 配置和初始化
@@ -16,19 +21,20 @@
 #             Attacker,
 #             Filter,
 #             LLM_with_PPL,
-#             Evaluator,
+#             AttackEvaluator,
 #             LeaderBoard,
 #         ],
 #         "edge": [
 #             (DatasetDB, Attacker),
 #             (DatasetDB, Filter),
-#             (DatasetDB, Evaluator),
+#             (DatasetDB, AttackEvaluator),
+#             (Attacker, DatasetDB),
 #             (Attacker, Filter),
 #             (Filter, LLM_with_PPL),
 #             (Filter, Attacker),
-#             (LLM_with_PPL, Evaluator),
-#             (Evaluator, DatasetDB),
-#             (Evaluator, LeaderBoard),
+#             (LLM_with_PPL, AttackEvaluator),
+#             (AttackEvaluator, DatasetDB),
+#             (AttackEvaluator, LeaderBoard),
 #         ],
 #         "args": [
 #             (
@@ -41,6 +47,7 @@
 #                 2,
 #                 {"llm": "GPT4"},
 #             ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
+#             (Attacker, 2, {}),
 #         ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个默认实例
 #     }
 #     return Graph.init(config)
@@ -50,7 +57,7 @@
 # def test_graph_initialization(setup_graph):
 #     assert isinstance(setup_graph, Graph)
 #     assert (
-#         len(setup_graph.nodes) == 7
+#         len(setup_graph.nodes) == 8
 #     )  # 确保所有节点都已初始化， 根据config的args参数，一共7个节点 6类节点，其中llm有两个
 
 
@@ -61,12 +68,16 @@
 #     leaderboard_nodes = setup_graph.find_type("LeaderBoard")
 #     assert attacker_nodes is not None
 #     assert leaderboard_nodes is not None
-#     assert isinstance(attacker_nodes[0], Attacker)
-#     assert isinstance(leaderboard_nodes[0], LeaderBoard)
+#     assert attacker_nodes[0].proxy().class_name.get() is "Attacker"
+#     assert leaderboard_nodes[0].proxy().class_name.get() is "LeaderBoard"
+#     # assert isinstance(attacker_nodes[0], Attacker)
+#     # assert isinstance(leaderboard_nodes[0], LeaderBoard)
 
 #     return {
-#         "attacker_node_id": attacker_nodes[0].id if attacker_nodes else None,
-#         "leaderboard_node_id": (leaderboard_nodes[0].id if leaderboard_nodes else None),
+#         "attacker_node_id": (attacker_nodes[0] if attacker_nodes else None),
+#         "leaderboard_node_id": (
+#             leaderboard_nodes[0] if leaderboard_nodes else None
+#         ),
 #     }
 
 
@@ -81,6 +92,7 @@
 #     task = Task(setup_graph)
 #     task.set_entry_node(node_ids["attacker_node_id"])
 #     task.set_exit_node(node_ids["leaderboard_node_id"])
+
 #     return task
 
 
@@ -92,15 +104,31 @@
 # # 测试设置入口和出口节点
 # def test_set_entry_and_exit_nodes(task, node_ids):
 #     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
-#     assert task.entry_node == node_ids["attacker_node_id"]  # 向entry_node注入消息
-#     assert task.exit_node == node_ids["leaderboard_node_id"]  # 观察exit_node的改动
+#     assert (
+#         task.entry_node == node_ids["attacker_node_id"]
+#     )  # 向entry_node注入消息
+#     assert (
+#         task.exit_node == node_ids["leaderboard_node_id"]
+#     )  # 观察exit_node的改动
 
 
 # # 测试任务的执行
 # def test_task_execution(task):
 #     task.set_initial_input("Select data from * sample(10)")
 #     task.run()  # 假设run方法执行任务并更新task.result
-#     assert task.result is not None  # 检查结果是否非空
+#     import time
+
+#     time.sleep(6)
+
+#     # 检查该任务是否在 出口节点 的邮箱中
+#     logging.info(task.exit_node.proxy().message_map.get())
+#     found_match = False
+#     for message in task.exit_node.proxy().message_map.get()[
+#         "AttackEvaluator:LeaderBoard"
+#     ]:
+#         if message.task_id == task.task_id:
+#             found_match = True
+#     assert found_match
 
 
 # # 测试结果的正确性

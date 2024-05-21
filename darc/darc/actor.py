@@ -7,7 +7,6 @@ from .message import Message
 
 @pykka.traversable
 class AbstractActor(pykka.ThreadingActor):
-
     def __init__(self):
         super().__init__()
         self._address_book: Set[str] = set()  # name -> addr

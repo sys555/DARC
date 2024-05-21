@@ -1,5 +1,5 @@
 import json
-from typing import List, Optional
+from typing import List
 
 from darc.darc.message import Message
 from darc.darc.node import Node
@@ -13,17 +13,18 @@ class LLM_with_PPL(Node):
         self.llm_batch_msg = []
 
     @Node.process(["Filter:LLM_with_PPL"])
-    def generate_text(self, attacker_Q: str) -> Optional[List[Message]]:
+    def generate_text(self, attacker_Q: List[str]) -> List[Message]:
         # 输入content为攻击Q，输出content为LLM的A以及原始的攻击Q的合并消息
         msg = []
-        responces = self.llm(attacker_Q)
-        if responces is not None:
+        # response = self.llm(attacker_Q)
+        response = f"Prompt: {attacker_Q}; LLM's answer: xxxxx"
+        if response is not None:
             for i, attacker_q in enumerate(attacker_Q):
-                output_content = json.dumps([attacker_q, responces[i]])
+                output_content = json.dumps([attacker_q, response[i]])
                 # 将Q和对应的A以某种用户定义的形式进行拼接
                 msg.append(
                     Message(
-                        message_name="LLM_with_PPL:Evaluator",
+                        message_name="LLM_with_PPL:AttackEvaluator",
                         content=output_content,
                     )
                 )

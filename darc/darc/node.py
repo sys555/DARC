@@ -1,8 +1,10 @@
 import logging
+import uuid
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List
 
 import pykka
+from loguru import logger
 
 from darc.darc.actor import AbstractActor
 from darc.darc.message import Message
@@ -26,14 +28,21 @@ class Node(AbstractActor):
         self.id: int = Node._id_counter
         Node._id_counter += 1
         self._node_type = "RealNode"
-        self.node_name = node_name
-        self.address = address
-        # message name : handler
-        self.handlers: Dict[str, Callable] = {}
+        self.class_name = self.__class__.__name__
+        self.node_name = (
+            node_name or f"{self.class_name}_{str(uuid.uuid4())[:8]}"
+        )
+        self.address = (
+            address or f"{self.class_name}_addr_{str(uuid.uuid4())[:16]}"
+        )
         # message name : [message, ...]
         self.message_map: Dict[str, List[Message]] = {}
 
     def on_receive(self, message: Message):
+        logger.info(
+            f"【Task】: {message.task_id};【Message】: \
+            {message.message_name}; 【Node】: {self.node_name}"
+        )
         self._message_box.append(message)
         if message.message_name not in self.message_map:
             self.message_map[message.message_name] = []
@@ -41,7 +50,7 @@ class Node(AbstractActor):
         message_list = self.handle_message(message)
         for message_item in message_list:
             if message_item.to_agent == "None":
-                message_item.to_agent = self.random_choose(message_item)
+                message_item.to_agent = self.latest_match(message_item)
             message_item.from_agent = self.address
             message_item.task_id = message.task_id
         for msg in message_list:
@@ -51,8 +60,8 @@ class Node(AbstractActor):
             else:
                 self.send(msg, msg.to_agent)
 
-    # 随机从地址簿中选择一个目标类型的 node 地址
-    def random_choose(self, message: Message):
+    # 从地址簿中选择第一个符合目标类型的 node 地址
+    def latest_match(self, message: Message):
         parts = message.message_name.split(":")
         # 遍历分割后的部分，查找在address_book中第一个匹配的key，并返回对应的value
         to_type = parts[-1]
@@ -109,7 +118,8 @@ class Node(AbstractActor):
             else:
                 contents = [message.content for message in message_list]
                 messages = handler(self, contents)
-                handled_messages.extend(messages)
+                if messages is not None:
+                    handled_messages.extend(messages)
         return handled_messages
 
     def message_in_inbox(self, message: Message):

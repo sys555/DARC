@@ -30,9 +30,10 @@ class Router(AbstractActor):
             raise NotImplementedError
 
     def spawn_new_actor(self, cls, node_gate_link_type):
-        self._node_gate_left, self._node_gate_right = (
-            node_gate_link_type.split("--")
-        )
+        (
+            self._node_gate_left,
+            self._node_gate_right,
+        ) = node_gate_link_type.split("--")
 
         # node_gate的实现是单例模式，因此，不会出现
         node_gate_left_instance = cls(
