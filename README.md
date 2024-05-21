@@ -45,7 +45,6 @@ conda activate your_env_name
 ## Installation
 ```bash
 poetry install && make compile
-poetry run python xxxx/main.py
 ```
 
 ## Usage
