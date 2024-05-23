@@ -81,7 +81,7 @@ class TestGather:
 
         import time
 
-        time.sleep(2)
+        time.sleep(1)
 
         c_to_d_message = Message(
             message_name="C:D",

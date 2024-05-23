@@ -40,7 +40,9 @@ class Graph:
 
     def find_type(self, cls_name):
         return [
-            node for node in self.nodes.values() if node.__class__.__name__ == cls_name
+            node
+            for node in self.nodes.values()
+            if node.__class__.__name__ == cls_name
         ]
 
 

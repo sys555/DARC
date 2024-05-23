@@ -15,23 +15,21 @@ class B(Node):
     @Node.process(["A:B"])
     def handle_A2B(self, data) -> list:
         content = data[0]
-        if self.sts(content):
+        if len(content) < 10:
             # pass, to C
-            Message2C = Message(message_name="B:C", content=f"B[A:B[{content}]]")
+            Message2C = Message(
+                message_name="B:C", content=f"B[A:B[{content}]]"
+            )
             msgs = []
             msgs.append(Message2C)
         else:
             # back, to A
-            Message2A = Message(message_name="B:A", content=f"B[A:B[{content}]]")
+            Message2A = Message(
+                message_name="B:A", content=f"B[A:B[{content}]]"
+            )
             msgs = []
             msgs.append(Message2A)
         return msgs
-
-    def sts(self, content) -> bool:
-        if len(content) > 10:
-            return False
-        else:
-            return True
 
 
 @pytest.fixture

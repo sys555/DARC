@@ -15,9 +15,9 @@ class Preprocessor(metaclass=ABCMeta):
 
 class Node(AbstractActor):
     _id_counter: int = 0
-    message_handlers: Dict[
-        str, List[Callable[..., Any]]
-    ] = {}  # Class-level attribute shared by all instances
+    message_handlers: Dict[str, List[Callable[..., Any]]] = (
+        {}
+    )  # Class-level attribute shared by all instances
     message_types: List[List[str]] = []
     handler_call_by_message_types: Dict[Callable, List[str]] = {}
 
@@ -34,7 +34,7 @@ class Node(AbstractActor):
         self.message_map: Dict[str, List[Message]] = {}
 
     def on_receive(self, message: Message):
-        self._message_box.append(message)
+        self.message_box.append(message)
         if message.message_name not in self.message_map:
             self.message_map[message.message_name] = []
         self.message_map[message.message_name].append(message)
@@ -80,7 +80,9 @@ class Node(AbstractActor):
 
         return decorator
 
-    def handle_message(self, message: Message, *args: Any, **kwargs: Any) -> Any:
+    def handle_message(
+        self, message: Message, *args: Any, **kwargs: Any
+    ) -> Any:
         handled_messages = []
         if message.message_name not in self.message_handlers:
             # 无处理方法
@@ -125,12 +127,14 @@ class Node(AbstractActor):
         # 构建 self to instance 的实例关系, 关联码本与实例表)
         try:
             # 检查instance是否是Node类的实例
-            if isinstance(instance, pykka._ref.ActorRef) and isinstance(address, str):
+            if isinstance(instance, pykka._ref.ActorRef) and isinstance(
+                address, str
+            ):
                 self._address_book.add(address)
-                self._instance[address] = instance
+                self.instance[address] = instance
             elif isinstance(instance, List) and isinstance(address, List):
                 for item_instance, addr in zip(instance, address):
                     self._address_book.add(addr)
-                    self._instance[addr] = item_instance
+                    self.instance[addr] = item_instance
         except BaseException as e:
             logging.error(f"{str(e)} ")
