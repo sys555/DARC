@@ -8,7 +8,7 @@ from darc.darc.controller import Task, Graph
 from darc.database import DatasetDB
 from darc.attacker import Attacker
 
-# from darc.evaluator import ev
+from darc.evaluator import AttackEvaluator
 
 import logging
 
@@ -55,7 +55,6 @@ def setup_graph():
 
 
 # 测试图的构建
-@pytest.mark.skip(reason="import path error")
 def test_graph_initialization(setup_graph):
     assert isinstance(setup_graph, Graph)
     assert (
@@ -83,7 +82,6 @@ def node_ids(setup_graph):
     }
 
 
-@pytest.mark.skip(reason="import path error")
 def test_find_node_types(node_ids):
     assert node_ids["attacker_node_id"] is not None
     assert node_ids["leaderboard_node_id"] is not None
@@ -100,13 +98,11 @@ def task(setup_graph, node_ids):
 
 
 # 测试任务初始化
-@pytest.mark.skip(reason="import path error")
 def test_task_initialization(task):
     assert isinstance(task, Task)
 
 
 # 测试设置入口和出口节点
-@pytest.mark.skip(reason="import path error")
 def test_set_entry_and_exit_nodes(task, node_ids):
     # 这些设置在fixture中已经完成，此处确认它们是否设置正确
     assert (
@@ -118,7 +114,6 @@ def test_set_entry_and_exit_nodes(task, node_ids):
 
 
 # 测试任务的执行
-@pytest.mark.skip(reason="import path error")
 def test_task_execution(task):
     task.set_initial_input("Select data from * sample(10)")
     task.run()  # 假设run方法执行任务并更新task.result
@@ -138,7 +133,6 @@ def test_task_execution(task):
 
 
 # 测试结果的正确性
-@pytest.mark.skip(reason="import path error")
 def test_result_correctness(task):
     expected_result = None  # 根据实际情况修改期望结果
     assert task.result == expected_result

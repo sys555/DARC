@@ -10,7 +10,7 @@ import logging
 class C(Node):
     @Node.process(["A:C", "B:C"])
     def handler_A_C_B_C(self, data: [str]) -> Message:
-        result = f"C[A:C,B:C{data}]"
+        result = f"C[A:C,B:C{data[:-1]}]"
         message = Message(message_name="C:A", content=result)
         target = []
         target.append(message)
@@ -18,7 +18,7 @@ class C(Node):
 
     @Node.process(["A:C"])
     def handler_A_C(self, data: [str]) -> Message:
-        result = f"C[A:C{data}]"
+        result = f"C[A:C{data[:-1]}]"
         message = Message(message_name="C:B", content=result)
         target = []
         target.append(message)

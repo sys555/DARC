@@ -14,7 +14,7 @@ class C(Node):
 
     @Node.process(["A:C", "B:C"])
     def handle_A2B(self, data: [str]) -> list:
-        result = f"C[A:C,B:C{data}]"
+        result = f"C[A:C,B:C{data[:-1]}]"
         Message2D = Message(message_name="C:D", content=result)
         msgs = []
         msgs.append(Message2D)
@@ -65,14 +65,14 @@ class TestGather:
             from_agent="a_0_addr",
             to_agent="c_0_addr",
             content=f"{initial_data_a}",
-            task_id=0,
+            task_id=str(0),
         )
         b_to_c_message = Message(
             message_name="B:C",
             from_agent="b_0_addr",
             to_agent="c_0_addr",
             content=f"{initail_data_b}",
-            task_id=0,
+            task_id=str(0),
         )
 
         a.send(a_to_c_message, a_to_c_message.to_agent)
@@ -87,7 +87,7 @@ class TestGather:
             from_agent="c_0_addr",
             to_agent="d_0_addr",
             content=f"C[A:C,B:C['{initial_data_a}', '{initail_data_b}']]",
-            task_id=0,
+            task_id=str(0),
         )
 
         # d 邮箱中有 CtoD_msg, 证明 b 收到了 AtoC_msg、BtoC_msg 并进行处理
@@ -103,14 +103,14 @@ class TestGather:
             from_agent="a_0_addr",
             to_agent="c_0_addr",
             content=f"{initial_data_a}",
-            task_id=0,
+            task_id=str(0),
         )
         b_to_c_message = Message(
             message_name="B:C",
             from_agent="b_0_addr",
             to_agent="c_0_addr",
             content=f"{initail_data_b}",
-            task_id=2,
+            task_id=str(2),
         )
 
         a.send(a_to_c_message, a_to_c_message.to_agent)
