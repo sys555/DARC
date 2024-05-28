@@ -3,6 +3,7 @@ from abc import ABCMeta
 from typing import Any, Callable, Dict, List
 
 import pykka
+from loguru import logger
 
 from darc.actor import AbstractActor
 from darc.message import Message
@@ -110,6 +111,7 @@ class Node(AbstractActor):
                 contents = [message.content for message in message_list]
                 messages = handler(self, contents)
                 handled_messages.extend(messages)
+        logger.info(handled_messages)
         return handled_messages
 
     def message_in_inbox(self, message: Message):
