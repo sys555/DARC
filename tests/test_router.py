@@ -1,5 +1,5 @@
 import unittest
-from darc.darc.router import Router
+from darc.router import Router
 
 
 class TestRouter(unittest.TestCase):

@@ -1,8 +1,8 @@
 import pytest
 
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 
 import logging
 
@@ -10,7 +10,7 @@ import logging
 class C(Node):
     @Node.process(["A:C", "B:C"])
     def handler_A_C_B_C(self, data: [str]) -> Message:
-        result = f"C[A:C,B:C{data[:-1]}]"
+        result = f"C[A:C,B:C{data}]"
         message = Message(message_name="C:A", content=result)
         target = []
         target.append(message)
@@ -18,7 +18,7 @@ class C(Node):
 
     @Node.process(["A:C"])
     def handler_A_C(self, data: [str]) -> Message:
-        result = f"C[A:C{data[:-1]}]"
+        result = f"C[A:C{data}]"
         message = Message(message_name="C:B", content=result)
         target = []
         target.append(message)

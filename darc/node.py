@@ -1,13 +1,12 @@
 import logging
-import uuid
 from abc import ABCMeta
 from typing import Any, Callable, Dict, List
 
 import pykka
 from loguru import logger
 
-from darc.darc.actor import AbstractActor
-from darc.darc.message import Message
+from darc.actor import AbstractActor
+from darc.message import Message
 
 
 class Preprocessor(metaclass=ABCMeta):
@@ -28,33 +27,24 @@ class Node(AbstractActor):
         self.id: int = Node._id_counter
         Node._id_counter += 1
         self._node_type = "RealNode"
-        self.class_name = self.__class__.__name__
-        self.node_name = (
-            node_name or f"{self.class_name}_{str(uuid.uuid4())[:8]}"
-        )
-        self.address = (
-            address or f"{self.class_name}_addr_{str(uuid.uuid4())[:16]}"
-        )
+        self.node_name = node_name
+        self.address = address
+        # message name : handler
+        self.handlers: Dict[str, Callable] = {}
         # message name : [message, ...]
         self.message_map: Dict[str, List[Message]] = {}
 
     def on_receive(self, message: Message):
-        logger.info(
-            f"【Task】{message.task_id[:8]};\
-【Message】{message.message_name:30};\
-【Node】{self.node_name:24} ;【Content】{message.content}"
-        )
-        self._message_box.append(message)
+        self.message_box.append(message)
         if message.message_name not in self.message_map:
             self.message_map[message.message_name] = []
         self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
         for message_item in message_list:
             if message_item.to_agent == "None":
-                message_item.to_agent = self.latest_match(message_item)
+                message_item.to_agent = self.random_choose(message_item)
             message_item.from_agent = self.address
             message_item.task_id = message.task_id
-            # message_item.content.append(message.task_id)
         for msg in message_list:
             if msg.to_agent is None:
                 # 广播
@@ -62,8 +52,8 @@ class Node(AbstractActor):
             else:
                 self.send(msg, msg.to_agent)
 
-    # 从地址簿中选择第一个符合目标类型的 node 地址
-    def latest_match(self, message: Message):
+    # 随机从地址簿中选择一个目标类型的 node 地址
+    def random_choose(self, message: Message):
         parts = message.message_name.split(":")
         # 遍历分割后的部分，查找在address_book中第一个匹配的key，并返回对应的value
         to_type = parts[-1]
@@ -94,9 +84,6 @@ class Node(AbstractActor):
     def handle_message(
         self, message: Message, *args: Any, **kwargs: Any
     ) -> Any:
-        import time
-
-        time.sleep(0.2)
         handled_messages = []
         if message.message_name not in self.message_handlers:
             # 无处理方法
@@ -122,10 +109,9 @@ class Node(AbstractActor):
                 continue
             else:
                 contents = [message.content for message in message_list]
-                contents.append(message.task_id)
                 messages = handler(self, contents)
-                if messages is not None:
-                    handled_messages.extend(messages)
+                handled_messages.extend(messages)
+        logger.info(handled_messages)
         return handled_messages
 
     def message_in_inbox(self, message: Message):
@@ -147,10 +133,10 @@ class Node(AbstractActor):
                 address, str
             ):
                 self._address_book.add(address)
-                self._instance[address] = instance
+                self.instance[address] = instance
             elif isinstance(instance, List) and isinstance(address, List):
                 for item_instance, addr in zip(instance, address):
                     self._address_book.add(addr)
-                    self._instance[addr] = item_instance
+                    self.instance[addr] = item_instance
         except BaseException as e:
             logging.error(f"{str(e)} ")

@@ -11,7 +11,7 @@ class Router(AbstractActor):
         self._node_gate_type_address_dict = {}
 
     def on_receive(self, message: Message):
-        self._message_box.append(message)
+        self.message_box.append(message)
         # 区分几个事情：
         # message只能发送给NodeGate，区分这个message是从哪个NodeGate发送过来
         if message.from_agent_type == self._node_gate_left:

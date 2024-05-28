@@ -1,7 +1,7 @@
 from typing import List
 
-from darc.darc.message import Message
-from darc.darc.node import Node
+from darc.message import Message
+from darc.node import Node
 
 
 class DatasetDB(Node):

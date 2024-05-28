@@ -1,8 +1,8 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 import logging
 
 
@@ -43,6 +43,7 @@ def scene2():
     d.stop()
 
 
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestDespetch:
     # 同一信息处理后分发场景：
     #    ┌───────────┐
@@ -72,7 +73,7 @@ class TestDespetch:
 
         import time
 
-        time.sleep(2)
+        time.sleep(1)
 
         b_to_c_message = Message(
             message_name="B:C",

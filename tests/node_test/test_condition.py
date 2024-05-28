@@ -1,8 +1,8 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 import logging
 
 
@@ -48,6 +48,7 @@ def scene3():
     c.stop()
 
 
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestCondition:
     # 条件分支 scene: A -> B, if B processed data is True then B -> C, else B -> A
 

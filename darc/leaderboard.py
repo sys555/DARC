@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from loguru import logger
 
-from darc.darc.node import Node
+from darc.node import Node
 
 
 class LeaderBoard(Node):

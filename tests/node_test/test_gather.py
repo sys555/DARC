@@ -1,9 +1,11 @@
 import pytest
 import pykka
 from unittest.mock import Mock, MagicMock, patch
-from darc.darc.node import Node
-from darc.darc.message import Message
+from darc.node import Node
+from darc.message import Message
 import logging
+
+from loguru import logger
 
 
 class C(Node):
@@ -13,8 +15,8 @@ class C(Node):
         self.address = address
 
     @Node.process(["A:C", "B:C"])
-    def handle_A2B(self, data: [str]) -> list:
-        result = f"C[A:C,B:C{data[:-1]}]"
+    def handle_AandB(self, data: [str]) -> list:
+        result = f"C[A:C,B:C{data}]"
         Message2D = Message(message_name="C:D", content=result)
         msgs = []
         msgs.append(Message2D)
@@ -40,6 +42,7 @@ def scene1():
     d.stop()
 
 
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestGather:
     # 多入度场景：
     #    ┌───────────┐     ┌───────────┐

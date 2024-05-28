@@ -12,7 +12,7 @@ class Message:
     content: str = "None"
     task_id: str = "None"
     from_agent_type: str = "None"
-    broadcasting: bool = True
+    broadcasting: bool = False
 
     def __call__(
         self,
