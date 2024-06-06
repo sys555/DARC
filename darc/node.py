@@ -1,11 +1,15 @@
 import logging
 from abc import ABCMeta
+from datetime import datetime
 from typing import Any, Callable, Dict, List
 
 import pykka
+from loguru import logger
 
 from darc.actor import AbstractActor
+from darc.logger import MASLog, MASLogger, TaskStatus, serialize_log
 from darc.message import Message
+from darc.multi_addr import MultiAddr
 
 
 class Preprocessor(metaclass=ABCMeta):
@@ -21,17 +25,18 @@ class Node(AbstractActor):
     message_types: List[List[str]] = []
     handler_call_by_message_types: Dict[Callable, List[str]] = {}
 
-    def __init__(self, node_name: str = "", address: str = ""):
+    def __init__(self, node_addr: MultiAddr = None, node_name: str = ""):
         super().__init__()
         self.id: int = Node._id_counter
         Node._id_counter += 1
         self._node_type = "RealNode"
         self.node_name = node_name
-        self.address = address
+        self.node_addr = node_addr.addr
         # message name : handler
         self.handlers: Dict[str, Callable] = {}
         # message name : [message, ...]
         self.message_map: Dict[str, List[Message]] = {}
+        self.class_name = type(self).__name__
 
     def on_receive(self, message: Message):
         self.message_box.append(message)
@@ -39,17 +44,43 @@ class Node(AbstractActor):
             self.message_map[message.message_name] = []
         self.message_map[message.message_name].append(message)
         message_list = self.handle_message(message)
+        # 构造message其余字段
         for message_item in message_list:
-            if message_item.to_agent == "None":
-                message_item.to_agent = self.random_choose(message_item)
-            message_item.from_agent = self.address
+            message_item.from_agent = self.node_addr
             message_item.task_id = message.task_id
-        for msg in message_list:
-            if msg.to_agent is None:
-                # 广播
-                ...
-            else:
-                self.send(msg, msg.to_agent)
+            message_item.from_agent_type = "RealNode"
+        # 发送message
+        for message_item in message_list:
+            self.on_send(message_item)
+        # if message.message_name not in self.message_map:
+        #     self.message_map[message.message_name] = []
+        # self.message_map[message.message_name].append(message)
+        # message_list = self.handle_message(message)
+        # for message_item in message_list:
+        #     if message_item.to_agent == "None":
+        #         message_item.to_agent = self.random_choose(message_item)
+        #     message_item.from_agent = self.address
+        #     message_item.task_id = message.task_id
+        # for msg in message_list:
+        #     if msg.to_agent is None:
+        #         # 广播
+        #         ...
+        #     else:
+        #         self.on_send(msg)
+
+    def on_send(self, message: Message):
+        self.message_box.append(message)
+        if message.message_name.split(":")[-1] != "END":
+            # 普通的消息正常流转
+            self._node_gate.tell(message)
+        else:
+            # xxx:END 信息直接发送给 logger
+            self.send_to_logger("", TaskStatus.COMPLETED, message)
+
+    def set_node_gate_addr(self, node_gate_addr, node_gate):
+        self._node_gate_addr = node_gate_addr
+        self._node_gate = node_gate
+        self.instance[node_gate_addr] = node_gate
 
     # 随机从地址簿中选择一个目标类型的 node 地址
     def random_choose(self, message: Message):
@@ -107,10 +138,36 @@ class Node(AbstractActor):
                 # 当前 task 的所有前置消息未到达
                 continue
             else:
-                contents = [message.content for message in message_list]
-                messages = handler(self, contents)
+                # contents = [message.content for message in message_list]
+                # messages = handler(self, contents)
+                self.send_to_logger(
+                    handler.__name__, TaskStatus.IN_PROGRESS, message
+                )
+                messages = handler(self, message_list)
+                self.send_to_logger(
+                    handler.__name__, TaskStatus.COMPLETED, message
+                )
                 handled_messages.extend(messages)
         return handled_messages
+
+    def send_to_logger(
+        self, handle_name: str, state: TaskStatus, message: Message
+    ):
+        # 将当前处理的 message 信息以及 handler 信息打包 发送给 logger
+        mas_logger = MASLogger()
+        log_ = MASLog(
+            node_name=f"{type(self).__name__} / {self.node_name}",
+            handle_name=handle_name,
+            timestamp=datetime.now().isoformat(),
+            stage=state,
+            message=message,
+        )
+        message = Message(
+            message_name="log",
+            content=serialize_log(log_),
+        )
+        # TODO:edit maslogger func new, then use tell
+        mas_logger.on_receive(message)
 
     def message_in_inbox(self, message: Message):
         if message.message_name in self.message_map:

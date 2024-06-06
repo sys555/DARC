@@ -2,8 +2,10 @@ import logging
 from typing import List, Set, Union
 
 import pykka
+from loguru import logger
 
-from .message import Message
+from darc.message import Message
+from darc.multi_addr import MultiAddr
 
 
 @pykka.traversable
@@ -14,21 +16,25 @@ class AbstractActor(pykka.ThreadingActor):
         self.instance = dict()  # addr
         self.message_box = []
         self._node_type = None
-        self._node_addr = None
+        self.node_addr = None
         self._node_alias = None
 
     def on_receive(self, message: Message):
         self.message_box.append(message)
 
-    def send(self, message: "Message", next_hop_address: List | str = []):
+    def send(self, message: "Message", next_hop_address):
         try:
-            if isinstance(next_hop_address, str):
+            if isinstance(next_hop_address, MultiAddr):
                 self.instance[next_hop_address].tell(message)
+
+            elif isinstance(next_hop_address, str):
+                self.instance[next_hop_address].tell(message)
+
             else:
                 for next_actor_instance_addr in next_hop_address:
                     self.instance[next_actor_instance_addr].tell(message)
         except BaseException as e:
-            logging.error(f"AbsActor send: {e}")
+            logging.error(f"AbsActor send: {type(e)}, {str(e)}")
 
     def spawn_new_actor(self, cls, args: Union[List, str]):
         raise NotImplementedError

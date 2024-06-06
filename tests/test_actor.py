@@ -56,6 +56,6 @@ class TestActorCommunication:
 
         # # # Verify that each actor received the correct message
         assert len(alice.message_box.get()) == 1
-        assert alice.message_box.get()[0] == message_to_alice
+        assert vars(alice.message_box.get()[0]) == vars(message_to_alice)
         assert len(bob.message_box.get()) == 1
-        assert bob.message_box.get()[0] == message_to_bob
+        assert vars(bob.message_box.get()[0]) == vars(message_to_bob)

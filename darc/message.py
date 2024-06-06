@@ -12,17 +12,21 @@ class Message:
     content: str = "None"
     task_id: str = "None"
     from_agent_type: str = "None"
+    from_node_type_name: str = "None"
     broadcasting: bool = True
+    handle_name: str = "None"
 
     def __call__(
         self,
         message_id,
         from_agent,
         task_id,
-        from_agent_type,
+        from_agent_type="RealNode",
         to_agent="None",
         content="None",
+        from_node_type_name="None",
         broadcasting=True,
+        handle_name="None",
     ):
         message_name = self.message_name
         return Message(
@@ -34,4 +38,6 @@ class Message:
             content=content,
             task_id=task_id,
             broadcasting=broadcasting,
+            from_node_type_name=from_node_type_name,
+            handle_name=handle_name,
         )

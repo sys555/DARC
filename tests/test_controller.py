@@ -107,3 +107,44 @@
 # def test_result_correctness(task):
 #     expected_result = None  # 根据实际情况修改期望结果
 #     assert task.result == expected_result
+
+import pytest
+from .test_base import Producer, Consumer
+from darc.controller import Graph
+
+from loguru import logger
+
+
+# 配置和初始化
+@pytest.fixture(scope="module")
+def setup_graph():
+    config = {
+        "node": [
+            Producer,
+            Consumer,
+        ],
+        "edge": [
+            (Producer, Consumer),
+        ],
+        "args": [
+            (
+                Consumer,
+                2,
+                [("Alice",), ("Bob",)],
+            ),
+        ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个默认实例
+    }
+    yield Graph.init(config)
+
+
+# @pytest.mark.skip("skip skip")
+def test_graph_initialization(setup_graph):
+    assert isinstance(setup_graph, Graph)
+    assert (
+        len(setup_graph.nodes) == 3
+    )  # 确保所有节点都已初始化， 根据config的args参数，一共3个节点 2类节点
+
+
+def test_find_type(setup_graph):
+    assert len(setup_graph.find_type("Producer")) == 1
+    assert len(setup_graph.find_type("Consumer")) == 2
