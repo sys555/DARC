@@ -4,10 +4,6 @@ import os
 
 from litellm import acompletion, completion
 
-os.environ["OPENAI_API_KEY"] = (
-    "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"
-)
-
 model_type = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 model_name = model_type[1]
 
