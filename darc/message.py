@@ -41,3 +41,8 @@ class Message:
             from_node_type_name=from_node_type_name,
             handle_name=handle_name,
         )
+
+
+def get_default_message():
+    # defualt factory
+    return Message(message_name="")

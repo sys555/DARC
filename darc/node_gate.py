@@ -1,7 +1,7 @@
 import copy
 import logging
 import random
-from typing import Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 from loguru import logger
 
@@ -40,16 +40,20 @@ class NodeGate(AbstractActor):
             self._address_book.add(router_addr)
 
     def on_receive(self, message: Message):
-        logger.debug(self._node_gate_type)
-        logger.debug(message)
         try:
             self.message_box.append(message)
             bak_message = copy.deepcopy(message)
             bak_message.from_agent_type = self._node_type
             bak_message.from_node_type_name = self._node_gate_type
-            # BUG: bak_message.from_node_type_name = self._node_gate_type 逻辑有误，当produce -> consumer 时,
+            # BUG: bak_message.from_node_type_name = self._node_gate_type 逻辑有误，
+            # 当produce -> consumer 时,
             # consumer 收到的message
-            # Message(message_name='Producer:Consumer', message_id='None', from_agent='F84ZU7OmOLcXS4Qv', to_agent='wLnlAfRbMnIKqaGo', content='None', task_id='e1de2911-d577-4082-8033-6fd4129511d1', from_agent_type='NodeGate', from_node_type_name='Consumer', broadcasting=True)
+            # Message(message_name='Producer:Consumer', message_id='None',
+            # from_agent='F84ZU7OmOLcXS4Qv', to_agent='wLnlAfRbMnIKqaGo',
+            # content='None',
+            # task_id='e1de2911-d577-4082-8033-6fd4129511d1',
+            # from_agent_type='NodeGate',
+            # from_node_type_name='Consumer', broadcasting=True)
             # from_node_type_name='Consumer' 不正确
             # 要么修改 from_node_type_name 要么 修改 from_node_type_name变更逻辑
             if message.from_agent_type == "Router":
@@ -59,10 +63,11 @@ class NodeGate(AbstractActor):
                     linked_instance_list = [
                         _addr
                         for _addr in self.instance.keys()
-                        if _addr not in self._router_addr_dict.values()
-                        and _addr != message.from_agent
+                        if (
+                            _addr not in self._router_addr_dict.values()
+                            and _addr != message.from_agent
+                        )
                     ]
-                    logger.error(linked_instance_list)
                     self.send(bak_message, linked_instance_list)
                 else:
                     # random sample
@@ -85,11 +90,12 @@ class NodeGate(AbstractActor):
         except Exception as e:
             logger.error(f"node gate on_receive {type(e)}, {str(e)}")
 
-    def spawn_new_actor(self, cls, args) -> Node:
+    def spawn_new_actor(self, cls, args) -> Any:
         # 单个 actor 的生成
         if args is None:
             args = ()
-        # count 必须先自增 否则多次 spawn_new_actor 并发执行, 会导致多个 new actor 的 node id 一样, 导致生成失败
+        # count 必须先自增 否则多次 spawn_new_actor 并发执行,
+        # 会导致多个 new actor 的 node id 一样, 导致生成失败
         # 记录当前 gate 中的 node 数量
         self._node_count += 1
         # node_id 以 gate type + node count

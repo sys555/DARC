@@ -1,5 +1,5 @@
 import copy
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import pykka
 from loguru import logger
@@ -41,7 +41,7 @@ class Router(AbstractActor):
         else:
             raise NotImplementedError
 
-    def spawn_new_actor(self, cls, node_gate_link_type) -> type:
+    def spawn_new_actor(self, cls, node_gate_link_type):
         self._node_gate_left, self._node_gate_right = (
             node_gate_link_type.split(":")
         )
@@ -88,16 +88,16 @@ class Router(AbstractActor):
             node_gate_reverse_link_type, self.node_addr, self.actor_ref
         )
 
-    def _get_nodegate_instance(self, nodegate_name) -> NodeGate:
+    def _get_nodegate_instance(self, nodegate_name) -> Any:
         nodegate_addr = self.node_gate_type_address_dict[nodegate_name]
         nodegate_instance = self.instance[nodegate_addr]
         return nodegate_instance
 
-    def spawn_real_instance(self, cls, args) -> type:
+    def spawn_real_instance(self, cls, args) -> Any:
         cls_name = cls.__name__
-        nodegate_instance: NodeGate = self._get_nodegate_instance(cls_name)
+        nodegate_instance = self._get_nodegate_instance(cls_name)
         return nodegate_instance.proxy().spawn_new_actor(cls, args).get()
 
-    def get_all_node_instance(self, cls_name):
+    def get_all_node_instance(self, cls_name) -> Any:
         nodegate_instance = self._get_nodegate_instance(cls_name)
         return nodegate_instance.proxy().get_all_node_instance().get()

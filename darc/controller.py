@@ -1,10 +1,8 @@
-import uuid
-from typing import Dict
+from typing import Dict, Any
 
 import networkx as nx
-from loguru import logger
 
-from darc.agent.dev import PM, FeatureDev
+from darc.agent.dev import PM, FeatureDev, QADev
 from darc.logger import MASLogger
 from darc.message import Message
 from darc.multi_addr import MultiAddr
@@ -46,7 +44,7 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         self.edges = []
-        self._router_dict: Dict[str, Router] = {}
+        self._router_dict: Dict[str, Any] = {}
         self._node_type = {}
         self._edge_list = {}
         self._instance = {}
@@ -57,7 +55,7 @@ class Graph:
         graph = cls()
         node_instances = {}
         instantiated_classes = set()
-        edge_list = []
+        # edge_list = []
 
         # 生成 router
         for left_cls, right_cls in config.get("edge", []):
@@ -91,7 +89,7 @@ class Graph:
             self._instance[router_addr] = router_instance
             self._router_dict[router_name] = router_instance
 
-    def _spawn_new_instance(self, cls, args) -> type:
+    def _spawn_new_instance(self, cls, args) -> Any:
         nodegate_type = cls.__name__
         for router_name in self._router_dict:
             if nodegate_type in router_name:
@@ -108,7 +106,7 @@ class Graph:
         if edge_name not in self._router_dict:
             self._spawn_new_actor(Router, edge_name)
 
-    def add_node(self, node: Node):
+    def add_node(self, node: Any):
         self.nodes[node.proxy().id.get()] = node
 
     def find_type(self, cls_name):

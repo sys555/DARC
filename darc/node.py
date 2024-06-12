@@ -25,7 +25,9 @@ class Node(AbstractActor):
     message_types: List[List[str]] = []
     handler_call_by_message_types: Dict[Callable, List[str]] = {}
 
-    def __init__(self, node_addr: MultiAddr = None, node_name: str = ""):
+    def __init__(
+        self, node_addr: MultiAddr = MultiAddr(), node_name: str = ""
+    ):
         super().__init__()
         self.id: int = Node._id_counter
         Node._id_counter += 1

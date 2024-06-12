@@ -6,7 +6,7 @@ from darc.node_gate import NodeGate
 from darc.logger import MASLogger
 from darc.controller import Graph, Task, config_to_networkx, networkx_to_config
 from darc.llm.proxy import get_answer_sync
-from darc.agent.dev import PM, FeatureDev
+from darc.agent.dev import PM, FeatureDev, QADev
 
 from loguru import logger
 
@@ -18,9 +18,11 @@ config = {
     "node": [
         PM,
         FeatureDev,
+        QADev,
     ],
     "edge": [
         (PM, FeatureDev),
+        (FeatureDev, QADev),
     ],
     "args": [
         (
@@ -32,6 +34,11 @@ config = {
             FeatureDev,
             1,
             [("Bob",)],
+        ),  
+        (
+            QADev,
+            1,
+            [("Coob",)],
         ),  
     ],
 }
@@ -48,19 +55,20 @@ graph = Graph.init(new_config)
 # mas_logger = MASLogger()
 alice = graph.find_node_with_name("Alice", "PM")
 
-# demand = "请用python帮我生成一个贪吃蛇的小游戏"
-demand = "hi"
+demand = "请用python帮我生成一个贪吃蛇的小游戏"
+# demand = "hi"
 
 task_id = str(uuid.uuid4())
 
 bob = graph.find_node_with_name("Bob", "FeatureDev")
+coob = graph.find_node_with_name("Coob", "QADev")
 
 task = Task(
     graph = graph,
     task_id = task_id,
 )
 task.set_entry_node(alice)
-task.set_exit_node(bob)
+task.set_exit_node(coob)
 task.set_initial_input(demand)
 graph.run(task)
     

@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from loguru import logger
 
 from darc.actor import AbstractActor
-from darc.message import Message
+from darc.message import Message, get_default_message
 
 
 class TaskStatus(Enum):
@@ -19,11 +19,11 @@ class TaskStatus(Enum):
 
 @dataclass
 class MASLog:
-    node_name: str
-    handle_name: str
-    timestamp: str
-    stage: TaskStatus
-    message: Message
+    node_name: str = field(default="")
+    handle_name: str = field(default="")
+    timestamp: str = field(default="")
+    stage: TaskStatus = field(default=TaskStatus.CREATED)
+    message: Message = field(default_factory=get_default_message)
 
 
 def serialize_log(log: MASLog) -> str:
@@ -45,9 +45,9 @@ def deserialize_log(log_str: str) -> MASLog:
         ]  # name string -> Enum
         message_data = log_data.get("message", {})
         log_data["message"] = Message(**message_data)
-        return MASLog(**log_data)
     except Exception as e:
         logger.error(f"logger, deserialize_log, error: {type(e)}, {e}")
+    return MASLog(**log_data)
 
 
 class MASLogger(AbstractActor):
@@ -89,10 +89,16 @@ class MASLogger(AbstractActor):
         ]
         return sorted(filtered_logs, key=lambda log: log.timestamp)
 
-    def get_result(self, task_id: str = None) -> Optional[MASLog]:
+    def get_result(self, task_id: str = "") -> Optional[MASLog]:
         filtered_logs = [
             log
             for log in self.end_logbook
-            if task_id is None or log.message.task_id == task_id
+            if log is not None
+            and (
+                task_id == ""
+                or (log.message is not None and log.message.task_id == task_id)
+            )
         ]
-        return max(filtered_logs, key=lambda log: log.timestamp, default=None)
+        if not filtered_logs:
+            return None
+        return max(filtered_logs, key=lambda log: log.timestamp)
