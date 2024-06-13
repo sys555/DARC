@@ -5,11 +5,16 @@ from loguru import logger
 from darc.llm.prompt.system_prompt_template import (
     dev_system_prompt,
     project_manager_prompt,
-    tester_system_prompt,
     pytest_system_prompt,
+    tester_system_prompt,
 )
 from darc.llm.proxy import get_answer_sync
 from darc.message import Message
+from darc.mock.mock_llm_query import (
+    mock_FeatureDev_query,
+    mock_PM_query,
+    mock_QADev_query,
+)
 from darc.node import Node
 
 
@@ -26,7 +31,9 @@ class PM(Node):
     def transport(self, message: List[Message]) -> List[Message]:
         valid_message = message[0]
         demand = valid_message.content
-        result = get_answer_sync(valid_message.content, project_manager_prompt)
+        # result = get_answer_sync(valid_message.content, \
+        # project_manager_prompt)
+        result = mock_PM_query
         message_to_FeatureDev = Message(
             message_name="PM:FeatureDev", content=f"需求：{demand}. {result}"
         )
@@ -45,10 +52,12 @@ class QADev(Node):
         return [self.work_test(demand)]
 
     def work_test(self, demand: str) -> Message:
-        prompt = f"请仅输出代码，不需要任何解释或额外文字, 特别是'```python', '```' 类似的文字。以下是我需要的功能描述：\
-[{demand}]\
-请直接给出代码："
-        result = get_answer_sync(prompt, pytest_system_prompt)
+        #         prompt = f"请仅输出代码，不需要任何解释或额外文字, \
+        # 特别是'```python', '```' 类似的文字。以下是我需要的功能描述：\
+        # [{demand}]\
+        # 请直接给出代码："
+        # result = get_answer_sync(prompt, pytest_system_prompt)
+        result = mock_QADev_query
         return Message(
             message_name="QADev:END",
             content=result,
@@ -66,17 +75,13 @@ class FeatureDev(Node):
         return [self.work_feature(demand)]
 
     def work_feature(self, demand: str):
-        prompt = f"请仅输出代码，不需要任何解释或额外文字, 特别是'```python', '```' 类似的文字。以下是我需要的功能描述：\
-[{demand}]\
-请直接给出代码："
-        # prompt = "what do you want to do"
-        # file_path = "/Users/mac/Documents/pjlab/repo/\
-        # LLMSafetyChallenge/darc/llm/proxy/snake.py"
-
+        #         prompt = f"请仅输出代码，不需要任何解释或额外文字, \
+        # 特别是'```python', '```' 类似的文字。以下是我需要的功能描述：\
+        # [{demand}]\
+        # 请直接给出代码："
         # 生成代码
-        code = get_answer_sync(prompt, dev_system_prompt)
-        # 将代码保存到指定文件
-        # self.save_code_to_file(code, file_path)
+        # code = get_answer_sync(prompt, dev_system_prompt)
+        code = mock_FeatureDev_query
         message = Message(
             message_name="FeatureDev:QADev",
             content=code,
