@@ -6,7 +6,7 @@ from darc.node_gate import NodeGate
 from darc.logger import MASLogger
 from darc.controller import Graph, Task, config_to_networkx, networkx_to_config
 from darc.llm.proxy import get_answer_sync
-from darc.agent.dev import PM, FeatureDev
+from darc.agent.dev import PM, FeatureDev, QADev
 
 from loguru import logger
 
@@ -22,12 +22,14 @@ def config():
 
     pm_gate = NodeGate.start("PM", MultiAddr("PM"))
     feature_dev_gate = NodeGate.start("FeatureDev", MultiAddr("FeatureDev"))
+    qadev_gate = NodeGate.start("QADev", MultiAddr("QADev"))
 
-    yield router.proxy(), pm_gate.proxy(), feature_dev_gate.proxy()
+    yield router.proxy(), pm_gate.proxy(), feature_dev_gate.proxy(), qadev_gate.proxy()
 
     router.stop()
     pm_gate.stop()
     feature_dev_gate.stop()
+    qadev_gate.stop()
 
 
 @pytest.fixture(scope="module")
@@ -36,21 +38,28 @@ def user_case_config():
         "node": [
             PM,
             FeatureDev,
+            QADev,
         ],
         "edge": [
             (PM, FeatureDev),
+            (FeatureDev, QADev),
         ],
         "args": [
             (
                 PM,
                 1,
                 [("Alice",)],
-            ),
+            ),  
             (
                 FeatureDev,
                 1,
                 [("Bob",)],
-            ),
+            ),  
+            (
+                QADev,
+                1,
+                [("Coob",)],
+            ),  
         ],
     }
 
@@ -67,20 +76,20 @@ def test_graph_use_case(user_case_config):
     mas_logger = MASLogger()
     alice = graph.find_node_with_name("Alice", "PM")
 
-    demand = "hi"
+    # demand = "请用python帮我生成一个贪吃蛇的小游戏"
+    demand = "请用python帮我生成一个整数加法函数"
+
     task_id = str(uuid.uuid4())
-    task_to_pm_message = Message(
-        message_name="Task:PM",
-        content=demand,
-        task_id=task_id,
-    )
 
-    # alice.proxy().on_receive(task_to_pm_message)
     bob = graph.find_node_with_name("Bob", "FeatureDev")
+    coob = graph.find_node_with_name("Coob", "QADev")
 
-    task = Task(graph=graph, task_id=task_id)
+    task = Task(
+        graph = graph,
+        task_id = task_id,
+    )
     task.set_entry_node(alice)
-    task.set_exit_node(bob)
+    task.set_exit_node(coob)
     task.set_initial_input(demand)
     graph.run(task)
 
@@ -88,8 +97,8 @@ def test_graph_use_case(user_case_config):
 
     time.sleep(1)
 
-    # 'PM:FeatureDev'
-    # 'FeatureDev:END'
-    assert len(bob.proxy().message_box.get()) is 2
-    # PM 2, FeatureDev 3
-    assert len(mas_logger.logbook) is 5
+    # 'FeatureDev:QADev'
+    # 'QADev:END
+    assert len(coob.proxy().message_box.get()) is 2
+    # PM 2, FeatureDev 2, QADev 3
+    assert len(mas_logger.logbook) is 7
