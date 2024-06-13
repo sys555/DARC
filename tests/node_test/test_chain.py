@@ -46,6 +46,7 @@ def scene0():
     C_gate.stop()
 
 
+# @pytest.mark.skip("兼容一下现有的actor类")
 class TestChain:
     # 链 scene0: A --> B, B --> C
     def test_scene0(self, scene0):

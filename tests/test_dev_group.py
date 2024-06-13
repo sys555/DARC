@@ -62,7 +62,6 @@ def user_case_config():
     yield Graph.init(new_config)
 
 
-# @pytest.mark.skip('pass')
 def test_graph_use_case(user_case_config):
     graph = user_case_config
     mas_logger = MASLogger()
