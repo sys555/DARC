@@ -6,6 +6,7 @@ from darc.llm.prompt.system_prompt_template import (
     dev_system_prompt,
     project_manager_prompt,
     tester_system_prompt,
+    pytest_system_prompt,
 )
 from darc.llm.proxy import get_answer_sync
 from darc.message import Message
@@ -44,7 +45,10 @@ class QADev(Node):
         return [self.work_test(demand)]
 
     def work_test(self, demand: str) -> Message:
-        result = get_answer_sync(demand, tester_system_prompt)
+        prompt = f"请仅输出代码，不需要任何解释或额外文字, 特别是'```python', '```' 类似的文字。以下是我需要的功能描述：\
+[{demand}]\
+请直接给出代码："
+        result = get_answer_sync(prompt, pytest_system_prompt)
         return Message(
             message_name="QADev:END",
             content=result,

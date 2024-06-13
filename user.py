@@ -55,8 +55,8 @@ graph = Graph.init(new_config)
 # mas_logger = MASLogger()
 alice = graph.find_node_with_name("Alice", "PM")
 
-demand = "请用python帮我生成一个贪吃蛇的小游戏"
-# demand = "hi"
+# demand = "请用python帮我生成一个贪吃蛇的小游戏"
+demand = "请用python帮我生成一个整数加法函数"
 
 task_id = str(uuid.uuid4())
 

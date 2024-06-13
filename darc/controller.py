@@ -1,15 +1,14 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import networkx as nx
 
 from darc.agent.dev import PM, FeatureDev, QADev
-from darc.logger import MASLogger, MASLog
+from darc.logger import MASLog, MASLogger
 from darc.message import Message
 from darc.multi_addr import MultiAddr
 from darc.node import Node
 from darc.node_gate import NodeGate
 from darc.router import Router
-from typing import Any, List, Optional
 
 
 class Task:
@@ -110,7 +109,7 @@ class Graph:
     def add_node(self, node: Any):
         self.nodes[node.proxy().id.get()] = node
 
-    def find_type(self, cls_name) -> List[Any]:
+    def find_type(self, cls_name) -> Any:
         for router_name in self._router_dict:
             if cls_name in router_name:
                 node_type_instance = (
@@ -120,6 +119,7 @@ class Graph:
                     .get()
                 )
                 return node_type_instance
+        return []
 
     def find_node_with_name(self, node_name, cls_name) -> Any:
         for router_name in self._router_dict:
@@ -138,10 +138,10 @@ class Graph:
     def run(self, task: Task):
         task.run()
 
-    def get_result(self, task_id) -> Optional[MASLog]:
+    def get_result(self, task_id) -> Any:
         return self.logger.get_result(task_id)
 
-    def get_log(self, task_id) -> Optional[MASLog]:
+    def get_log(self, task_id) -> Any:
         return self.logger.get_logs(task_id)
 
 
