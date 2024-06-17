@@ -28,8 +28,8 @@ def alice_and_bob():
     # Return proxies for communication testing
     yield alice.proxy(), bob.proxy()
 
-    alice.stop()
-    bob.stop()
+    # alice.stop()
+    # bob.stop()
 
 
 class TestActorCommunication:

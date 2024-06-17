@@ -76,11 +76,11 @@ def scene3():
 
     yield A_B_router.proxy(), A_gate.proxy(), B_gate.proxy(), B_C_router.proxy(), C_gate.proxy()
 
-    A_B_router.stop()
-    A_gate.stop()
-    B_gate.stop()
-    B_C_router.stop()
-    C_gate.stop()
+    # A_B_router.stop()
+    # A_gate.stop()
+    # B_gate.stop()
+    # B_C_router.stop()
+    # C_gate.stop()
 
 
 @pytest.mark.skip("兼容一下现有的actor类")

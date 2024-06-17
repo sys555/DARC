@@ -25,9 +25,9 @@ def config():
 
     yield router.proxy(), producer_gate.proxy(), consumer_gate.proxy()
 
-    router.stop()
-    producer_gate.stop()
-    consumer_gate.stop()
+    # router.stop()
+    # producer_gate.stop()
+    # consumer_gate.stop()
 
 
 def test_handler(config):
@@ -55,5 +55,5 @@ def test_handler(config):
         == alice_to_bob_message.task_id
     )
 
-    alice.stop()
-    bob.stop()
+    # alice.stop()
+    # bob.stop()

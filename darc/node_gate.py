@@ -24,7 +24,7 @@ class NodeGate(AbstractActor):
         if node_gate_type not in self.__first_init__:
             super().__init__()
             self._node_type = "NodeGate"
-            self._router_addr_dict = {}
+            self._router_addr_dict: Dict[str, List[MultiAddr]] = {}
             self.node_addr = addr
             self._node_gate_type = node_gate_type
             self.__first_init__.add(node_gate_type)
@@ -34,10 +34,15 @@ class NodeGate(AbstractActor):
     def set_router_addr(
         self, node_gate_link_type, router_addr, router_instance
     ):
+        # if node_gate_link_type not in self._router_addr_dict:
+        #     self._router_addr_dict[node_gate_link_type] = router_addr
+        #     self.instance[router_addr] = router_instance
+        #     self._address_book.add(router_addr)
         if node_gate_link_type not in self._router_addr_dict:
-            self._router_addr_dict[node_gate_link_type] = router_addr
-            self.instance[router_addr] = router_instance
-            self._address_book.add(router_addr)
+            self._router_addr_dict[node_gate_link_type] = []
+        self._router_addr_dict[node_gate_link_type].append(router_addr)
+        self.instance[router_addr] = router_instance
+        self._address_book.add(router_addr)
 
     def on_receive(self, message: Message):
         try:
@@ -45,6 +50,11 @@ class NodeGate(AbstractActor):
             bak_message = copy.deepcopy(message)
             bak_message.from_agent_type = self._node_type
             bak_message.from_node_type_name = self._node_gate_type
+            combined_list = [
+                addr
+                for sublist in self._router_addr_dict.values()
+                for addr in sublist
+            ]
             # BUG: bak_message.from_node_type_name = self._node_gate_type 逻辑有误，
             # 当produce -> consumer 时,
             # consumer 收到的message
@@ -64,7 +74,7 @@ class NodeGate(AbstractActor):
                         _addr
                         for _addr in self.instance.keys()
                         if (
-                            _addr not in self._router_addr_dict.values()
+                            _addr not in combined_list
                             and _addr != message.from_agent
                         )
                     ]
@@ -74,7 +84,7 @@ class NodeGate(AbstractActor):
                     linked_instance_list = [
                         _addr
                         for _addr in self.instance.keys()
-                        if _addr not in self._router_addr_dict.values()
+                        if _addr not in combined_list
                         and _addr != message.from_agent
                     ]
                     random_to_instance = random.choice(linked_instance_list)
@@ -82,7 +92,8 @@ class NodeGate(AbstractActor):
 
             elif message.from_agent_type == "RealNode":
                 self.send(
-                    bak_message, self._router_addr_dict[message.message_name]
+                    bak_message,
+                    self._router_addr_dict[message.message_name][0],
                 )
 
             else:

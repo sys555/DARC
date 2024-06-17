@@ -37,10 +37,10 @@ def scene2():
 
     yield a.proxy(), b.proxy(), c.proxy(), d.proxy()
 
-    a.stop()
-    b.stop()
-    c.stop()
-    d.stop()
+    # a.stop()
+    # b.stop()
+    # c.stop()
+    # d.stop()
 
 
 @pytest.mark.skip("兼容一下现有的actor类")

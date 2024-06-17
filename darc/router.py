@@ -20,7 +20,7 @@ class Router(AbstractActor):
         self.spawn_new_actor(NodeGate, self.node_addr.name)
 
     def on_receive(self, message: Message):
-        logger.info(message)
+        # logger.info(message)
         self.message_box.append(message)
         bak_message = copy.deepcopy(message)
         bak_message.from_agent_type = self._node_type

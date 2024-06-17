@@ -37,9 +37,9 @@ def config():
 
     yield a.proxy(), b.proxy(), c.proxy()
 
-    a.stop()
-    b.stop()
-    c.stop()
+    # a.stop()
+    # b.stop()
+    # c.stop()
 
 
 @pytest.mark.skip("兼容一下现有的actor类")

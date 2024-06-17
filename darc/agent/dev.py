@@ -33,7 +33,7 @@ class PM(Node):
         demand = valid_message.content
         # result = get_answer_sync(valid_message.content, \
         # project_manager_prompt)
-        result = mock_PM_query
+        result = "mock_PM_query"
         message_to_FeatureDev = Message(
             message_name="PM:FeatureDev", content=f"需求：{demand}. {result}"
         )
@@ -57,7 +57,7 @@ class QADev(Node):
         # [{demand}]\
         # 请直接给出代码："
         # result = get_answer_sync(prompt, pytest_system_prompt)
-        result = mock_QADev_query
+        result = "mock_QADev_query"
         return Message(
             message_name="QADev:END",
             content=result,
@@ -81,7 +81,7 @@ class FeatureDev(Node):
         # 请直接给出代码："
         # 生成代码
         # code = get_answer_sync(prompt, dev_system_prompt)
-        code = mock_FeatureDev_query
+        code = "mock_FeatureDev_query"
         message = Message(
             message_name="FeatureDev:QADev",
             content=code,

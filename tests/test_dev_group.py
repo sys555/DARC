@@ -49,17 +49,17 @@ def user_case_config():
                 PM,
                 1,
                 [("Alice",)],
-            ),  
+            ),
             (
                 FeatureDev,
                 1,
                 [("Bob",)],
-            ),  
+            ),
             (
                 QADev,
                 1,
                 [("Coob",)],
-            ),  
+            ),
         ],
     }
 
@@ -74,6 +74,7 @@ def user_case_config():
 def test_graph_use_case(user_case_config):
     graph = user_case_config
     mas_logger = MASLogger()
+
     alice = graph.find_node_with_name("Alice", "PM")
 
     # demand = "请用python帮我生成一个贪吃蛇的小游戏"
@@ -85,8 +86,8 @@ def test_graph_use_case(user_case_config):
     coob = graph.find_node_with_name("Coob", "QADev")
 
     task = Task(
-        graph = graph,
-        task_id = task_id,
+        graph=graph,
+        task_id=task_id,
     )
     task.set_entry_node(alice)
     task.set_exit_node(coob)
@@ -101,4 +102,6 @@ def test_graph_use_case(user_case_config):
     # 'QADev:END
     assert len(coob.proxy().message_box.get()) is 2
     # PM 2, FeatureDev 2, QADev 3
-    assert len(mas_logger.logbook) is 7
+    # for item in mas_logger.get_logs(task_id):
+    #     logger.info(item)
+    assert len(mas_logger.get_logs(task_id)) is 7

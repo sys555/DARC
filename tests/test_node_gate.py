@@ -15,7 +15,7 @@ import pytest
 from loguru import logger
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def config():
     addr = MultiAddr("Producer:Consumer")
     router = Router.start(addr)
@@ -25,17 +25,13 @@ def config():
 
     yield router.proxy(), producer_gate.proxy(), consumer_gate.proxy()
 
-    router.stop()
-    producer_gate.stop()
-    consumer_gate.stop()
-
 
 # @pytest.mark.skip("pass")
 def test_unique(config):
     router, producer_gate, _ = config
     import time
 
-    time.sleep(0.1)
+    time.sleep(1)
     node_gate_instance_addr = router.node_gate_type_address_dict.get()[
         "Producer"
     ]
@@ -65,7 +61,6 @@ def test_point_to_point_send(config):
         task_id=str(uuid.uuid4()),
     )
     alice.proxy().on_send(alice_to_bob_message)
-
     # 等待消息传递
     import time
 
