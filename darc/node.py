@@ -150,6 +150,7 @@ class Node(AbstractActor):
                     handler.__name__, TaskStatus.COMPLETED, message
                 )
                 handled_messages.extend(messages)
+        logger.info(handled_messages)
         return handled_messages
 
     def send_to_logger(

@@ -138,7 +138,7 @@ class TestCondition:
             from_agent="a_0_addr",
             to_agent="b_0_addr",
             content=f"{initail_data_a_pass}",
-            task_id=0,
+            task_id=str(0),
         )
 
         AtoB_msg_pass = Message(
@@ -146,7 +146,7 @@ class TestCondition:
             from_agent="a_0_addr",
             to_agent="b_0_addr",
             content=f"{initail_data_a_pass}",
-            task_id=0,
+            task_id=str(0),
         )
 
         a.send(AtoB_msg_pass, "b_0_addr")
@@ -160,14 +160,14 @@ class TestCondition:
             from_agent="b_0_addr",
             to_agent="c_0_addr",
             content=f"B[A:B[{initail_data_a_pass}]]",
-            task_id=0,
+            task_id=str(0),
         )
         b_to_a_msg = Message(
             message_name="B:A",
             from_agent="b_0_addr",
             to_agent="a_0_addr",
             content=f"B[A:B[{initial_data_a_back}]]",
-            task_id=0,
+            task_id=str(0),
         )
 
         # a -> b -> c
@@ -188,7 +188,7 @@ class TestCondition:
             from_agent="a_0_addr",
             to_agent="b_0_addr",
             content=f"{initial_data_a_back}",
-            task_id=1,
+            task_id=str(1),
         )
 
         # a.send(AtoB_msg_pass)
@@ -203,14 +203,14 @@ class TestCondition:
             from_agent="b_0_addr",
             to_agent="c_0_addr",
             content=f"B[A:B[{initail_data_a_pass}]]",
-            task_id=1,
+            task_id=str(1),
         )
         b_to_a_msg = Message(
             message_name="B:A",
             from_agent="b_0_addr",
             to_agent="a_0_addr",
             content=f"B[A:B[{initial_data_a_back}]]",
-            task_id=1,
+            task_id=str(1),
         )
 
         # a -> c -> a

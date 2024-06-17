@@ -31,7 +31,7 @@ class Message:
         message_name = self.message_name
         return Message(
             message_name=message_name,
-            message_id=message_id,
+            message_id=message_id or str(uuid.uuid4()),
             from_agent=from_agent,
             from_agent_type=from_agent_type,
             to_agent=to_agent,

@@ -11,6 +11,10 @@ from darc.node_gate import NodeGate
 from darc.router import Router
 
 
+def show(self):
+    return self.nodes
+
+
 class Task:
     def __init__(self, graph, task_id):
         self.graph = graph
