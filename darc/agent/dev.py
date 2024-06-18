@@ -41,6 +41,20 @@ class PM(Node):
         msgs.append(message_to_FeatureDev)
         return msgs
 
+    @Node.process(["QADev:PM"])
+    def circle(self, message: List[Message]) -> List[Message]:
+        valid_message = message[0]
+        demand = valid_message.content
+        # result = get_answer_sync(valid_message.content, \
+        # project_manager_prompt)
+        result = "mock_PM_query"
+        message_to_FeatureDev = Message(
+            message_name="PM:FeatureDev", content=f"需求：mock"
+        )
+        msgs = []
+        msgs.append(message_to_FeatureDev)
+        return msgs
+
 
 class QADev(Node):
     def __init__(self, node_addr=None, node_name=""):
@@ -48,6 +62,9 @@ class QADev(Node):
 
     @Node.process(["FeatureDev:QADev"])
     def act(self, message: List[Message]) -> List[Message]:
+        import time
+
+        time.sleep(1)
         demand = message[0].content
         return [self.work_test(demand)]
 
@@ -59,7 +76,7 @@ class QADev(Node):
         # result = get_answer_sync(prompt, pytest_system_prompt)
         result = "mock_QADev_query"
         return Message(
-            message_name="QADev:END",
+            message_name="QADev:PM",
             content=result,
         )
 
@@ -70,7 +87,9 @@ class FeatureDev(Node):
 
     @Node.process(["PM:FeatureDev"])
     def act(self, message: List[Message]) -> List[Message]:
-        logger.debug("act")
+        import time
+
+        time.sleep(1)
         demand = message[0].content
         return [self.work_feature(demand)]
 

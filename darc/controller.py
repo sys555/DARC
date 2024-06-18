@@ -1,6 +1,8 @@
+import uuid
 from typing import Any, Dict, List, Optional
 
 import networkx as nx
+from loguru import logger
 
 from darc.agent.dev import PM, FeatureDev, QADev
 from darc.logger import MASLog, MASLogger
@@ -41,7 +43,8 @@ class Task:
             task_id=self.task_id,
         )
         # TODO:use tell
-        self.entry_node.proxy().on_receive(message)
+        # self.entry_node.proxy().on_receive(message)
+        self.entry_node.tell(message)
 
 
 class Graph:
@@ -70,8 +73,18 @@ class Graph:
         # 根据 args 生成 node
         for node_cls, count, args_list in config.get("args", []):
             instantiated_classes.add(node_cls)
+            cur = 0
             for args in args_list:
+                cur += 1
                 instance = graph._spawn_new_instance(node_cls, args)
+                node_instances.setdefault(node_cls, []).append(instance)
+                graph.add_node(instance)
+            while cur < count:
+                # 随机初始化没有特殊参数的节点
+                cur += 1
+                instance = graph._spawn_new_instance(
+                    node_cls, (str(uuid.uuid4),)
+                )
                 node_instances.setdefault(node_cls, []).append(instance)
                 graph.add_node(instance)
 

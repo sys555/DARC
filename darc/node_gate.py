@@ -69,16 +69,16 @@ class NodeGate(AbstractActor):
             if message.from_agent_type == "Router":
                 if message.to_agent != "None":
                     self.send(bak_message, message.to_agent)
-                elif message.broadcasting:
-                    linked_instance_list = [
-                        _addr
-                        for _addr in self.instance.keys()
-                        if (
-                            _addr not in combined_list
-                            and _addr != message.from_agent
-                        )
-                    ]
-                    self.send(bak_message, linked_instance_list)
+                # elif message.broadcasting:
+                #     linked_instance_list = [
+                #         _addr
+                #         for _addr in self.instance.keys()
+                #         if (
+                #             _addr not in combined_list
+                #             and _addr != message.from_agent
+                #         )
+                #     ]
+                #     self.send(bak_message, linked_instance_list)
                 else:
                     # random sample
                     linked_instance_list = [

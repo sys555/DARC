@@ -27,21 +27,23 @@ config = {
     "args": [
         (
             PM,
-            1,
-            [("Alice",)],
+            2,
+            [("Alice",),("io",)],
         ),  
         (
             FeatureDev,
-            1,
-            [("Bob",)],
+            2,
+            [("Bob",),("ki",)],
         ),  
         (
             QADev,
-            1,
-            [("Coob",)],
+            2,
+            [("Coob",),("vi",)],
         ),  
     ],
 }
+
+logger.debug(config)
 
 # 将配置转换为networkx图
 G = config_to_networkx(config)
@@ -51,6 +53,10 @@ new_config = networkx_to_config(G)
 
 graph = Graph.init(new_config)
 
+import time
+time.sleep(1)
+
+logger.debug(graph.nodes)
 #TODO: find_node_with_name return id
 # mas_logger = MASLogger()
 alice = graph.find_node_with_name("Alice", "PM")
@@ -58,22 +64,23 @@ alice = graph.find_node_with_name("Alice", "PM")
 # demand = "请用python帮我生成一个贪吃蛇的小游戏"
 demand = "请用python帮我生成一个整数加法函数"
 
-task_id = str(uuid.uuid4())
+for _ in range(1):
+    task_id = str(uuid.uuid4())
 
-bob = graph.find_node_with_name("Bob", "FeatureDev")
-coob = graph.find_node_with_name("Coob", "QADev")
+    bob = graph.find_node_with_name("Bob", "FeatureDev")
+    coob = graph.find_node_with_name("Coob", "QADev")
 
-task = Task(
-    graph = graph,
-    task_id = task_id,
-)
-task.set_entry_node(alice)
-task.set_exit_node(coob)
-task.set_initial_input(demand)
-graph.run(task)
+    task = Task(
+        graph = graph,
+        task_id = task_id,
+    )
+    task.set_entry_node(alice)
+    task.set_exit_node(coob)
+    task.set_initial_input(demand)
+    graph.run(task)
     
 import time
-time.sleep(8)
+time.sleep(160)
 
 logger.info(graph.get_log(task_id))
 logger.info(graph.get_result(task_id))
