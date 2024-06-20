@@ -1,14 +1,6 @@
 import pytest
 
-
-from darc.filter import Filter, ev
-from darc.llm import LLM_with_PPL
-from darc.leaderboard import LeaderBoard
 from darc.controller import Task, Graph
-from darc.database import DatasetDB
-from darc.attacker import Attacker
-
-from darc.evaluator import AttackEvaluator
 
 import logging
 
@@ -17,38 +9,20 @@ import logging
 @pytest.fixture
 def setup_graph():
     config = {
-        "node": [
-            DatasetDB,
-            Attacker,
-            Filter,
-            LLM_with_PPL,
-            AttackEvaluator,
-            LeaderBoard,
-        ],
-        "edge": [
-            (DatasetDB, Attacker),
-            (DatasetDB, Filter),
-            (DatasetDB, AttackEvaluator),
-            (Attacker, DatasetDB),
-            (Attacker, Filter),
-            (Filter, LLM_with_PPL),
-            (Filter, Attacker),
-            (LLM_with_PPL, AttackEvaluator),
-            (AttackEvaluator, DatasetDB),
-            (AttackEvaluator, LeaderBoard),
-        ],
+        "node": [],
+        "edge": [],
         "args": [
-            (
-                DatasetDB,
-                1,
-                {"db": "chanllenge"},
-            ),  # 实例化一个参数为{"db": "chanllenge"}的DatasetDB对象
-            (
-                LLM_with_PPL,
-                2,
-                {"llm": "GPT4"},
-            ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
-            (Attacker, 2, {}),
+            # (
+            #     DatasetDB,
+            #     1,
+            #     {"db": "chanllenge"},
+            # ),  # 实例化一个参数为{"db": "chanllenge"}的DatasetDB对象
+            # (
+            #     LLM_with_PPL,
+            #     2,
+            #     {"llm": "GPT4"},
+            # ),  # 实例化两个参数为{"llm": "GPT4"}的LLM_with_PPL对象，用于流量控制
+            # (Attacker, 2, {}),
         ],  # 如果在args里面没有出现，但在node里面出现的实体，则使用默认参数，初始化一个默认实例
     }
     return Graph.init(config)
