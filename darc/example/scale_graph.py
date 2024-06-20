@@ -25,7 +25,7 @@ roles_map = {
 colors = ["red", "green", "blue"]
 
 # 创建随机分区图
-sizes = [1000, 1500, 1500]  # 每个 group 节点数量
+sizes = [150, 200, 150]  # 每个 group 节点数量
 p_in = 0.5
 p_out = 0.05
 G = nx.random_partition_graph(sizes, p_in, p_out, seed=42)
@@ -108,24 +108,34 @@ for i in range(10000):
     graph.run(task)
 
 
-def average_cpu_memory(duration=30, interval=1):
+import psutil
+import time
+
+def average_cpu_memory_for_current_process(duration=30, interval=1):
+    # 获取当前进程的引用
+    current_process = psutil.Process()
+
     cpu_percentages = []
     memory_percentages = []
 
     # 计算测量的次数
     num_iterations = int(duration / interval)
 
-    # 每隔一定时间(interval秒)，收集CPU和内存使用率
+    # 每隔一定时间(interval秒)，收集当前进程的CPU和内存使用率
     for _ in range(num_iterations):
-        # 收集CPU使用率
-        cpu_usage = psutil.cpu_percent(interval=interval)
+        # 收集当前进程的CPU使用率
+        # 注意：由于psutil的特性，cpu_percent()调用应当设置interval=None来直接获取当前时刻的CPU使用率
+        cpu_usage = current_process.cpu_percent(interval=None)
         cpu_percentages.append(cpu_usage)
 
-        # 收集内存使用率
-        memory = psutil.virtual_memory()
-        memory_percentages.append(memory.percent)
+        # 收集当前进程的内存使用率
+        memory_info = current_process.memory_percent()
+        memory_percentages.append(memory_info)
 
-        print(f"Collected CPU: {cpu_usage}%, Memory: {memory.percent}%")
+        print(f"Collected CPU: {cpu_usage}%, Memory: {memory_info}%")
+
+        # 等待interval秒
+        time.sleep(interval)
 
     # 计算平均使用率
     average_cpu = sum(cpu_percentages) / len(cpu_percentages)
@@ -133,8 +143,8 @@ def average_cpu_memory(duration=30, interval=1):
 
     return average_cpu, average_memory
 
-
 # 运行函数并打印结果
-average_cpu, average_memory = average_cpu_memory(duration=128, interval=8)
-print(f"Average CPU Usage over 128 seconds: {average_cpu}%")
-print(f"Average Memory Usage over 128 seconds: {average_memory}%")
+duration = 128
+average_cpu, average_memory = average_cpu_memory_for_current_process(duration=duration, interval=8)
+print(f"Average CPU Usage of current process over {duration} seconds: {average_cpu}%")
+print(f"Average Memory Usage of current process over {duration} seconds: {average_memory}%")
