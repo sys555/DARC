@@ -17,30 +17,35 @@ defmodule Ain.ActorModelServer do
     {:ok, state}
   end
 
-  def send(from_name, to_name) do
+  def send(from_name, to_name, message) do
     from_pid = String.to_atom(from_name)
-    {:ok, state} = GenServer.call(from_pid, :get_state)
-    message = compute(state.logs)
-    GenServer.cast(String.to_atom(to_name), {:receive, message})
+    to_pid = String.to_atom(to_name)
+    GenServer.cast(to_pid, {:receive, message, from_pid})
   end
 
-  # 发送当前节点的日志中的一个随机条目到另一个指定节点
-  def send(target_name, state) do
-    message = compute(state.logs)
-    GenServer.cast(String.to_atom(target_name), {:receive, message})
-  end
+  # # 发送当前节点的日志中的一个随机条目到另一个指定节点
+  # def send(target_name, state) do
+  #   message = compute(state.logs)
+  #   GenServer.cast(String.to_atom(target_name), {:receive, message})
+  # end
 
-  # 从其他节点接收日志并打印
-  def handle_cast({:receive, message}, state) do
+  def handle_cast({:receive, message, from_pid}, state) do
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
+    # 生成响应消息并发送回发送者
+    response_message = compute(state.logs)
+    GenServer.cast(from_pid, {:receive, response_message, self()})
     {:noreply, updated_state}
   end
 
-  def handle_call({:receive, message}, state) do
+  # 如果需要处理同步消息，也应更新此逻辑
+  def handle_call({:receive, message, from_pid}, _from, state) do
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
-    {:noreply, updated_state}
+    # 生成响应消息并发送回发送者
+    response_message = compute(state.logs)
+    GenServer.cast(from_pid, {:receive, response_message, self()})
+    {:reply, :ok, updated_state}
   end
 
   # 构造消息，选择日志中的一个随机条目

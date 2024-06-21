@@ -17,8 +17,9 @@ defmodule Communicate do
     # 等待一小段时间确保两个节点都已启动并注册
     :timer.sleep(1000)
 
-    # 从节点 :node1 发送日志到节点 :node2
-    Ain.ActorModelServer.send("node1", "node2")
+    # 从节点 :node1 发送日志到节点 :node2，并且包括消息内容
+    initial_message = "Initial message from node1 to node2"
+    Ain.ActorModelServer.send("node1", "node2", initial_message)
 
     :timer.sleep(1000)
 
