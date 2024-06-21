@@ -9,10 +9,12 @@ defmodule Ain.ActorModelServer do
 
   # 初始化
   def init(args) do
+    {:ok, python_server_pid} = PythonServer.start_link(args["env"])
     state = %{
       init: args["init"],
       env: args["env"],
-      logs: args["logs"]
+      logs: args["logs"],
+      python_server_pid: python_server_pid,
     }
     {:ok, state}
   end
