@@ -32,13 +32,13 @@ defmodule Ain.ActorModelServer do
 
   # 从其他节点接收日志并打印
   def handle_cast({:receive, message}, state) do
-    updated_state = Map.update!(state, :logs, fn logs -> [message | logs] end)
+    updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
     {:noreply, updated_state}
   end
 
   def handle_call({:receive, message}, state) do
-    updated_state = Map.update!(state, :logs, fn logs -> [message | logs] end)
+    updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
     {:noreply, updated_state}
   end
@@ -61,5 +61,10 @@ defmodule Ain.ActorModelServer do
 
   def handle_call(:get_state, _from, state) do
     {:reply, {:ok, state}, state}
+  end
+
+  # 更新状态的通用函数
+  defp update_state(state, key, func) do
+    Map.update!(state, key, func)
   end
 end
