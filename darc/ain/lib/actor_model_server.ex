@@ -17,31 +17,33 @@ defmodule Ain.ActorModelServer do
     {:ok, state}
   end
 
-  # 发送当前节点的日志到另一个指定节点
-  def send_logs_to_other_node(source_name, target_name) do
-    # 使用 case 语句来处理所有可能的返回
-    case GenServer.call(String.to_atom(source_name), :get_logs) do
-      logs when is_list(logs) ->
-        GenServer.cast(String.to_atom(target_name), {:receive_logs_from_other, logs})
+  def send(from_name, to_name) do
+    from_pid = String.to_atom(from_name)
+    {:ok, state} = GenServer.call(from_pid, :get_state)
+    message = compute(state.logs)
+    GenServer.cast(String.to_atom(to_name), {:receive, message})
+  end
 
-      {:ok, logs} when is_list(logs) ->
-        GenServer.cast(String.to_atom(target_name), {:receive_logs_from_other, logs})
-
-      _ ->
-        IO.puts("Failed to retrieve logs from #{source_name}")
-    end
+  # 发送当前节点的日志中的一个随机条目到另一个指定节点
+  def send(target_name, state) do
+    message = compute(state.logs)
+    GenServer.cast(String.to_atom(target_name), {:receive, message})
   end
 
   # 从其他节点接收日志并打印
-  def handle_cast({:receive_logs_from_other, logs}, state) do
-    IO.puts("Received logs from another node:")
-    Enum.each(logs, &IO.puts/1)
+  def handle_cast({:receive, message}, state) do
+    IO.puts("Received message from another node: #{message}")
     {:noreply, state}
   end
 
-  # 获取当前节点的日志
-  def handle_call(:get_logs, _from, state) do
-    {:reply, state.logs, state}
+  def handle_call({:receive, message}, state) do
+    IO.puts("Received message from another node: #{message}")
+    {:noreply, state}
+  end
+
+  # 构造消息，选择日志中的一个随机条目
+  def compute(logs) do
+    Enum.random(logs)
   end
 
   # 打印日志消息
@@ -53,5 +55,9 @@ defmodule Ain.ActorModelServer do
   def handle_call(:print_logs, _from, state) do
     Enum.each(state.logs, &IO.puts/1)
     {:reply, :ok, state}
+  end
+
+  def handle_call(:get_state, _from, state) do
+    {:reply, {:ok, state}, state}
   end
 end
