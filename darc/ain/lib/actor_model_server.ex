@@ -32,13 +32,15 @@ defmodule Ain.ActorModelServer do
 
   # 从其他节点接收日志并打印
   def handle_cast({:receive, message}, state) do
+    updated_state = Map.update!(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
-    {:noreply, state}
+    {:noreply, updated_state}
   end
 
   def handle_call({:receive, message}, state) do
+    updated_state = Map.update!(state, :logs, fn logs -> [message | logs] end)
     IO.puts("Received message from another node: #{message}")
-    {:noreply, state}
+    {:noreply, updated_state}
   end
 
   # 构造消息，选择日志中的一个随机条目

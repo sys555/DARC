@@ -20,6 +20,8 @@ defmodule Communicate do
     # 从节点 :node1 发送日志到节点 :node2
     Ain.ActorModelServer.send("node1", "node2")
 
+    :timer.sleep(1000)
+
     # 从节点 :node2 打印其接收到的日志
     Ain.ActorModelServer.print_logs("node2")
   end
