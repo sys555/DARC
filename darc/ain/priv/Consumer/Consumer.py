@@ -35,6 +35,6 @@ def handle_message(input):
             cast_message(message_handler, (Atom('error'), error_message))
     
 def compute(input: str) -> str:
-    return ""
+    return "consumer here"
 
 set_message_handler(handle_message)
