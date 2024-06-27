@@ -10,7 +10,7 @@ defmodule PythonPortExample do
     })
 
     GenServer.cast(pid_alice_producer, {:receive, "bob_consumer ASK alice_producer", pid_bob_consumer, :initial})
-    GenServer.cast(pid_bob_consumer, {:receive, "alice_producer ASK bob_consumer", pid_alice_producer, :initial})
+    # GenServer.cast(pid_bob_consumer, {:receive, "alice_producer ASK bob_consumer", pid_alice_producer, :initial})
   end
 
 end
