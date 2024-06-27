@@ -1,6 +1,6 @@
 defmodule Ain.ActorModelServer do
   use GenServer
-
+  alias Ain.Python
   # 启动 GenServer，使用 init 字段作为名称注册
   def start_link(args) do
     name = String.to_atom(args["init"])  # 将 init 字段转换为原子作为名称
@@ -9,12 +9,23 @@ defmodule Ain.ActorModelServer do
 
   # 初始化
   def init(args) do
-    state = %{
-      init: args["init"],
-      env: args["env"],
-      logs: args["logs"]
-    }
-    {:ok, state}
+    try do
+      # 启动一个 Python 解释器的实例 并记录其 PID
+      python_session = Python.start(args["env"])
+      # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
+      Python.call(python_session, String.to_atom(args["env"]), :register_handler, [self()])
+      state = %{
+        init: args["init"],
+        env: args["env"],
+        logs: args["logs"],
+        python_session: python_session
+      }
+      {:ok, state}
+    rescue
+      e in UndefinedFunctionError ->
+        IO.puts("An error occurred: #{inspect(e)}")
+        {:stop, e}
+    end
   end
 
   # 发送消息
@@ -29,7 +40,7 @@ defmodule Ain.ActorModelServer do
     IO.puts("#{state.init} received initial message: #{message}")
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     # 发送ACK消息
-    response_message = compute(state.logs)
+    response_message = compute(state, message)
     GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
     {:noreply, updated_state}
   end
@@ -48,8 +59,9 @@ defmodule Ain.ActorModelServer do
   end
 
   # 构造消息，选择日志中的一个随机条目
-  def compute(logs) do
-    Enum.random(logs)
+  def compute(state, input) do
+    result = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
+    result
   end
 
   # 打印日志消息
