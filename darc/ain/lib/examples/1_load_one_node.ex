@@ -16,6 +16,3 @@ defmodule LoadOneNode do
     end
   end
 end
-
-# 在 IEx 里运行该模块的 run 函数
-LoadOneNode.run()
