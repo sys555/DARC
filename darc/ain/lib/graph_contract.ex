@@ -151,12 +151,12 @@ defmodule GraphContract do
     nodes = Map.fetch!(json_data, "nodes")
     edges = Map.fetch!(json_data, "edges")
     init_messages = Map.fetch!(json_data, "data")
-
+    count = 0
     # 在映射中捕获可能的启动错误，并保留已有的PID或新的PID
     pids = Enum.reduce(nodes, %{}, fn {node_name, node_info}, acc ->
       env = Map.get(node_info, "env", "compute_prefix")
       logs = Map.get(node_info, "logs", [])
-
+      IO.inspect(count)
       case Ain.ActorModelServer.start_link(%{"init" => node_name, "env" => env, "logs" => logs}) do
         {:ok, pid} ->
           Map.put(acc, node_name, pid)

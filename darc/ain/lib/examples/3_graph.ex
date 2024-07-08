@@ -1,7 +1,7 @@
 defmodule GraphExample do
   def run do
-    num_nodes = 100000
-    num_edges = 10000
+    num_nodes = 1000
+    num_edges = 1000
 
     # 使用 GraphGenerator 模块直接生成图并获取 JSON 格式数据
     {:ok, contract_pid} = GraphContract.start_link([])
