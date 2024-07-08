@@ -37,7 +37,7 @@ defmodule Ain.ActorModelServer do
 
   # 处理接收到的消息
   def handle_cast({:receive, message, from_pid, :initial}, state) do
-    IO.puts("#{state.init} received initial message: #{message}")
+    # IO.puts("#{state.init} received initial message: #{message}")
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     # 发送ACK消息
     response_message = compute(state, message)
@@ -46,7 +46,7 @@ defmodule Ain.ActorModelServer do
   end
 
   def handle_cast({:receive, message, from_pid, :ack}, state) do
-    IO.puts("#{state.init} received ACK: #{message}")
+    # IO.puts("#{state.init} received ACK: #{message}")
     # 发送FINAL消息
     final_message = "FINAL"
     GenServer.cast(from_pid, {:receive, final_message, self(), :final})
@@ -54,7 +54,7 @@ defmodule Ain.ActorModelServer do
   end
 
   def handle_cast({:receive, message, from_pid, :final}, state) do
-    IO.puts("#{state.init} received FINAL message: #{message}, communication ended.")
+    # IO.puts("#{state.init} received FINAL message: #{message}, communication ended.")
     {:noreply, state}
   end
 

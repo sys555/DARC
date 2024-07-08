@@ -7,14 +7,15 @@ defmodule Ain.MixProject do
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixir_opts: [erl_opts: "--erl \"-args_file ./vm.args\""]
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :observer, :wx]
     ]
   end
 
@@ -25,6 +26,7 @@ defmodule Ain.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:erlport, "~> 0.9"},
       {:jason, "~> 1.2"},
+      {:recon, "~> 2.5"},
     ]
   end
 end
