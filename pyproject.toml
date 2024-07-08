@@ -15,6 +15,7 @@ pytest = "^8.2.0"
 pykka = "^4.0.2"
 loguru = "^0.7.2"
 erlport = "^0.6"
+kuzu = "^0.4.2"
 
 
 [tool.poetry.group.dev.dependencies]
