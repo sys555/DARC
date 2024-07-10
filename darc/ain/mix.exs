@@ -27,6 +27,8 @@ defmodule Ain.MixProject do
       {:erlport, "~> 0.9"},
       {:jason, "~> 1.2"},
       {:recon, "~> 2.5"},
+      {:ecto_sql, "~> 3.2"},
+      {:postgrex, "~> 0.15"}
     ]
   end
 end
