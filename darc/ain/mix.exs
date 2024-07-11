@@ -28,7 +28,9 @@ defmodule Ain.MixProject do
       {:jason, "~> 1.2"},
       {:recon, "~> 2.5"},
       {:ecto_sql, "~> 3.2"},
-      {:postgrex, "~> 0.15"}
+      {:postgrex, "~> 0.15"},
+      {:ex_machina, "~> 2.7"},
+      {:faker, "~> 0.17"}
     ]
   end
 end
