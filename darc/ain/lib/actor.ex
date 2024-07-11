@@ -28,6 +28,27 @@ defmodule Actor do
       e in UndefinedFunctionError ->
         IO.puts("An error occurred: #{inspect(e)}")
         {:stop, e}
+    end
+  end
+
+  def process_input(state) do
+    prefix = state.prefix
+    input_cache = state.input_cache
+
+    # 检查所有入度消息是否已经到达
+    all_received = Enum.all?(prefix, fn uid ->
+      Map.has_key?(input_cache, uid)
+    end)
+
+    # 所有入度消息已到达
+    if all_received do
+      # 打包入度消息
+      input = construct_input(state)
+      compute(input, state)
+  end
+
+  def construct_input(state) do
+
   end
 
   def handle_cast({:receive, message}, state) do
@@ -37,9 +58,11 @@ defmodule Actor do
     new_input_cache = Map.put(state.input_cache, uid, content)
     new_state = %{state | input_cache: new_input_cache}
 
-    process_input(state)
+    process_input(new_state)
 
     {:noreply, new_state}
   end
+
+
 
 end
