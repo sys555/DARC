@@ -1,18 +1,18 @@
-defmodule DB.Repo.Migrations.CreateTasks do
-  use Ecto.Migration
+defmodule DB.Task do
+  use Ecto.Schema
+  import Ecto.Changeset
 
-  def change do
-    create table(:tasks, primary_key: false) do
-      add :uid, :uuid, primary_key: true
-      add :ttl, :integer
-      add :nodes, :map
-      add :input, :map
-      add :output, :map
-      add :diff_graph, :map
-      add :whole_graph, :map
-      add :logs, :map
+  @primary_key {:uid, :binary_id, autogenerate: true}
+  schema "tasks" do
+    field :ttl, :integer
+    field :nodes, :map
+    field :input, :map
+    field :output, :map
+    field :diff_graph, :map
+    field :whole_graph, :map
+    field :logs, :map
 
-      timestamps()
-    end
+    timestamps()
   end
+
 end

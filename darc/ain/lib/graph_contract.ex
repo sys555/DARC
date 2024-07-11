@@ -1,20 +1,46 @@
 defmodule GraphContract do
   use GenServer
+  import Util.GraphContractUtil
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %{})
+  def start_link(initial_state \\ %{}) do
+    GenServer.start_link(__MODULE__, initial_state)
   end
 
-  def init(_) do
+  def init(initial_state) do
     # 初始化状态，包括节点信息、边的信息、每个节点的消息日志、节点的入度计数器
-    {:ok, %{
-      nodes: %{},
-      edges: %{},
+    state = %{
+      nodes: initial_state[:nodes] || %{},
+      edges: initial_state[:edges] || %{},
+      task: initial_state[:task] || %{},
       logs: %{},
       queues: %{},
       counter: %{}
-    }}
+    }
+
+    {:ok, state}
   end
+
+  # 暴露的初始化函数，接收 graph_id 和 init_data
+  def start_with_graph_id_and_init_data(graph_id, init_data) do
+    with {:ok, %{actors: actors, edges: edges}} <- GraphContractUtil.get_graph_by_uid(graph_id),
+          {:ok, task} <- GraphContractUtil.generate_task(init_data) do
+
+      nodes = Enum.reduce(actors, %{}, fn %{init: init, env: env}, acc ->
+        Map.put(acc, init, env)
+      end)
+
+      initial_state = %{
+        nodes: nodes,
+        edges: transform_edges(edges),
+        task: task
+      }
+
+      start_link(initial_state)
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
 
   # 添加节点
   def add_node(contract_pid, name, pid) do
