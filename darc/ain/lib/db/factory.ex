@@ -16,6 +16,7 @@ defmodule DB.Factory do
 
   def actor_factory(attrs \\ %{}) do
     %Actor{
+      uid: Map.get(attrs, :uid, Ecto.UUID.generate()),  # 处理传入的 uid
       name: Person.name(),
       role: Map.get(attrs, :role, ""),
       age: Enum.random(18..70),

@@ -1,7 +1,7 @@
 defmodule GraphExample do
   def run do
-    num_nodes = 1000
-    num_edges = 1000
+    num_nodes = 10
+    num_edges = 2
 
     # 使用 GraphGenerator 模块直接生成图并获取 JSON 格式数据
     data = GraphGenerator.generate_graph(num_nodes, num_edges)

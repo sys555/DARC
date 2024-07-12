@@ -7,13 +7,20 @@ defmodule Ain.ActorModelServer do
     GenServer.start_link(__MODULE__, args, name: name)
   end
 
-  # 初始化
   def init(args) do
     try do
-      # 启动一个 Python 解释器的实例 并记录其 PID
-      python_session = Python.start(args["env"])
-      # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
-      Python.call(python_session, String.to_atom(args["env"]), :register_handler, [self()])
+      python_session =
+        if args["env"] == "Graph" do
+          # Graph env 不加载 python 解释器
+          nil
+        else
+          # 启动一个 Python 解释器的实例 并记录其 PID
+          session = Python.start(args["env"])
+          # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
+          Python.call(session, String.to_atom(args["env"]), :register_handler, [self()])
+          session
+        end
+
       state = %{
         init: args["init"],
         env: args["env"],
@@ -58,11 +65,20 @@ defmodule Ain.ActorModelServer do
     {:noreply, state}
   end
 
-  # 构造消息，选择日志中的一个随机条目
   def compute(state, input) do
-    result = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
-    result
+    if state.env == "Graph" do
+      graph_compute(state, input)
+    else
+      Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
+    end
   end
+
+  defp graph_compute(state, input) do
+    # 这里需要实现 Graph 计算逻辑
+    "Graph compute result for #{input}"
+  end
+
+
 
   # 打印日志消息
   def print_logs(name) do

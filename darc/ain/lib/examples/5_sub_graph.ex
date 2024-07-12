@@ -1,5 +1,6 @@
 defmodule SubGraphExample do
   alias DB.Repo
+  alias Util.GraphContractUtil
   import DB.Factory
 
   def mockdata do
@@ -11,6 +12,7 @@ defmodule SubGraphExample do
   end
 
   def gen_task do
+    Repo.start_link()
     init_data = %{
       ttl: 3600,
       nodes: %{},
@@ -26,4 +28,15 @@ defmodule SubGraphExample do
       {:error, changeset} -> IO.inspect(changeset, label: "Task Generation Error")
     end
   end
+
+  def get_graph_data do
+    Repo.start_link()
+    IO.inspect(GraphContractUtil.get_actors_and_edges_by_graph_id("2026b8af-79d2-4853-acbe-bcd080ae403d"))
+  end
+
+  def gen_contract do
+    Repo.start_link()
+    pid = GraphContract.start_with_graph_id_and_init_data("198a4c54-77f1-490b-be52-b57c57732b82", "haha")
+  end
+
 end

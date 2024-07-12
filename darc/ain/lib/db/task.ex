@@ -15,4 +15,13 @@ defmodule DB.Task do
     timestamps()
   end
 
+  @doc """
+  创建或更新 Task 的 changeset。
+  """
+  def changeset(task, attrs) do
+    task
+    |> cast(attrs, [:ttl, :nodes, :input, :output, :diff_graph, :whole_graph, :logs])
+    |> validate_required([:ttl, :nodes, :input, :output, :diff_graph, :whole_graph, :logs])
+  end
+
 end
