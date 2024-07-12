@@ -36,10 +36,15 @@ defmodule GraphContract do
       }
 
       {:ok, pid} = start_link(initial_state)
-      run(initial_state, pid)
+      GraphContract.run(initial_state, pid)
     else
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  # 外部调用的 run 函数
+  def run(pid) do
+    GenServer.call(pid, :run)
   end
 
   def run(state, contract_pid) do

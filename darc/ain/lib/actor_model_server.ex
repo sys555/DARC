@@ -75,10 +75,9 @@ defmodule Ain.ActorModelServer do
 
   defp graph_compute(state, input) do
     # 这里需要实现 Graph 计算逻辑
+    IO.inspect("defp graph_compute(state, input) do")
     "Graph compute result for #{input}"
   end
-
-
 
   # 打印日志消息
   def print_logs(name) do
