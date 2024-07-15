@@ -25,7 +25,9 @@ defmodule Ain.ActorModelServer do
         init: args["init"],
         env: args["env"],
         logs: args["logs"],
-        python_session: python_session
+        python_session: python_session,
+        # graph contract pid
+        callback_pid: nil
       }
       {:ok, state}
     rescue
@@ -47,8 +49,12 @@ defmodule Ain.ActorModelServer do
     # IO.puts("#{state.init} received initial message: #{message}")
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
     # 发送ACK消息
-    response_message = compute(state, message)
-    GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
+    if state.env == "Graph" do
+      updated_state = graph_compute(state, message)
+    else
+      response_message = compute(state, message)
+      GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
+    end
     {:noreply, updated_state}
   end
 
@@ -65,18 +71,27 @@ defmodule Ain.ActorModelServer do
     {:noreply, state}
   end
 
+  def handle_cast({:all_logs_received, updated_logs}, state) do
+    response_message = updated_logs
+    IO.inspect(response_message)
+    IO.inspect(state.callback_pid)
+    GenServer.cast(state.callback_pid, {:receive, response_message, self(), :ack})
+    {:noreply, state}
+  end
+
   def compute(state, input) do
-    if state.env == "Graph" do
-      graph_compute(state, input)
-    else
-      Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
-    end
+    Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
   end
 
   defp graph_compute(state, input) do
     # 这里需要实现 Graph 计算逻辑
-    IO.inspect("defp graph_compute(state, input) do")
-    "Graph compute result for #{input}"
+    # IO.inspect("defp graph_compute(state, input) do")
+    # "Graph compute result for #{input}"
+    # create a MAS
+    uid = state.init
+    pid = GraphContract.start_with_graph_id_and_init_data(uid, uid, self())
+    updated_state = %{state | callback_pid: pid}
+    updated_state
   end
 
   # 打印日志消息

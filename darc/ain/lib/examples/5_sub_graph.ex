@@ -36,7 +36,7 @@ defmodule SubGraphExample do
 
   def gen_contract do
     Repo.start_link()
-    pid = GraphContract.start_with_graph_id_and_init_data("198a4c54-77f1-490b-be52-b57c57732b82", "haha")
+    pid = GraphContract.start_with_graph_id_and_init_data("2026b8af-79d2-4853-acbe-bcd080ae403d", "haha")
   end
 
 end

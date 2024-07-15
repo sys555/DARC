@@ -20,19 +20,20 @@ defmodule GraphContract do
       queues: %{},
       counter: %{},
       init_data: initial_state[:init_data] || "",
+      callback_pid: initial_state[:callback_pid] || "",
     }
 
     {:ok, state}
   end
 
   # 暴露的初始化函数，接收 graph_id 和 init_data
-  def start_with_graph_id_and_init_data(graph_id, init_data) do
-    with {:ok, %{actors: nodes_info, edges: edges_info}} <- GraphContractUtil.get_graph_by_uid(graph_id) do
-
+  def start_with_graph_id_and_init_data(graph_id, init_data, callback_pid \\ nil) do
+    with {:ok, %{actors: nodes_info, edges: edges_info}} <- GraphContractUtil.get_actors_and_edges_by_graph_id(graph_id) do
       initial_state = %{
         nodes_info: nodes_info,
         edges_info: edges_info,
         init_data: init_data,
+        callback_pid: callback_pid
       }
 
       {:ok, pid} = start_link(initial_state)
@@ -56,7 +57,7 @@ defmodule GraphContract do
     pids = Enum.reduce(nodes, %{}, fn {node_name, node_info}, acc ->
       env = Map.get(node_info, "env", "compute_prefix")
       logs = Map.get(node_info, "logs", [])
-      IO.inspect(node_name)
+      # IO.inspect(node_name)
       case Ain.ActorModelServer.start_link(%{"init" => node_name, "env" => env, "logs" => logs}) do
         {:ok, pid} ->
           Map.put(acc, node_name, pid)
@@ -141,6 +142,8 @@ defmodule GraphContract do
     # 更新该节点的日志
     updated_logs = Map.update(state.logs, node, [message], fn existing_msgs -> [message | existing_msgs] end)
 
+    check_logs(updated_logs, state)
+
     # 根据 from_pid 的出度更新对应节点的队列
     from_node_out_degrees = Map.get(state.counter, node, %{}).out_degree
     updated_queues = Enum.reduce(from_node_out_degrees, state.queues, fn out_node, acc ->
@@ -166,6 +169,17 @@ defmodule GraphContract do
     end)
 
     {:noreply, new_state}
+  end
+
+  def check_logs(logs, state) do
+    # 所有值是否不为空
+    all_values_non_empty = Enum.all?(logs, fn {_key, value} -> value != [] end)
+    if all_values_non_empty do
+      # 所有值都不为空，使用 GenServer.cast 发送消息
+      if state.callback_pid do
+        GenServer.cast(state.callback_pid, {:all_logs_received, inspect(logs)})
+      end
+    end
   end
 
   defp update_after_sending(node, message_reply, state) do
