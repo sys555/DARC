@@ -31,12 +31,12 @@ defmodule SubGraphExample do
 
   def get_graph_data do
     Repo.start_link()
-    IO.inspect(GraphContractUtil.get_actors_and_edges_by_graph_id("2026b8af-79d2-4853-acbe-bcd080ae403d"))
+    IO.inspect(GraphContractUtil.get_actors_and_edges_by_graph_id("f7e7d9d2-3a90-4e1f-a3b1-b365fa8a1333"))
   end
 
   def gen_contract do
     Repo.start_link()
-    pid = GraphContract.start_with_graph_id_and_init_data("2026b8af-79d2-4853-acbe-bcd080ae403d", "haha")
+    pid = GraphContract.start_with_graph_id_and_init_data("f7e7d9d2-3a90-4e1f-a3b1-b365fa8a1333", "请为一个童话故事开一个头")
   end
 
 end

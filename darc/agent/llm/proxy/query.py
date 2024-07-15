@@ -6,10 +6,10 @@ from typing import Any, List
 from litellm import acompletion, completion
 from loguru import logger
 
-from darc.llm.prompt.system_prompt_template import bundle_prompt
+from darc.agent.llm.prompt.system_prompt_template import bundle_prompt
 
 model_type = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
-model_name = model_type[1]
+model_name = model_type[0]
 
 
 def get_response_sync(question, system_prompt=""):

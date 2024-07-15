@@ -51,7 +51,7 @@ defmodule Util.GraphContractUtil do
     Enum.reduce(actors, %{}, fn %Actor{uid: uid, name: name, role: role}, acc ->
       Map.put(acc, uid, %{
         "init" => "#{uid}:#{name}",
-        "env" => String.capitalize(role)
+        "env" => role
       })
     end)
   end

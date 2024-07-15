@@ -46,11 +46,12 @@ defmodule Ain.ActorModelServer do
 
   # 处理接收到的消息
   def handle_cast({:receive, message, from_pid, :initial}, state) do
-    # IO.puts("#{state.init} received initial message: #{message}")
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
+    # MAS 回调绑定
+    updated_state = %{state | callback_pid: from_pid}
     # 发送ACK消息
     if state.env == "Graph" do
-      updated_state = graph_compute(state, message)
+      graph_compute(updated_state, message)
     else
       response_message = compute(state, message)
       GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
@@ -73,25 +74,23 @@ defmodule Ain.ActorModelServer do
 
   def handle_cast({:all_logs_received, updated_logs}, state) do
     response_message = updated_logs
-    IO.inspect(response_message)
-    IO.inspect(state.callback_pid)
     GenServer.cast(state.callback_pid, {:receive, response_message, self(), :ack})
     {:noreply, state}
   end
 
   def compute(state, input) do
-    Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
+    python_call_res = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
+    # 当传输或打印一个包含非 ASCII 字符的字符列表时，每个字符会被其对应的 Unicode 码点表示，必须做list to str
+    res = List.to_string(python_call_res)
+    IO.inspect(state.init)
+    IO.inspect(input)
+    IO.inspect(res)
   end
 
   defp graph_compute(state, input) do
-    # 这里需要实现 Graph 计算逻辑
-    # IO.inspect("defp graph_compute(state, input) do")
-    # "Graph compute result for #{input}"
-    # create a MAS
     uid = state.init
-    pid = GraphContract.start_with_graph_id_and_init_data(uid, uid, self())
-    updated_state = %{state | callback_pid: pid}
-    updated_state
+    # create a MAS
+    pid = GraphContract.start_with_graph_id_and_init_data(uid, input, self())
   end
 
   # 打印日志消息

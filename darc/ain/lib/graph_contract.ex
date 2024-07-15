@@ -20,7 +20,7 @@ defmodule GraphContract do
       queues: %{},
       counter: %{},
       init_data: initial_state[:init_data] || "",
-      callback_pid: initial_state[:callback_pid] || "",
+      callback_pid: initial_state[:callback_pid] || nil,
     }
 
     {:ok, state}
@@ -57,7 +57,6 @@ defmodule GraphContract do
     pids = Enum.reduce(nodes, %{}, fn {node_name, node_info}, acc ->
       env = Map.get(node_info, "env", "compute_prefix")
       logs = Map.get(node_info, "logs", [])
-      # IO.inspect(node_name)
       case Ain.ActorModelServer.start_link(%{"init" => node_name, "env" => env, "logs" => logs}) do
         {:ok, pid} ->
           Map.put(acc, node_name, pid)
@@ -156,7 +155,6 @@ defmodule GraphContract do
     new_state = Enum.reduce(from_node_out_degrees, %{state | queues: updated_queues, logs: updated_logs}, fn out_node, acc ->
       queue = Map.get(acc.queues, out_node, [])
       in_degree_size = length(Map.get(acc.counter, out_node, %{}).in_degree)
-
       if length(queue) == in_degree_size do
         # 合并所有入度节点发送的消息并发送
         messages_to_send = Enum.join(queue, ", ")
@@ -167,7 +165,6 @@ defmodule GraphContract do
         acc
       end
     end)
-
     {:noreply, new_state}
   end
 
@@ -194,11 +191,6 @@ defmodule GraphContract do
   end
 
   defp pid_to_node_name(pid, state) do
-    # IO.puts("Inspecting PID:")
-    # IO.inspect(pid)
-
-    # IO.puts("Inspecting State:")
-    # IO.inspect(state)
     state.nodes
     |> Enum.find(fn {_key, val} -> val == pid end)
     |> case do

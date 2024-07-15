@@ -49,11 +49,11 @@ defmodule DB.Factory do
 
     # Generate actors with specific graph_id and insert them into the database
     actors = [
-      insert(:actor, %{graph_id: common_graph_id, role: "Producer"}),
+      insert(:actor, %{graph_id: common_graph_id, role: "PM"}),
       insert(:actor, %{graph_id: common_graph_id, uid: second_actor_uid, role: "Graph"}),
-      insert(:actor, %{graph_id: common_graph_id, role: "Producer"}),
-      insert(:actor, %{graph_id: second_actor_uid, role: "Producer"}),
-      insert(:actor, %{graph_id: second_actor_uid, role: "Producer"})
+      insert(:actor, %{graph_id: common_graph_id, role: "QA"}),
+      insert(:actor, %{graph_id: second_actor_uid, role: "DEV"}),
+      insert(:actor, %{graph_id: second_actor_uid, role: "DEV"})
     ]
 
     # Ensure actors have uid
