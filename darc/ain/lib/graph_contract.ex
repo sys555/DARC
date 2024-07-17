@@ -136,7 +136,7 @@ defmodule GraphContract do
 
   def handle_cast({:receive, message, from_pid, :ack}, state) do
     # IO.puts("Received ACK: #{message}")
-    # write_with_timestamp("/Users/mac/Documents/pjlab/repo/LLMSafetyChallenge/darc/ain/lib/examples/logs.json", message)
+    write_with_timestamp("/Users/mac/Documents/pjlab/repo/LLMSafetyChallenge/darc/ain/lib/examples/logs.json", message)
     node = pid_to_node_name(from_pid, state)
     # 更新该节点的日志
     updated_logs = Map.update(state.logs, node, [message], fn existing_msgs -> [message | existing_msgs] end)
@@ -265,11 +265,14 @@ defmodule GraphContract do
     # 要写入的内容，附带时间戳
     content_to_write = "#{content} - Timestamp: #{timestamp}\n"
 
+    # 将内容转换为二进制格式，使用 UTF-8 编码
+    binary_content = :unicode.characters_to_binary(content_to_write, :utf8, :utf8)
+
     # 打开文件，模式为：追加模式，如果文件不存在则创建
     case File.open(file_path, [:append, :create]) do
       {:ok, file} ->
-        # 写入内容并关闭文件
-        IO.write(file, content_to_write)
+        # 写入二进制内容并关闭文件
+        IO.binwrite(file, binary_content)
         File.close(file)
         :ok
 

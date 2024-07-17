@@ -8,6 +8,7 @@ import os
 
 # 导入 get_answers_sync 函数
 from darc.agent.llm.proxy.query import get_answer_sync
+from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
 
 
 # Reference to the Elixir process to send result to
@@ -42,6 +43,6 @@ def handle_message(input):
     
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
-    return get_answer_sync(decoded_string)
+    return get_answer_sync(decoded_string, system_prompt = tester_system_prompt)
 
 set_message_handler(handle_message)
