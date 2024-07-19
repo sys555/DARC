@@ -7,18 +7,27 @@ defmodule Ain.ActorModelServer do
     GenServer.start_link(__MODULE__, args, name: name)
   end
 
-  # 初始化
   def init(args) do
     try do
-      # 启动一个 Python 解释器的实例 并记录其 PID
-      python_session = Python.start(args["env"])
-      # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
-      Python.call(python_session, String.to_atom(args["env"]), :register_handler, [self()])
+      python_session =
+        if args["env"] == "Graph" do
+          # Graph env 不加载 python 解释器
+          nil
+        else
+          # 启动一个 Python 解释器的实例 并记录其 PID
+          session = Python.start(args["env"])
+          # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
+          Python.call(session, String.to_atom(args["env"]), :register_handler, [self()])
+          session
+        end
+
       state = %{
         init: args["init"],
         env: args["env"],
         logs: args["logs"],
-        python_session: python_session
+        python_session: python_session,
+        # graph contract pid
+        callback_pid: nil
       }
       {:ok, state}
     rescue
@@ -37,11 +46,16 @@ defmodule Ain.ActorModelServer do
 
   # 处理接收到的消息
   def handle_cast({:receive, message, from_pid, :initial}, state) do
-    # IO.puts("#{state.init} received initial message: #{message}")
     updated_state = update_state(state, :logs, fn logs -> [message | logs] end)
+    # MAS 回调绑定
+    updated_state = %{state | callback_pid: from_pid}
     # 发送ACK消息
-    response_message = compute(state, message)
-    GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
+    if state.env == "Graph" do
+      graph_compute(updated_state, message)
+    else
+      response_message = compute(state, message)
+      GenServer.cast(from_pid, {:receive, response_message, self(), :ack})
+    end
     {:noreply, updated_state}
   end
 
@@ -58,10 +72,25 @@ defmodule Ain.ActorModelServer do
     {:noreply, state}
   end
 
-  # 构造消息，选择日志中的一个随机条目
+  def handle_cast({:all_logs_received, updated_logs}, state) do
+    response_message = updated_logs
+    GenServer.cast(state.callback_pid, {:receive, response_message, self(), :ack})
+    {:noreply, state}
+  end
+
   def compute(state, input) do
-    result = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
-    result
+    python_call_res = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
+    # 当传输或打印一个包含非 ASCII 字符的字符列表时，每个字符会被其对应的 Unicode 码点表示，必须做list to str
+    res = List.to_string(python_call_res)
+    IO.inspect(state.init)
+    IO.inspect(input)
+    IO.inspect(res)
+  end
+
+  defp graph_compute(state, input) do
+    uid = state.init
+    # create a MAS
+    pid = GraphContract.start_with_graph_id_and_init_data(uid, input, self())
   end
 
   # 打印日志消息
