@@ -1,29 +1,93 @@
 defmodule GraphContract do
   use GenServer
+  alias Util.GraphContractUtil
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, %{})
+  def start_link(initial_state \\ %{}) do
+    GenServer.start_link(__MODULE__, initial_state)
   end
 
-  def init(_) do
+  def init(initial_state) do
     # 初始化状态，包括节点信息、边的信息、每个节点的消息日志、节点的入度计数器
-    {:ok, %{
+    state = %{
+      # name => pid
       nodes: %{},
+      # uid => {"env", "init"}
+      nodes_info: initial_state[:nodes_info] || %{},
       edges: %{},
+      edges_info: initial_state[:edges_info] || %{},
+      task: initial_state[:task] || %{},
       logs: %{},
       queues: %{},
-      counter: %{}
-    }}
+      counter: %{},
+      init_data: initial_state[:init_data] || "",
+      callback_pid: initial_state[:callback_pid] || nil,
+    }
+
+    {:ok, state}
   end
 
-  # 添加节点
-  def add_node(contract_pid, name, pid) do
-    GenServer.cast(contract_pid, {:add_node, name, pid})
+  # 暴露的初始化函数，接收 graph_id 和 init_data
+  def start_with_graph_id_and_init_data(graph_id, init_data, callback_pid \\ nil) do
+    with {:ok, %{actors: nodes_info, edges: edges_info}} <- GraphContractUtil.get_actors_and_edges_by_graph_id(graph_id) do
+      initial_state = %{
+        nodes_info: nodes_info,
+        edges_info: edges_info,
+        init_data: init_data,
+        callback_pid: callback_pid
+      }
+
+      {:ok, pid} = start_link(initial_state)
+      GraphContract.run(initial_state, pid)
+    else
+      {:error, reason} -> {:error, reason}
+    end
   end
 
-  # 添加边
-  def add_edge(contract_pid, from, to) do
-    GenServer.cast(contract_pid, {:add_edge, from, to})
+  # 外部调用的 run 函数
+  def run(pid) do
+    GenServer.call(pid, :run)
+  end
+
+  def run(state, contract_pid) do
+    nodes = state.nodes_info
+    edges = state.edges_info
+    init_messages = state.init_data
+
+    # 在映射中捕获可能的启动错误，并保留已有的PID或新的PID
+    pids = Enum.reduce(nodes, %{}, fn {node_name, node_info}, acc ->
+      env = Map.get(node_info, "env", "compute_prefix")
+      logs = Map.get(node_info, "logs", [])
+      case Ain.ActorModelServer.start_link(%{"init" => node_name, "env" => env, "logs" => logs}) do
+        {:ok, pid} ->
+          Map.put(acc, node_name, pid)
+        {:error, {:already_started, pid}} ->
+          IO.puts("Node #{node_name} already started with PID #{inspect(pid)}")
+          Map.put(acc, node_name, pid)
+        _error ->
+          acc
+      end
+    end)
+
+    # 等待节点创建完毕
+    :timer.sleep(1000)
+    # node添加入graph
+    Enum.each(pids, fn {node_name, pid} ->
+      GenServer.cast(contract_pid, {:add_node, node_name, pid})
+    end)
+
+    # edge添加入graph
+    Enum.each(edges, fn edge ->
+      [from, to] = String.split(edge, ":")
+      GenServer.cast(contract_pid, {:add_edge, from, to})
+    end)
+
+    # 等待节点与边添加完毕
+    :timer.sleep(1000)
+
+    entry_nodes = find_nodes_with_zero_indegree_and_nonzero_outdegree(nodes, edges)
+    init_messages = generate_initial_messages(entry_nodes, state.init_data)
+    # 发送初始消息
+    GraphContract.init_messages(contract_pid, init_messages)
   end
 
   # 发送初始化消息到所有入度为0的节点，每个节点接收不同的消息
@@ -55,7 +119,6 @@ defmodule GraphContract do
     updated_counter = Map.update!(updated_counter, from, fn count ->
       %{count | out_degree: [to | count.out_degree]}
     end)
-
     {:noreply, %{state | edges: updated_edges, counter: updated_counter}}
   end
 
@@ -73,10 +136,12 @@ defmodule GraphContract do
 
   def handle_cast({:receive, message, from_pid, :ack}, state) do
     # IO.puts("Received ACK: #{message}")
-    # write_with_timestamp("/Users/mac/Documents/pjlab/repo/LLMSafetyChallenge/darc/ain/lib/examples/logs.json", message)
+    write_with_timestamp("/Users/mac/Documents/pjlab/repo/LLMSafetyChallenge/darc/ain/lib/examples/logs.json", message)
     node = pid_to_node_name(from_pid, state)
     # 更新该节点的日志
     updated_logs = Map.update(state.logs, node, [message], fn existing_msgs -> [message | existing_msgs] end)
+
+    check_logs(updated_logs, state)
 
     # 根据 from_pid 的出度更新对应节点的队列
     from_node_out_degrees = Map.get(state.counter, node, %{}).out_degree
@@ -90,7 +155,6 @@ defmodule GraphContract do
     new_state = Enum.reduce(from_node_out_degrees, %{state | queues: updated_queues, logs: updated_logs}, fn out_node, acc ->
       queue = Map.get(acc.queues, out_node, [])
       in_degree_size = length(Map.get(acc.counter, out_node, %{}).in_degree)
-
       if length(queue) == in_degree_size do
         # 合并所有入度节点发送的消息并发送
         messages_to_send = Enum.join(queue, ", ")
@@ -101,8 +165,18 @@ defmodule GraphContract do
         acc
       end
     end)
-
     {:noreply, new_state}
+  end
+
+  def check_logs(logs, state) do
+    # 所有值是否不为空
+    all_values_non_empty = Enum.all?(logs, fn {_key, value} -> value != [] end)
+    if all_values_non_empty do
+      # 所有值都不为空，使用 GenServer.cast 发送消息
+      if state.callback_pid do
+        GenServer.cast(state.callback_pid, {:all_logs_received, inspect(logs)})
+      end
+    end
   end
 
   defp update_after_sending(node, message_reply, state) do
@@ -117,11 +191,6 @@ defmodule GraphContract do
   end
 
   defp pid_to_node_name(pid, state) do
-    # IO.puts("Inspecting PID:")
-    # IO.inspect(pid)
-
-    # IO.puts("Inspecting State:")
-    # IO.inspect(state)
     state.nodes
     |> Enum.find(fn {_key, val} -> val == pid end)
     |> case do
@@ -151,12 +220,12 @@ defmodule GraphContract do
     nodes = Map.fetch!(json_data, "nodes")
     edges = Map.fetch!(json_data, "edges")
     init_messages = Map.fetch!(json_data, "data")
-    count = 0
+
     # 在映射中捕获可能的启动错误，并保留已有的PID或新的PID
     pids = Enum.reduce(nodes, %{}, fn {node_name, node_info}, acc ->
       env = Map.get(node_info, "env", "compute_prefix")
       logs = Map.get(node_info, "logs", [])
-      IO.inspect(count)
+
       case Ain.ActorModelServer.start_link(%{"init" => node_name, "env" => env, "logs" => logs}) do
         {:ok, pid} ->
           Map.put(acc, node_name, pid)
@@ -173,13 +242,13 @@ defmodule GraphContract do
 
     # node添加入graph
     Enum.each(pids, fn {node_name, pid} ->
-      GraphContract.add_node(contract_pid, node_name, pid)
+      GenServer.cast(contract_pid, {:add_node, node_name, pid})
     end)
 
     # edge添加入graph
     Enum.each(edges, fn edge ->
       [from, to] = String.split(edge, ":")
-      GraphContract.add_edge(contract_pid, from, to)
+      GenServer.cast(contract_pid, {:add_edge, from, to})
     end)
 
     # 等待节点与边添加完毕
@@ -196,11 +265,14 @@ defmodule GraphContract do
     # 要写入的内容，附带时间戳
     content_to_write = "#{content} - Timestamp: #{timestamp}\n"
 
+    # 将内容转换为二进制格式，使用 UTF-8 编码
+    binary_content = :unicode.characters_to_binary(content_to_write, :utf8, :utf8)
+
     # 打开文件，模式为：追加模式，如果文件不存在则创建
     case File.open(file_path, [:append, :create]) do
       {:ok, file} ->
-        # 写入内容并关闭文件
-        IO.write(file, content_to_write)
+        # 写入二进制内容并关闭文件
+        IO.binwrite(file, binary_content)
         File.close(file)
         :ok
 
@@ -209,6 +281,33 @@ defmodule GraphContract do
         IO.puts("Error writing to file: #{reason}")
         {:error, reason}
     end
+  end
+
+  def find_nodes_with_zero_indegree_and_nonzero_outdegree(nodes, edges) do
+    # 初始化入度和出度计数器
+    initial_counter = Enum.reduce(Map.keys(nodes), %{}, fn node, acc ->
+      Map.put(acc, node, %{in_degree: 0, out_degree: 0})
+    end)
+
+    # 更新入度和出度计数器
+    counter = Enum.reduce(edges, initial_counter, fn edge, acc ->
+      [from, to] = String.split(edge, ":")
+
+      acc
+      |> Map.update!(from, fn count -> %{count | out_degree: count.out_degree + 1} end)
+      |> Map.update!(to, fn count -> %{count | in_degree: count.in_degree + 1} end)
+    end)
+
+    # 筛选入度为0且出度不为0的节点
+    counter
+    |> Enum.filter(fn {_node, counts} -> counts.in_degree == 0 and counts.out_degree > 0 end)
+    |> Enum.map(fn {node, _counts} -> node end)
+  end
+
+  def generate_initial_messages(nodes_list, init_message) do
+    Enum.reduce(nodes_list, %{}, fn node, acc ->
+      Map.put(acc, node, init_message)
+    end)
   end
 
 end

@@ -12,13 +12,18 @@ defmodule GraphGenerator do
   end
 
   defp generate_nodes(count) do
+    # %{
+    #   "node1" => %{"init" => "addr1", "env" => "compute_prefix"},
+    #   "node2" => %{"init" => "addr2", "env" => "compute_prefix"},
+    #   # 依次类推，直到 "node#{count}"
+    # }
     Enum.map(1..count, fn i ->
       node_id = "node#{i}"
       {
         node_id,
         %{
           "init" => "addr#{i}",
-          "env" => "compute_prefix"
+          "env" => "Producer"
         }
       }
     end)
