@@ -11,7 +11,6 @@ from darc.agent.llm.prompt.system_prompt_template import bundle_prompt
 model_type = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview"]
 model_name = model_type[1]
 
-
 def get_response_sync(question, system_prompt=""):
     user_message = question + gen_num_words()
     messages = [
@@ -48,11 +47,11 @@ async def get_answers(question) -> List[str]:
 
 def get_answer_sync(question, system_prompt="") -> Any:
     try:
-        logger.debug(question)
+        # logger.debug(question)
         answer = choice_response_content(
             get_response_sync(question, system_prompt)
         )
-        logger.debug(answer)
+        # logger.debug(answer)
     except Exception as e:
         logger.error(f"Error getting answer: {type(e)}, {str(e)}")
     return answer

@@ -8,6 +8,7 @@ defmodule Ain.ActorModelServer do
   end
 
   def init(args) do
+    IO.inspect(args)
     try do
       python_session =
         if args["env"] == "Graph" do
@@ -82,9 +83,6 @@ defmodule Ain.ActorModelServer do
     python_call_res = Python.call(state.python_session, String.to_atom(state.env), :compute, [input])
     # 当传输或打印一个包含非 ASCII 字符的字符列表时，每个字符会被其对应的 Unicode 码点表示，必须做list to str
     res = List.to_string(python_call_res)
-    IO.inspect(state.init)
-    IO.inspect(input)
-    IO.inspect(res)
   end
 
   defp graph_compute(state, input) do
