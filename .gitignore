@@ -137,3 +137,7 @@ dmypy.json
 .DS_Store
 
 !/darc/ain/lib/
+
+erl_crash.dump
+
+autogen/
