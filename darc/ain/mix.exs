@@ -31,7 +31,8 @@ defmodule Ain.MixProject do
       {:postgrex, "~> 0.15"},
       {:ex_machina, "~> 2.7"},
       {:faker, "~> 0.17"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:mox, "~> 1.0", only: :test},
     ]
   end
 end

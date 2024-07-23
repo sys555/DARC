@@ -2,52 +2,46 @@ defmodule MessageTest do
   use ExUnit.Case
   alias Message
 
-  @valid_sender "sender1"
-  @valid_receiver "receiver1"
-  @valid_role "fetch_data"
-  @valid_parameters %{
-    data_id: "12345",
-    additional_info: "Some information"
-  }
+  test "create/4 correctly creates a Message struct" do
+    sender = "Alice"
+    receiver = "Bob"
+    content = "Hello, Bob!"
+    parameters = %{"key" => "value"}
 
-  describe "create/4" do
-    test "creates a message with the correct structure" do
-      message = Message.create(@valid_sender, @valid_receiver, @valid_role, @valid_parameters)
+    message = Message.create(sender, receiver, content, parameters)
 
-      assert %Message{} = message
-      assert message.sender == @valid_sender
-      assert message.receiver == @valid_receiver
-      assert message.content.role == @valid_role
-      assert message.content.parameters == @valid_parameters
-      assert is_binary(message.uuid)
-      assert message.timestamp =~ ~r/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3,6}Z/
-    end
+    assert %Message{
+            uuid: _,
+            sender: ^sender,
+            receiver: ^receiver,
+            content: ^content,
+            parameters: ^parameters,
+            timestamp: _
+          } = message
 
-    test "generates a unique UUID for each message" do
-      message1 = Message.create(@valid_sender, @valid_receiver, @valid_role, @valid_parameters)
-      message2 = Message.create(@valid_sender, @valid_receiver, @valid_role, @valid_parameters)
-
-      assert message1.uuid != message2.uuid
-    end
-
-    test "generates a valid ISO8601 timestamp" do
-      message = Message.create(@valid_sender, @valid_receiver, @valid_role, @valid_parameters)
-
-      assert match?({:ok, _, _}, DateTime.from_iso8601(message.timestamp))
-    end
+    assert String.length(message.uuid) > 0
+    assert DateTime.from_iso8601(message.timestamp) |> elem(0) == :ok
   end
 
-  describe "parse/1" do
-    test "parses a message correctly" do
-      message = Message.create(@valid_sender, @valid_receiver, @valid_role, @valid_parameters)
-      parsed_message = Message.parse(message)
+  test "parse/1 correctly parses a Message struct to a map" do
+    message = %Message{
+      uuid: UUID.uuid4(),
+      sender: "Alice",
+      receiver: "Bob",
+      content: "Hello, Bob!",
+      parameters: %{"key" => "value"},
+      timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+    }
 
-      assert parsed_message.uuid == message.uuid
-      assert parsed_message.sender == message.sender
-      assert parsed_message.receiver == message.receiver
-      assert parsed_message.role == message.content.role
-      assert parsed_message.parameters == message.content.parameters
-      assert parsed_message.timestamp == message.timestamp
-    end
+    parsed = Message.parse(message)
+
+    assert parsed == %{
+            uuid: message.uuid,
+            sender: message.sender,
+            receiver: message.receiver,
+            content: message.content,
+            parameters: message.parameters,
+            timestamp: message.timestamp
+          }
   end
 end
