@@ -45,8 +45,9 @@ def handle_message(input):
     
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
+    data = json.loads(decoded_string)
     response = get_answer_sync(TEMPLATE_DICT["repo_sketch.json"].format_map(
-                            {"readme": decoded_string}
+                            {"readme": data["content"]}
                         ))
     
     parsed_response = parse_reponse(response)
@@ -55,11 +56,20 @@ def compute(input: bytes) -> str:
     repo_sketch_tree: RepoSketchNode = parse_repo_sketch(parsed_response)
     # 路径list
     repo_sketch_paths = repo_sketch_tree.get_paths()
-    result = {
-        "parsed_response": parsed_response,
-        "repo_sketch_paths": repo_sketch_paths
-    }
-
-    return json.dumps(result, ensure_ascii=False)
+    messages = []
+    for path in repo_sketch_paths:
+        if path.endswith(".py"):
+            message = {
+                "parameters": {
+                    "to_role": "FileSketcher",
+                    "repo_response": response,
+                    "readme_content": data["content"],
+                    "repository_sketch": parsed_response,
+                    "file_path": path,
+                    "repo_sketch_paths": repo_sketch_paths,
+                }
+            }
+            messages.append(message)
+    return json.dumps(messages, ensure_ascii=False)
 
 set_message_handler(handle_message)

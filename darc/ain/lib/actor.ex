@@ -3,7 +3,7 @@ defmodule Ain.Actor do
   alias Ain.Python
 
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args, uuid: args.uuid)
+    GenServer.start_link(__MODULE__, args, name: {:global, args.uuid})
   end
 
   def init(args) do
@@ -13,13 +13,13 @@ defmodule Ain.Actor do
       # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
       Python.call(python_session, String.to_atom(args.role), :register_handler, [self()])
       state = %{
-        uuid: "",
-        name: "",
-        role: args.role,
+        uuid: Map.get(args, :uuid, ""),
+        name: Map.get(args, :name, ""),
+        role: Map.get(args, :role, ""),
         # address(uuid) => pid
-        address_book: args.address_book,
+        address_book: Map.get(args, :address_book, %{}),
         # address(uuid) => role
-        face: args.face,
+        face: Map.get(args, :face, %{}),
         logs: [],
         python_session: python_session,
       }
@@ -33,7 +33,7 @@ defmodule Ain.Actor do
 
   def handle_cast({:explore, message}, state) do
     parsed_message = Message.parse(message)
-    uuid = parsed_message.uuid
+    uuid = parsed_message.parameters["to_uuid"]
     to_pid = parsed_message.parameters["to_pid"]
     to_role = parsed_message.parameters["to_role"]
     new_address_book = Map.put(state.address_book, uuid, to_pid)
@@ -47,18 +47,43 @@ defmodule Ain.Actor do
   end
 
   def handle_cast({:receive, message}, state) do
-    updated_logs = [message | state.logs]
-    updated_state = %{state | logs: updated_logs}
+    try do
+      updated_logs = [message | state.logs]
+      updated_state = %{state | logs: updated_logs}
+      IO.inspect(message)
+      trimmed_message = %{
+        content: message.content,
+        parameters: message.parameters
+      }
+      json = Jason.encode!(trimmed_message)
 
-    computed_messages = compute(state, message)
+      computed_messages = compute(state, json)
 
-    computed_messages
-    |> Enum.each(fn computed_message ->
-      {to_pid, response_message} = parse_computed_message(computed_message, state)
-      GenServer.cast(to_pid, {:receive, response_message})
-    end)
+      if Enum.empty?(computed_messages) do
+        IO.puts("Computed messages are empty, nothing to process.")
+      else
+        Enum.each(computed_messages, fn computed_message ->
+          try do
+            {to_pid, response_message} = parse_computed_message(computed_message, state)
+            if to_pid != [] and response_message != nil do
+              GenServer.cast(to_pid, {:receive, response_message})
+            else
+              IO.puts("Parsed message returned nil values, skipping cast.")
+            end
+          rescue
+            e in Enum.EmptyError ->
+              IO.puts("An error occurred: #{inspect(e)}")
+              # 记录日志或采取其他适当的操作
+          end
+        end)
+      end
 
-    {:noreply, updated_state}
+      {:noreply, updated_state}
+    rescue
+      e ->
+        IO.puts("An error occurred in handle_cast(:receive): #{inspect(e)}")
+        {:noreply, state}
+    end
   end
 
   def compute(state, input) do
@@ -73,23 +98,23 @@ defmodule Ain.Actor do
   end
 
   def parse_computed_message(computed_message, state) do
+    # TODO: pid == nil or computed_message is empty
     role = computed_message["parameters"]["to_role"]
     uuids = state.face
             |> Enum.filter(fn {_, r} -> r == role end)
             |> Enum.map(fn {uuid, _} -> uuid end)
 
     pids = uuids |> Enum.map(&Map.get(state.address_book, &1))
-
     if pids == [] do
-      raise EmptyPidsError
+      {nil, nil}
     end
 
     to_pid = path(pids)
     message = Message.create(
       self(),
       to_pid,
-      computed_message["content"],
-      %{}
+      "",
+      computed_message["parameters"]
     )
     {to_pid, message}
   end

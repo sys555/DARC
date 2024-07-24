@@ -12,6 +12,7 @@ from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
 from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
+import darc.agent.codes.utils as utils
 
 # Reference to the Elixir process to send result to
 message_handler = None
@@ -46,10 +47,12 @@ def handle_message(input):
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
     data = json.loads(decoded_string)
-
+    data = data["parameters"]
     readme_content = data.get("readme_content")
     repository_sketch = data.get("repository_sketch")
     file_path = data.get("file_path")
+    repo_response = data.get("repo_response")
+    repo_sketch_paths = data.get("repo_sketch_paths")
     response = get_answer_sync(TEMPLATE_DICT["file_sketch.json"].format_map(
                             {
                                 "readme": readme_content,
@@ -57,6 +60,47 @@ def compute(input: bytes) -> str:
                                 "file_path": file_path
                             }
                         ))
-    return response
+
+    insts = {path: {"parsed": "not impl yet."} for path in repo_sketch_paths}
+    insts[file_path]["parsed"] = response
+
+    messages = []
+    each = {
+        "parsed": parse_reponse(response),
+        "repo_sketch": repository_sketch,
+        "file_path": file_path,
+    }
+
+    function_requests = utils.generate_function_body_input_openai(
+        each,
+        readme_content,
+        insts,
+        "",
+        TEMPLATE_DICT["function_body.json"],
+    )
+
+    for function_request in function_requests:
+        readme_summary = function_request["readme_summary"]
+        repo_sketch = function_request["repo_sketch"]
+        relevant_file_list = function_request["relevant_file_paths"]
+        relevant_file_sketch_content = function_request["relevant_file_sketches"]
+        current_file_path = function_request["current_file_path"]
+        function_header = function_request["function_header"]
+        prompt = function_request["instruction"]
+        message = {
+                "parameters": {
+                    "readme_summary": readme_summary,
+                    "repo_sketch": repo_sketch,
+                    "relevant_file_paths": relevant_file_list,
+                    "relevant_file_sketches": relevant_file_sketch_content,
+                    "current_file_path": current_file_path,
+                    "function_header": function_header,
+                    "instruction": prompt,
+                    "file_path": file_path,
+                    "to_role": "SketchFiller",
+                    }
+            }
+        messages.append(message)
+    return json.dumps(messages, ensure_ascii=False)
 
 set_message_handler(handle_message)

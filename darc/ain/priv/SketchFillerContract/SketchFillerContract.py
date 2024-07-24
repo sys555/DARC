@@ -46,25 +46,18 @@ def handle_message(input):
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
     data = json.loads(decoded_string)
-    data = data["parameters"]
-    prompt = data.get("instruction")
-    file_path = data.get("file_path")
-    print("============================================================================================================================")
-    print(data)
-    print(prompt)
-    print("============================================================================================================================")
-    response = get_answer_sync(prompt)
-    print(response)
-    message = {
-                "parameters": {
-                    "repo_response": response,
-                    "readme_content": "",
-                    "file_path": file_path,
-                    "function_header": "",
-                    "function_body": response,
-                }
-            }
 
+    readme_content = data.get("readme_content")
+    repository_sketch = data.get("repository_sketch")
+    file_sketches = data.get("file_sketches")
+    response = get_answer_sync(TEMPLATE_DICT["function_body.json"].format_map(
+                            {
+                                "readme": readme_content,
+                                "repo_sketch": repository_sketch,
+                                "file_sketches": file_sketches
+                            }
+                        ))
+    
     return response
 
 set_message_handler(handle_message)
