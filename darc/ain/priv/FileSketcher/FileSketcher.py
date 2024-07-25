@@ -101,6 +101,28 @@ def compute(input: bytes) -> str:
                     }
             }
         messages.append(message)
+    
+    with open("filesketch.txt", "a", encoding="utf-8") as f:
+        content = f"{len(messages)}\n"
+        f.write(content)
+        
+    save_file_sketch(messages, readme_content, response, parse_reponse(response))
+    
     return json.dumps(messages, ensure_ascii=False)
 
 set_message_handler(handle_message)
+
+def save_file_sketch(messages, readme, generated, parsed):
+    for message in messages:
+        message = message["parameters"]
+        file_content =  {
+            "readme": readme,
+            "repo_sketch": message["repo_sketch"],
+            "file_path": message["file_path"],
+            "instruction": message["instruction"],
+            "generated": generated,
+            "parsed": parsed,
+        }
+        with open('./filesketch.jsonl', 'w') as json_file:
+            json.dump(file_content, json_file, indent=4)
+    

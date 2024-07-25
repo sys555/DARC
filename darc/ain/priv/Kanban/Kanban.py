@@ -10,8 +10,9 @@ import os
 from darc.agent.llm.proxy.query import get_answer_sync
 from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
 from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
-from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
+from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
+import darc.agent.codes.utils as utils
 
 # Reference to the Elixir process to send result to
 message_handler = None
@@ -46,42 +47,20 @@ def handle_message(input):
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
     data = json.loads(decoded_string)
-    response = get_answer_sync(TEMPLATE_DICT["repo_sketch.json"].format_map(
-                            {"readme": data["content"]}
-                        ))
+    data = data["parameters"]
+        
+    from_role = data["from_role"]
+    messages = [
+        
+    ]
+    match from_role:
+        case "FileSketcher":
+            ...
+        case "SketchFiller":
+            ...
+        case _:
+            ...
     
-    parsed_response = parse_reponse(response)
-
-    # 解析为文件树
-    repo_sketch_tree: RepoSketchNode = parse_repo_sketch(parsed_response)
-    # 路径list
-    repo_sketch_paths = repo_sketch_tree.get_paths()
-    
-    file_content =  {
-            "readme": decoded_string,
-            "instruction": TEMPLATE_DICT["repo_sketch.json"].format_map(
-                                {"readme": data["content"]}
-                            ),
-            "generated": parsed_response,
-            "parsed": parsed_response,
-        }
-    with open('./repo_sketch.jsonl', 'w') as json_file:
-        json.dump(file_content, json_file, indent=4)
-    
-    messages = []
-    for path in repo_sketch_paths:
-        if path.endswith(".py"):
-            message = {
-                "parameters": {
-                    "to_role": "FileSketcher",
-                    "repo_response": response,
-                    "readme_content": data["content"],
-                    "repository_sketch": parsed_response,
-                    "file_path": path,
-                    "repo_sketch_paths": repo_sketch_paths,
-                }
-            }
-            messages.append(message)
     return json.dumps(messages, ensure_ascii=False)
 
 set_message_handler(handle_message)

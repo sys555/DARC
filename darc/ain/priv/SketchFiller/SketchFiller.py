@@ -49,13 +49,9 @@ def compute(input: bytes) -> str:
     data = data["parameters"]
     prompt = data.get("instruction")
     file_path = data.get("file_path")
-    print("============================================================================================================================")
-    print(data)
-    print(prompt)
-    print("============================================================================================================================")
     response = get_answer_sync(prompt)
-    print(response)
-    message = {
+    message = [
+        {
                 "parameters": {
                     "repo_response": response,
                     "readme_content": "",
@@ -64,7 +60,33 @@ def compute(input: bytes) -> str:
                     "function_body": response,
                 }
             }
+    ]
 
-    return response
+    with open("sketchfiller.txt", "a", encoding="utf-8") as f:
+        content = f"1\n"
+        f.write(content)
+
+    return json.dumps(data, message, ensure_ascii=False)
+
+def save_sketch_filler(data, messages, readme, generated, parsed):
+    for message in messages:
+        message = message["parameters"]
+        file_content =  {
+            "readme_summary": data["readme_summary"],
+            "repo_sketch": data["repo_sketch"],
+            "relevant_file_paths": [],
+            "relevant_file_sketches": {},
+            "current_file_path": data["current_file_path"],
+            # TODO: call def get_current_file_sketch_content(idx, path, current_python_content):
+            "current_file_sketch": {},
+            "function_header": ,
+            "instruction": ,
+            "generated": ,
+            "parsed": ,
+        }
+        with open('./filesketch.jsonl', 'w') as json_file:
+            json.dump(file_content, json_file, indent=4)
+    
 
 set_message_handler(handle_message)
+

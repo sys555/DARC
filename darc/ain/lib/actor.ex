@@ -47,6 +47,9 @@ defmodule Ain.Actor do
   end
 
   def handle_cast({:receive, message}, state) do
+    IO.inspect("================================================================================================================================")
+    IO.inspect(state)
+    IO.inspect("================================================================================================================================")
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
@@ -65,7 +68,7 @@ defmodule Ain.Actor do
         Enum.each(computed_messages, fn computed_message ->
           try do
             {to_pid, response_message} = parse_computed_message(computed_message, state)
-            if to_pid != [] and response_message != nil do
+            if to_pid != "None" and response_message != "None" do
               GenServer.cast(to_pid, {:receive, response_message})
             else
               IO.puts("Parsed message returned nil values, skipping cast.")
@@ -98,25 +101,36 @@ defmodule Ain.Actor do
   end
 
   def parse_computed_message(computed_message, state) do
-    # TODO: pid == nil or computed_message is empty
-    role = computed_message["parameters"]["to_role"]
-    uuids = state.face
-            |> Enum.filter(fn {_, r} -> r == role end)
-            |> Enum.map(fn {uuid, _} -> uuid end)
-
-    pids = uuids |> Enum.map(&Map.get(state.address_book, &1))
-    if pids == [] do
-      {nil, nil}
+    with %{"parameters" => %{"to_role" => role}} <- computed_message,
+          uuids when uuids != [] <- fetch_uuids(role, state.face),
+          pids when pids != [] <- fetch_pids(uuids, state.address_book),
+          to_pid when not is_nil(to_pid) <- path(pids) do
+      message = Message.create(self(), to_pid, "", computed_message["parameters"])
+      {to_pid, message}
+    else
+      %{} ->
+        IO.puts("Info: computed_message is empty or to_role is missing.")
+        {"None", "None"}
+      uuids when uuids == [] ->
+        IO.puts("Info: No UUIDs found for role #{computed_message["parameters"]["to_role"]}.")
+        {"None", "None"}
+      pids when pids == [] ->
+        IO.puts("Infp: No PIDs found for the given UUIDs.")
+        {"None", "None"}
+      to_pid when is_nil(to_pid) ->
+        IO.puts("Info: path(pids) returned nil.")
+        {"None", "None"}
     end
+  end
 
-    to_pid = path(pids)
-    message = Message.create(
-      self(),
-      to_pid,
-      "",
-      computed_message["parameters"]
-    )
-    {to_pid, message}
+  defp fetch_uuids(role, face) do
+    face
+    |> Enum.filter(fn {_, r} -> r == role end)
+    |> Enum.map(fn {uuid, _} -> uuid end)
+  end
+
+  defp fetch_pids(uuids, address_book) do
+    uuids |> Enum.map(&Map.get(address_book, &1))
   end
 
   defp path(pids) do
