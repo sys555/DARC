@@ -70,13 +70,14 @@ def compute(input: bytes) -> str:
         "repo_sketch": repository_sketch,
         "file_path": file_path,
     }
-
+    logger.debug(response)
     function_requests = utils.generate_function_body_input_openai(
         each,
         readme_content,
         insts,
         "",
         TEMPLATE_DICT["function_body.json"],
+        response
     )
 
     for function_request in function_requests:
@@ -97,12 +98,13 @@ def compute(input: bytes) -> str:
                     "function_header": function_header,
                     "instruction": prompt,
                     "file_path": file_path,
+                    "file_sketch": response,
                     "to_role": "SketchFiller",
                     }
             }
         messages.append(message)
     
-    with open("filesketch.txt", "a", encoding="utf-8") as f:
+    with open("filesketch_count.txt", "a", encoding="utf-8") as f:
         content = f"{len(messages)}\n"
         f.write(content)
         
@@ -123,6 +125,7 @@ def save_file_sketch(messages, readme, generated, parsed):
             "generated": generated,
             "parsed": parsed,
         }
-        with open('./filesketch.jsonl', 'w') as json_file:
-            json.dump(file_content, json_file, indent=4)
+        with open('./file_sketch.json.jsonl', 'a') as json_file:
+            json_data = json.dumps(file_content)
+            json_file.write(json_data + '\n')
     

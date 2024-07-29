@@ -193,7 +193,7 @@ def generate_function_body_input(idx, each, readme, insts, repo_path):
     return function_requets
 
 
-def generate_function_body_input_openai(each, readme, insts, repo_path, template):
+def generate_function_body_input_openai(each, readme, insts, repo_path, template, full_file_sketch):
     python_content = each["parsed"]
     repo_sketch = each["repo_sketch"]
     repo_sketch_tree = parse_repo_sketch(repo_sketch)
@@ -255,6 +255,7 @@ def generate_function_body_input_openai(each, readme, insts, repo_path, template
         #     if selected.strip() != "pass" and selected.strip() != '"""TODO"""'
         # ]
         # relevant_file_sketch_content = "\n".join(splitted)
+        relevant_file_sketch_content = full_file_sketch
         prompt = template.format_map(
             {
                 "readme": readme_summary,

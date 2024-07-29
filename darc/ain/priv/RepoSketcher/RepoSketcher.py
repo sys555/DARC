@@ -57,16 +57,18 @@ def compute(input: bytes) -> str:
     # 路径list
     repo_sketch_paths = repo_sketch_tree.get_paths()
     
+    instruction = TEMPLATE_DICT["repo_sketch.json"].format_map(
+                                {"readme": data["content"]}
+                            )
     file_content =  {
             "readme": decoded_string,
-            "instruction": TEMPLATE_DICT["repo_sketch.json"].format_map(
-                                {"readme": data["content"]}
-                            ),
+            "instruction": instruction,
             "generated": parsed_response,
             "parsed": parsed_response,
         }
-    with open('./repo_sketch.jsonl', 'w') as json_file:
-        json.dump(file_content, json_file, indent=4)
+    with open('./repo_sketch.json.jsonl', 'a') as json_file:
+            json_data = json.dumps(file_content)
+            json_file.write(json_data + '\n')
     
     messages = []
     for path in repo_sketch_paths:

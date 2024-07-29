@@ -9,7 +9,7 @@ import os
 # 导入 get_answers_sync 函数
 from darc.agent.llm.proxy.query import get_answer_sync
 from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
-from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
+from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt, get_current_file_sketch_content
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
 
@@ -62,30 +62,31 @@ def compute(input: bytes) -> str:
             }
     ]
 
-    with open("sketchfiller.txt", "a", encoding="utf-8") as f:
+    with open("sketchfiller_count.txt", "a", encoding="utf-8") as f:
         content = f"1\n"
         f.write(content)
+    save_sketch_filler(data, message, response, parse_reponse(response))
+    return json.dumps(message, ensure_ascii=False)
 
-    return json.dumps(data, message, ensure_ascii=False)
-
-def save_sketch_filler(data, messages, readme, generated, parsed):
+def save_sketch_filler(data, messages, generated, parsed):
     for message in messages:
         message = message["parameters"]
         file_content =  {
             "readme_summary": data["readme_summary"],
             "repo_sketch": data["repo_sketch"],
-            "relevant_file_paths": [],
-            "relevant_file_sketches": {},
+            "relevant_file_paths": "[]",
+            "relevant_file_sketches": "\{\}",
             "current_file_path": data["current_file_path"],
             # TODO: call def get_current_file_sketch_content(idx, path, current_python_content):
-            "current_file_sketch": {},
-            "function_header": ,
-            "instruction": ,
-            "generated": ,
-            "parsed": ,
+            "current_file_sketch": get_current_file_sketch_content(0, data["current_file_path"], data["file_path"]),
+            "function_header": data["function_header"],
+            "instruction": data["instruction"],
+            "generated": generated,
+            "parsed": parsed,
         }
-        with open('./filesketch.jsonl', 'w') as json_file:
-            json.dump(file_content, json_file, indent=4)
+        with open('./function_body.json.jsonl', 'a') as json_file:
+            json_data = json.dumps(file_content)
+            json_file.write(json_data + '\n')
     
 
 set_message_handler(handle_message)
