@@ -12,6 +12,7 @@ from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
 from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
+from darc.ain.priv.env import REPO_NAME
 
 # Reference to the Elixir process to send result to
 message_handler = None
@@ -66,7 +67,12 @@ def compute(input: bytes) -> str:
             "generated": parsed_response,
             "parsed": parsed_response,
         }
-    with open('./repo_sketch.json.jsonl', 'a') as json_file:
+    # 确保目录存在
+    directory_path = f"./eval_data/jsonl/{REPO_NAME}"
+    os.makedirs(directory_path, exist_ok=True)
+
+    file_path = os.path.join(directory_path, "repo_sketch.json.jsonl")
+    with open(file_path, 'a') as json_file:
             json_data = json.dumps(file_content)
             json_file.write(json_data + '\n')
     

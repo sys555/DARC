@@ -8,8 +8,8 @@ from loguru import logger
 
 from darc.agent.llm.prompt.system_prompt_template import bundle_prompt
 
-model_type = ["gpt-3.5-turbo-1106", "gpt-4-1106-preview", "gpt-4o-mini"]
-model_name = model_type[2]
+model_type = ["gpt-3.5-turbo-1106", "gpt-4o-2024-05-13", "gpt-4-1106-preview", "gpt-4o-mini"]
+model_name = model_type[-1]
 
 def get_response_sync(question, system_prompt=""):
     user_message = question + gen_num_words()

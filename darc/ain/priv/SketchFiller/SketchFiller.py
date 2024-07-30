@@ -12,6 +12,7 @@ from darc.agent.llm.prompt.system_prompt_template import tester_system_prompt
 from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt, get_current_file_sketch_content
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
+from darc.ain.priv.env import REPO_NAME
 
 # Reference to the Elixir process to send result to
 message_handler = None
@@ -62,13 +63,19 @@ def compute(input: bytes) -> str:
             }
     ]
 
-    with open("sketchfiller_count.txt", "a", encoding="utf-8") as f:
+    path = f"./eval_data/jsonl/{REPO_NAME}/sketchfiller_count.txt"
+    with open(path, "a", encoding="utf-8") as f:
         content = f"1\n"
         f.write(content)
+        
     save_sketch_filler(data, message, response, parse_reponse(response))
     return json.dumps(message, ensure_ascii=False)
 
 def save_sketch_filler(data, messages, generated, parsed):
+    directory_path = f"./eval_data/jsonl/{REPO_NAME}"
+    os.makedirs(directory_path, exist_ok=True)
+    file_path = os.path.join(directory_path, "function_body.json.jsonl")
+
     for message in messages:
         message = message["parameters"]
         file_content =  {
@@ -84,7 +91,7 @@ def save_sketch_filler(data, messages, generated, parsed):
             "generated": generated,
             "parsed": parsed,
         }
-        with open('./function_body.json.jsonl', 'a') as json_file:
+        with open(file_path, 'a') as json_file:
             json_data = json.dumps(file_content)
             json_file.write(json_data + '\n')
     

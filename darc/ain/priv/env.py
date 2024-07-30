@@ -1,0 +1,1 @@
+REPO_NAME = "EVM_inscription"
