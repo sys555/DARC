@@ -30,7 +30,9 @@ defmodule Ain.MixProject do
       {:ecto_sql, "~> 3.2"},
       {:postgrex, "~> 0.15"},
       {:ex_machina, "~> 2.7"},
-      {:faker, "~> 0.17"}
+      {:faker, "~> 0.17"},
+      {:elixir_uuid, "~> 1.2"},
+      {:mox, "~> 1.0", only: :test},
     ]
   end
 end

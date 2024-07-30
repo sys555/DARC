@@ -396,9 +396,10 @@ def get_relevant_file_sketch(path, all_imports, tree_lists, function_name, repo_
     import_key_word_list = extract_key_names(all_imports)
     relevant_file_paths = extract_relevant_file_paths(import_key_word_list, tree_lists)
 
-    relevant_file_prompt = get_relevant_final_prompt(
-        path, relevant_file_paths, function_name, repo_path
-    )
+    relevant_file_prompt = "not implemented yet."
+    # relevant_file_prompt = get_relevant_final_prompt(
+    #     path, relevant_file_paths, function_name, repo_path
+    # )
 
     return relevant_file_prompt.strip()
 
@@ -415,9 +416,11 @@ def get_relevant_file_meta(
     import_key_word_list = extract_key_names(all_imports)
     relevant_file_paths = extract_relevant_file_paths(import_key_word_list, tree_lists)
 
-    relevant_file_prompt = get_relevant_final_prompt(
-        path, relevant_file_paths, function_name, repo_path, insts, index
-    )
+    relevant_file_prompt = "not implemented yet."
+    
+    # relevant_file_prompt = get_relevant_final_prompt(
+    #     path, relevant_file_paths, function_name, repo_path, insts, index
+    # )
 
     return relevant_file_paths, relevant_file_prompt.strip()
 
