@@ -74,4 +74,45 @@ defmodule DB.Factory do
 
     {actors_with_uid, edges}
   end
+
+  def mock_distributed_topology(args) do
+    start_repo()
+    clear_tables()  # 清除表内容
+
+    graph_id = Map.fetch!(args, :graph_id)
+    roles = Map.keys(args) -- [:graph_id]
+
+    # Generate actors based on the specified number of agents for each role
+    actors =
+      for {role, count} <- args, role != :graph_id do
+        for _ <- 1..count do
+          insert(:actor, %{graph_id: graph_id, role: Atom.to_string(role)})
+        end
+      end
+      |> List.flatten()
+
+    # Ensure actors have uid
+    actors_with_uid = Enum.map(actors, fn actor ->
+      case actor do
+        %DB.Actor{uid: uid} = actor ->
+          actor
+
+        _ ->
+          raise "Actor does not have a uid: #{inspect(actor)}"
+      end
+    end)
+
+    # Generate edges ensuring each agent has at least one connection
+    edges =
+      for actor <- actors_with_uid, next_actor <- actors_with_uid, actor.uid != next_actor.uid do
+        insert(:edge, %{
+          graph_id: graph_id,
+          since: Enum.random(1..10),
+          from_uid: actor.uid,
+          to_uid: next_actor.uid
+        })
+      end
+    IO.inspect(edges)
+    {actors_with_uid, edges}
+  end
 end
