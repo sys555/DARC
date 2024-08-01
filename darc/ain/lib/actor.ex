@@ -48,12 +48,11 @@ defmodule Ain.Actor do
 
   def handle_cast({:receive, message}, state) do
     IO.inspect("================================================================================================================================")
-    IO.inspect(state)
+    # IO.inspect(state)
     IO.inspect("================================================================================================================================")
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
-      IO.inspect(message)
       trimmed_message = %{
         content: message.content,
         parameters: message.parameters
@@ -105,7 +104,8 @@ defmodule Ain.Actor do
           uuids when uuids != [] <- fetch_uuids(role, state.face),
           pids when pids != [] <- fetch_pids(uuids, state.address_book),
           to_pid when not is_nil(to_pid) <- path(pids) do
-      message = Message.create(self(), to_pid, "", computed_message["parameters"])
+            content = Map.get(computed_message, "content", "")
+            message = Message.create(self(), to_pid, content, computed_message["parameters"])
       {to_pid, message}
     else
       %{} ->
