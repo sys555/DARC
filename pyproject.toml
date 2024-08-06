@@ -16,7 +16,9 @@ pykka = "^4.0.2"
 loguru = "^0.7.2"
 erlport = "^0.6"
 kuzu = "^0.4.2"
-tortoise-orm = "^0.21.5"
+asyncpg = "^0.29.0"
+pytz = "^2024.1"
+sqlalchemy = "^2.0.31"
 
 
 [tool.poetry.group.dev.dependencies]
