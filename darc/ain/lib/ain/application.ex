@@ -6,6 +6,8 @@ defmodule Ain.Application do
     children = [
       # 启动 Ecto 存储库
       DB.Repo,
+      MasrpcServerState,
+      {GRPC.Server.Supervisor, endpoint: Masrpc.Endpoint, port: 50051, start_server: true},
     ]
 
     # 定义监督策略

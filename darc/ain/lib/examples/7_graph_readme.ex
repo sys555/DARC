@@ -41,14 +41,11 @@ defmodule ReadmeGraphExample do
       end
     end
 
-    # IO.inspect(actor_pids)
     message = %Message{
-      sender: self(),
-      receiver: self(),
-      content: readme_content,
-      parameters: %{},
-      timestamp: :os.system_time(:millisecond),
-      uuid: UUID.uuid4()
+      content: "hi",
+      parameters: %{
+        "from_role": ""
+      },
     }
     GenServer.cast(reposketcher_pid, {:receive, message})
   end
@@ -64,16 +61,12 @@ defmodule ReadmeGraphExample do
   defp connect_actors(from_pid, to_pid, to_uuid, actor_specs) do
     to_role = get_role(to_uuid, actor_specs)
     message = %Message{
-      sender: "",
-      receiver: "",
-      content: "original message",
+      content: "hi",
       parameters: %{
         "to_uuid" => to_uuid,
         "to_pid" => to_pid,
         "to_role" => to_role
       },
-      timestamp: :os.system_time(:millisecond),
-      uuid: UUID.uuid4()
     }
     GenServer.cast(from_pid, {:explore, message})
   end

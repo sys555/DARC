@@ -50,11 +50,11 @@ defmodule Util.DBUtil do
     #   %Actor{uid: "198a4c54-77f1-490b-be52-b57c57732b83", name: "node2", role: "Consumer"}
     # ]
     # to
-    #
+    # [
     # :uid => uid,
     # :name => name,
     # :role => role
-    #
+    # ]
     Enum.map(actors, fn %Actor{uid: uid, name: name, role: role, age: age, graph_id: graph_id}->
       %{
         :uid => uid,

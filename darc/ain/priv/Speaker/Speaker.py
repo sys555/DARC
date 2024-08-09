@@ -42,6 +42,16 @@ def handle_message(input):
             cast_message(message_handler, (Atom('error'), error_message))
     
 def compute(input: bytes) -> str:
-    return "itsok"
+    decoded_string = input.decode('utf-8', errors='ignore')
+    data = json.loads(decoded_string)
+    data = data["content"]
+    message = [{
+        "content": get_answer_sync(data),
+        "parameters": {
+            "to_role": "Speaker",
+        },
+    }]
+    
+    return json.dumps(message, ensure_ascii=False)
 
 set_message_handler(handle_message)

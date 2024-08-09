@@ -20,8 +20,6 @@ defmodule Util.ActorUtil do
           case get_role_by_uid(to_uid, actor_specs) do
             {:ok, to_role} ->
               message = %Message{
-                sender: "",
-                receiver: "",
                 content: "original message",
                 parameters: %{
                   "to_uid" => to_uid,
@@ -50,5 +48,14 @@ defmodule Util.ActorUtil do
     actor_specs
     |> Enum.find(fn actor_spec -> actor_spec.uid == uid end)
     |> Map.get(:role)
+  end
+
+  def get_uid_by_pid(address_book, target_pid) do
+    address_book
+    |> Enum.find(fn {_uid, pid} -> pid == target_pid end)
+    |> case do
+      {uid, _pid} -> uid
+      nil -> nil
+    end
   end
 end

@@ -1,6 +1,7 @@
 defmodule Ain.Actor do
   use GenServer
   alias Ain.Python
+  alias Util.ActorUtil
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: {:global, args.uid})
@@ -22,6 +23,7 @@ defmodule Ain.Actor do
         face: Map.get(args, :face, %{}),
         logs: [],
         python_session: python_session,
+        logger: Map.get(args, :logger, nil),
       }
       {:ok, state}
     rescue
@@ -49,7 +51,8 @@ defmodule Ain.Actor do
   def handle_cast({:receive, message}, state) do
     # IO.inspect("================================================================================================================================")
     # IO.inspect(state)
-    # IO.inspect("================================================================================================================================")\
+    # IO.inspect("================================================================================================================================")
+    :timer.sleep(100)
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
@@ -69,6 +72,7 @@ defmodule Ain.Actor do
             {to_pid, response_message} = parse_computed_message(computed_message, state)
             if to_pid != "None" and response_message != "None" do
               GenServer.cast(to_pid, {:receive, response_message})
+              GenServer.cast(state.logger, {:log, response_message})
             else
               IO.puts("Parsed message returned nil values, skipping cast.")
             end
@@ -105,7 +109,16 @@ defmodule Ain.Actor do
           pids when pids != [] <- fetch_pids(uids, state.address_book),
           to_pid when not is_nil(to_pid) <- path(pids) do
             content = Map.get(computed_message, "content", "")
-            message = Message.create(self(), to_pid, content, computed_message["parameters"])
+            message = %Message{
+              uid: UUID.uuid4(),
+              sender_pid: self(),
+              receiver_pid: to_pid,
+              sender_uid: state.uid,
+              receiver_uid: ActorUtil.get_uid_by_pid(state.address_book, to_pid),
+              content: content,
+              parameters: computed_message["parameters"],
+              timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
+            }
       {to_pid, message}
     else
       %{} ->

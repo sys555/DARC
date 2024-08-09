@@ -52,12 +52,7 @@ defmodule DBExample do
     readme_content = Map.get(readme_map, repo_name)
 
     message = %Message{
-      sender: self(),
-      receiver: self(),
-      content: readme_content,
-      parameters: %{},
-      timestamp: :os.system_time(:millisecond),
-      uuid: UUID.uuid4(),
+      content: "hi",
       parameters: %{
         "from_role": ""
       },
@@ -75,16 +70,13 @@ defmodule DBExample do
 
       if from_pid != :undefined and to_pid != :undefined do
         to_role = get_role_by_uuid(to_uuid, actor_specs)
-
         message = %Message{
-          sender: "",
-          receiver: "",
-          content: "original message",
+          content: "hi",
           parameters: %{
             "to_uuid" => to_uuid,
             "to_pid" => to_pid,
             "to_role" => to_role
-          }
+          },
         }
 
         GenServer.cast(from_pid, {:explore, message})

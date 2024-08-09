@@ -22,7 +22,8 @@ defmodule Ain.ActorSupervisor do
       name: Map.get(actor_spec, :name, "Unknown"),
       role: Map.get(actor_spec, :role, "Unknown"),
       age: Map.get(actor_spec, :age, 0),
-      graph_id: Map.get(actor_spec, :graph_id, nil)
+      graph_id: Map.get(actor_spec, :graph_id, nil),
+      logger: Map.get(actor_spec, :logger, nil),
     }
   end
 end

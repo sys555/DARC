@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package masrpc;
+
+// The request message for a load operation.
+message LoadRequest {
+    string graph_id = 1;
+}
+
+// The request message for a send operation.
+message SendRequest {
+    string uid = 1;
+    map<string, string> message = 2;
+}
+
+// The request message for a get_log operation.
+message GetLogRequest {
+    string uid = 1;
+}
+
+// The response message for operations.
+message OperationResponse {
+    string status = 1;
+    repeated string logs = 2;
+}
+
+// The MasRPC service definition.
+service MasRPC {
+    // Load function
+    rpc Load (LoadRequest) returns (OperationResponse) {}
+
+    // Send function
+    rpc Send (SendRequest) returns (OperationResponse) {}
+
+    // GetLog function
+    rpc GetLog (GetLogRequest) returns (OperationResponse) {}
+}

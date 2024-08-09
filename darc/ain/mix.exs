@@ -15,7 +15,8 @@ defmodule Ain.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :observer, :wx]
+      extra_applications: [:logger, :observer, :wx],
+      mod: {Ain.Application, []}
     ]
   end
 
@@ -33,6 +34,9 @@ defmodule Ain.MixProject do
       {:faker, "~> 0.17"},
       {:elixir_uuid, "~> 1.2"},
       {:mox, "~> 1.0", only: :test},
+      {:grpc, "~> 0.9"},
+      {:protobuf, "~> 0.11.0"},
+      {:protobuf_generate, "~> 0.1.1"}
     ]
   end
 end
