@@ -45,6 +45,7 @@ defmodule Ain.Actor do
       | address_book: new_address_book,
         face: new_face,
     }
+    IO.inspect(new_state)
     {:noreply, new_state}
   end
 
@@ -52,7 +53,6 @@ defmodule Ain.Actor do
     # IO.inspect("================================================================================================================================")
     # IO.inspect(state)
     # IO.inspect("================================================================================================================================")
-    :timer.sleep(100)
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
@@ -74,7 +74,7 @@ defmodule Ain.Actor do
               GenServer.cast(to_pid, {:receive, response_message})
               GenServer.cast(state.logger, {:log, response_message})
             else
-              IO.puts("Parsed message returned nil values, skipping cast.")
+              # IO.puts("Parsed message returned nil values, skipping cast.")
             end
           rescue
             e in Enum.EmptyError ->
@@ -122,16 +122,19 @@ defmodule Ain.Actor do
       {to_pid, message}
     else
       %{} ->
-        IO.puts("Info: computed_message is empty or to_role is missing.")
+        # IO.puts(state.uid)
+        # IO.puts(state.name)
+        # IO.puts(state.role)
+        # IO.puts("Info: computed_message is empty or to_role is missing.")
         {"None", "None"}
       uids when uids == [] ->
-        IO.puts("Info: No UIDs found for role #{computed_message["parameters"]["to_role"]}.")
+        # IO.puts("Info: No UIDs found for role #{computed_message["parameters"]["to_role"]}.")
         {"None", "None"}
       pids when pids == [] ->
-        IO.puts("Infp: No PIDs found for the given UIDs.")
+        # IO.puts("Infp: No PIDs found for the given UIDs.")
         {"None", "None"}
       to_pid when is_nil(to_pid) ->
-        IO.puts("Info: path(pids) returned nil.")
+        # IO.puts("Info: path(pids) returned nil.")
         {"None", "None"}
     end
   end

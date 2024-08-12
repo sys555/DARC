@@ -18,7 +18,7 @@ defmodule Ain.ActorSupervisor do
 
   defp normalize_actor_spec(actor_spec) do
     %{
-      uid: Map.get(actor_spec, :uid, "Unknown"),
+      uid: Map.get(actor_spec, :uid, UUID.uuid4()),
       name: Map.get(actor_spec, :name, "Unknown"),
       role: Map.get(actor_spec, :role, "Unknown"),
       age: Map.get(actor_spec, :age, 0),

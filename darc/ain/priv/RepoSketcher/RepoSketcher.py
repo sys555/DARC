@@ -44,6 +44,30 @@ def handle_message(input):
             error_message = str(e).encode('utf-8')
             cast_message(message_handler, (Atom('error'), error_message))
     
+def intro() -> str:
+    return """
+        文件树生成机器人
+功能说明：
+
+这个机器人能够自动解析项目的 README 文件，并将其中的目录结构转换为文件树。它可以帮助开发者快速了解项目的整体结构，节省时间。
+
+主要特点：
+
+自动化解析：无需手动输入，机器人会自动读取并解析 README 文件。
+直观展示：通过可视化的文件树结构，清晰展示项目的目录和文件层级。
+易于集成：可以轻松集成到现有的工作流中，支持多种编程语言的项目。
+使用方法：
+
+将 README 文件上传至机器人平台。
+机器人自动生成文件树。
+下载或查看生成的文件树结构。
+应用场景：
+
+开发者快速熟悉新项目。
+团队协作时统一对项目结构的理解。
+文档生成和项目展示需求。
+    """
+
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
     data = json.loads(decoded_string)

@@ -10,7 +10,7 @@ defmodule Masrpc.Server do
       {:load_complete, _graph_id} ->
         Masrpc.OperationResponse.new(status: "Load complete")
     after
-      24_000 ->
+      42_000 ->
         Masrpc.OperationResponse.new(status: "Load time out")
     end
   end

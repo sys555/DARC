@@ -9,7 +9,7 @@ from loguru import logger
 from darc.agent.llm.prompt.system_prompt_template import bundle_prompt
 import logging
 
-logging.getLogger('LiteLLM').setLevel(logging.WARNING)
+# logging.getLogger('LiteLLM').setLevel(logging.WARNING)
 
 model_type = ["gpt-3.5-turbo-1106", "gpt-4o-2024-05-13", "gpt-4-1106-preview", "gpt-4o-mini"]
 model_name = model_type[-1]

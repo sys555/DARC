@@ -11,25 +11,28 @@ defmodule ReadmeGraphExample do
       "fastui-chat" => "# fastui-chat\n\nA minimalistic ChatBot Interface in pure python. </br>\nBuild on top of [FastUI](https://github.com/pydantic/FastUI) and [LangChain Core](https://github.com/langchain-ai/langchain).\n\n## Usage\n\n```bash\npip install fastui-chat\n```\n\n```python\nfrom langchain.chat_models import ChatOpenAI\nfrom langchain.memory import ChatMessageHistory\n\nfrom fastui_chat import ChatUI, basic_chat_handler\n\nhistory = ChatMessageHistory()\nhandler = basic_chat_handler(\n    llm=ChatOpenAI(),\n    chat_history=history,\n)\n\nhistory.add_ai_message(\"How can I help you today?\")\n\napp = ChatUI(\n    chat_history=history,\n    chat_handler=handler,\n)\n\napp.start_with_uvicorn()\n```\n\n## Features\n\n- Easy to use\n- Minimalistic & Lightweight\n- LangChain Compatible\n- Python Only",
       "kanban-python" => "# kanban-python\n\n> A Terminal Kanban Application written in Python to boost your productivity\n\n## Introduction\nWelcome to **kanban-python**, your Terminal Kanban-Board Manager.\n\nThe [clikan] Kanban App inspired me to write\nmy own Terminal Kanban Application since I preferred a more simple and guided workflow.\n\n**kanban-python** also comes with more features, like custom column creation,\nautomatic scanning and customizable config file to support you being productive.\n\nThis package was developed with [pyscaffold], which provides awesome project templates\nand takes over much of the boilerplate for python packaging.\nIt was a great help for developing my first package and I can highly recommend it.\n\n## Features\n<details><summary>Colorful and Interactive</summary>\n\n- kanban-python uses [rich] under the hood to process user input\nand display nice looking kanban-boards to the terminal.\n- Each task has a unique `ID` per board and also has an optional `Tag` and `Due Date` associated with it,\nwhich are displayed alongside its `Title`\n\n</details>\n\n\n<details><summary>Following the XDG basedir convention</summary>\n\n- kanban-python utilizes [platformdirs] `user_config_dir` to save the config file and `user_data_dir` for\nthe board specific task files. After creating your first board, you can use `kanban configure` to show the current settings table.\nThe config path in the table caption and the path for the task files can be found in the kanban_boards section.\n\n</details>\n\n\n<details><summary>Scanning of Files for automatic Task Creation</summary>\n\n- kanban-python can scan files of defined types for specific patterns at start of line.\nCheck [Automatic Task Creation](#automatic-task-creation) for more Infos.\n\n</details>\n\n\n<details><summary>Customizable Configfile</summary>\n\n- A `pykanban.ini` file gets created on first initialization in a `kanban-python` folder in your `user_config_dir`-Directory.\nThis can be edited manually or within the kanban-python application. It tracks the location for all your created boards. \\\n![configfile](https://raw.githubusercontent.com/Zaloog/kanban-python/main/images/image_config.PNG)\n   * `Active_Board`: current board that is shown when using `kanban`-command\n   * `Done_Limit`: If the amount of tasks exceed this number in the  <span style=\"color:green\">Done</span> column,\n   the first task of that column gets its status updated to <span style=\"color:gold\">Archived</span> and is moved into that column. (default: `10`)\n   * `Column_Min_Width`: Sets the minimum width of columns. (default: `40`)\n   * `Show_Footer`: Shows the table footer with package name and version. (default: `True`)\n   * `Files`: Space seperated filetypes to search for patterns to create tasks. (default: `.py .md`)\n   * `Patterns`: Comma seperated patterns to search for start of line to create tasks. <br />(default: `# TODO,#TODO,# BUG`)\n\n</details>\n\n\n<details><summary>Task Storage File for each Board</summary>\n\n- Each created board comes with its own name and `pykanban.json` file,\nwhich stores all tasks for that board. The files are stored in board specific folders under `$USER_DATA_DIR/kanban-python/kanban_boards/<BOARDNAME>`.\nWhen changing Boards you also get an overview over tasks in visible columns for each board and the most urgent or overdue task on that board.\n![change_view](https://raw.githubusercontent.com/Zaloog/kanban-python/main/images/image_kanban_change.PNG)\n\n</details>\n\n\n<details><summary>Customizable Columns</summary>\n\n- kanban-python comes with 5 pre-defined colored columns: [Ready, Doing, Done, Archived, Deleted]\nMore column can be added manually in the `pykanban.ini`, the visibility can be configured in the settings\nwith `kanban configure`.\n\n</details>\n\n\n<details><summary>Time Tracking of Task duration in Doing</summary>\n\n- For each task it is tracked, how long it was in the\n <span style=\"color:yellow\">Doing</span> column, based on the moments when you update the task status.\n The initial Task structure on creation looks as follows:\n![task](https://raw.githubusercontent.com/Zaloog/kanban-python/main/images/image_task_example.PNG)\n\n</details>\n\n\n<details><summary>Report Creation for completed Tasks</summary>\n\n- When you use [kanban report](#create-report) a github-like contribution map is displayed for the current year,\nAlso a markdown file is created with all tasks comleted based on the moment, when the tasks were moved to Done Column.\n![task](https://raw.githubusercontent.com/Zaloog/kanban-python/main/images/image_kanban_report_document.PNG)\n\n</details>\n\n## Usage\nAfter Installation of kanban-python, there are 5 commands available:\n\n### Create new Boards\n  ```bash\n  kanban init\n  ```\nIs used to create a new kanban board i.e. it asks for a name and then creates a `pykanban.json` file with a Welcome Task.\nOn first use of any command, the `pykanban.ini` configfile and the `kanban-python` folder will be created automatically.\n\n### Interact with Tasks/Boards\n  ```bash\n  kanban\n  ```\nThis is your main command to interact with your boards and tasks. It also gives the option to show the current settings and adjust them.\nAdjusting the settings can also be done directly by using the command `kanban configure`.\n\nUse `Ctrl-C` or `Ctrl-D` to exit the application at any time. :warning: If you exit in the middle of creating/updating a task,\nor changing settings, your progress wont be saved.\n\n### Automatic Task Creation\n  ```bash\n  kanban scan\n  ```\nAfter executing this command, kanban-python scans your current Directory recursively for the defined filetypes and searches for lines that start with the pattern provided.\n\nAfter confirmation to add the found tasks to table they will be added to the board. The alphanumeric Part of the Pattern will be used as tag.\nThe filepath were the task was found will be added as description of the task.\n\n### Create Report\n  ```bash\n  kanban report\n  ```\nGoes over all your Boards and creates a single markdown file by checking the `Completion Dates` of your tasks.\nAlso shows a nice github-like contribution table for the current year.\n\n### Change Settings\n  ```bash\n  kanban configure\n  ```\nTo create a new custom Columns, you have to edit the `pykanban.ini` manually and add a new column name + visibility status\nunder the `settings.columns.visible` section. The other options are all customizable now via the new settings menu.",
       "flameshow" => "# Flameshow\n\nFlameshow is a terminal Flamegraph viewer.\n\n## Features\n\n- Renders Flamegraphs in your terminal\n- Supports zooming in and displaying percentages\n- Keyboard input is prioritized\n- All operations can also be performed using the mouse.\n- Can switch to different sample types\n\n## Usage\n\nView golang's goroutine dump:\n\n```shell\n$ curl http://localhost:9100/debug/pprof/goroutine -o goroutine.out\n$ flameshow goroutine.out\n```\n\nAfter entering the TUI, the available actions are listed on Footer:\n\n- <kbd>q</kbd> for quit\n- <kbd>j</kbd> <kbd>i</kbd> <kbd>j</kbd> <kbd>k</kbd> or <kbd>\u2190</kbd>\n  <kbd>\u2193</kbd> <kbd>\u2191</kbd> <kbd>\u2192</kbd> for moving around, and <kbd>Enter</kbd>\n  for zoom in, then <kbd>Esc</kbd> for zoom out.\n- You can also use a mouse, hover on a span will show it details, and click will\n  zoom it.\n\n## Supported Formats\n\nAs far as I know, there is no standard specification for profiles. Different\nlanguages or tools might generate varying profile formats. I'm actively working\non supporting more formats. Admittedly, I might not be familiar with every tool\nand its specific format. So, if you'd like Flameshow to integrate with a tool\nyou love, please feel free to reach out and submit an issue.\n\n- Golang pprof\n- [Brendan Gregg's Flamegraph](https://www.brendangregg.com/flamegraphs.html)",
+      "libgen_to_txt" => "# Libgen to txt\n\nThis repo will convert books from libgen to plain txt or markdown format.  This repo does not contain any books, only the scripts to download and convert them.\n\nThe scripts use a seedbox to download the libgen torrents, copy them to your machine/cloud instance, convert them, and enrich them with metadata.  Processing will be by chunk, with configurable parallelization.\n\nIt currently only works for the libgen rs nonfiction section, but PRs welcome for additional compatibility.  It will cost about $300 to convert all of libgen rs nonfiction if you're using a cloud instance, and take about 1 week to process everything (bandwidth-bound).  You'll need 3TB of disk space.\n\n# Configuration\n\n- Get a putio oauth token following [these instructions](https://help.put.io/en/articles/5972538-how-to-get-an-oauth-token-from-put-io)\n- Either set the env var `PUTIO_TOKEN`, or create a `local.env` file with `PUTIO_TOKEN=yourtoken`\n- Inspect `libgen_to_txt/settings.py`.  You can edit settings directly to override them, set an env var, or add the key to a `local.env` file.\n  - You may particularly want to look at `CONVERSION_WORKERS` and `DOWNLOAD_WORKERS` to control parallelization.  The download step is the limiting factor, and too many download workers will saturate your bandwidth.\n\n# Usage\n\n- `python download_and_clean.py` to download and clean the data\n  - `--workers` to control number of download workers (how many parallel downloads happen at once)\n  - `--no_download` to only process libgen chunks that already exist on the seedbox\n  - `--max` controls how many chunks at most to process (for testing)\n  - `--no_local_delete` to avoid deleting chunks locally after they're downloaded.  Mainly useful for debugging.\n\nYou should see progress information printed out - it will take several weeks to finish depending on bandwidth and conversion method (see below).  Check the `txt` and `processed` folders to monitor.\n\n## Markdown conversion\n\nThis can optionally be integrated with [marker](https://www.github.com/VikParuchuri/marker) to do high-accuracy pdf to markdown conversion.  To use marker, first install it, then:\n\n- `CONVERSION_METHOD` to `marker`\n- `MARKER_FOLDER` to the path to the marker folder\n\n`CONVERSION_WORKERS` will control how many marker processes per GPU are run in parallel.  Marker takes about 2.5GB of VRAM per process, so set this accordingly.\n\nYou can adjust additional settings around how marker is integrated using the `MARKER_*` settings.  In particular, pay attention to the timeouts.  These ensure that conversion doesn't get stuck on a chunk. Marker can run on CPU or GPU, but is much faster on GPU.  With 4x GPUs, a single libgen chunk should take about 1 hour to process.\n\n# Cloud storage\n\nYou can store the converted txt/markdown files in a s3-compatible storage backend as they're processed using `s3fs`.  Here's how:\n\n- `sudo apt install s3fs`\n- `echo ACCESS_KEY_ID:SECRET_ACCESS_KEY > ${HOME}/.passwd-s3fs`\n- `chmod 600 ${HOME}/.passwd-s3fs`\n- `s3fs BUCKET_NAME LOCAL_DIR -o url=STORAGE_URL -o use_cache=/tmp -o allow_other -o use_path_request_style -o uid=1000 -o gid=1000 -o passwd_file=${HOME}/.passwd-s3fs`",
     }
-    repo_name = "EVM_inscription"
+    repo_name = "CVE-2023-44487"
     readme_content = Map.get(readme_map, repo_name)
 
     actor_specs = generate_actor_specs()
-
+    IO.inspect(actor_specs)
     {:ok, _supervisor} = Ain.ActorSupervisor.start_link(actor_specs)
 
     # Allow some time for the actors to start
     :timer.sleep(1_000)
 
-    actor_pids = for %{uuid: uuid} <- actor_specs do
-      pid = GenServer.whereis({:global, uuid})
-      {uuid, pid}
+    actor_pids = for %{uid: uid} <- actor_specs do
+      pid = GenServer.whereis({:global, uid})
+      {uid, pid}
     end
 
     {reposketcher_uuid, reposketcher_pid} = Enum.at(actor_pids, 0)
     file_sketcher_pids = Enum.slice(actor_pids, 1, 3)
     sketch_fillers = Enum.slice(actor_pids, 4, 6)
+    {packer_uid, packer_pid} = Enum.at(actor_pids, 7)
+    {evaluator_uid, evaluator_pid} = Enum.at(actor_pids, 8)
     for {file_sketcher_uuid, file_sketcher_pid} <- file_sketcher_pids do
       connect_actors(reposketcher_pid, file_sketcher_pid, file_sketcher_uuid, actor_specs)
     end
@@ -41,29 +44,40 @@ defmodule ReadmeGraphExample do
       end
     end
 
+    connect_actors(packer_pid, evaluator_pid, evaluator_uid, actor_specs)
+
     message = %Message{
-      content: "hi",
+      content: readme_content,
       parameters: %{
         "from_role": ""
       },
     }
     GenServer.cast(reposketcher_pid, {:receive, message})
+    :timer.sleep(120_000)
+    message = %Message{
+      content: repo_name,
+      parameters: %{
+        "from_role": ""
+      },
+    }
+    GenServer.cast(packer_pid, {:receive, message})
   end
 
   defp generate_actor_specs do
-    repo_sketcher = %{uuid: "repo_sketcher", name: "RepoSketcher", role: "RepoSketcher"}
-    file_sketchers = for i <- 1..3, do: %{uuid: "file_sketcher_#{i}", name: "FileSketcher_#{i}", role: "FileSketcher"}
-    sketch_fillers = for i <- 1..3, do: %{uuid: "sketch_filler_#{i}", name: "SketchFiller_#{i}", role: "SketchFiller"}
-
-    [repo_sketcher | file_sketchers ++ sketch_fillers]
+    repo_sketcher = %{uid: "repo_sketcher", name: "RepoSketcher", role: "RepoSketcher"}
+    file_sketchers = for i <- 1..3, do: %{uid: "file_sketcher_#{i}", name: "FileSketcher_#{i}", role: "FileSketcher"}
+    sketch_fillers = for i <- 1..3, do: %{uid: "sketch_filler_#{i}", name: "SketchFiller_#{i}", role: "SketchFiller"}
+    packer = %{uid: "packer", name: "Packer", role: "Packer"}
+    evaluator = %{uid: "evaluator", name: "Evaluator", role: "Evaluator"}
+    [repo_sketcher | file_sketchers ++ sketch_fillers ++ [packer, evaluator]]
   end
 
-  defp connect_actors(from_pid, to_pid, to_uuid, actor_specs) do
-    to_role = get_role(to_uuid, actor_specs)
+  defp connect_actors(from_pid, to_pid, to_uid, actor_specs) do
+    to_role = get_role(to_uid, actor_specs)
     message = %Message{
       content: "hi",
       parameters: %{
-        "to_uuid" => to_uuid,
+        "to_uid" => to_uid,
         "to_pid" => to_pid,
         "to_role" => to_role
       },
@@ -73,7 +87,7 @@ defmodule ReadmeGraphExample do
 
   defp get_role(uuid, actor_specs) do
     actor_specs
-    |> Enum.find(fn actor_spec -> actor_spec.uuid == uuid end)
+    |> Enum.find(fn actor_spec -> actor_spec.uid == uuid end)
     |> Map.get(:role)
   end
 end
