@@ -20,6 +20,17 @@ class Actor(Base):
 
     outgoing_edges = relationship("Edge", back_populates="from_actor", foreign_keys='Edge.from_uid')
     incoming_edges = relationship("Edge", back_populates="to_actor", foreign_keys='Edge.to_uid')
+    
+    def to_dict(self):
+        return {
+            'uid': str(self.uid),
+            'name': self.name,
+            'role': self.role,
+            'age': self.age,
+            'graph_id': str(self.graph_id),
+            'inserted_at': self.inserted_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+        }
 
 class Edge(Base):
     __tablename__ = 'edge'
