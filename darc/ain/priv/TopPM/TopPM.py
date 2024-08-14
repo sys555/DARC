@@ -8,7 +8,7 @@ import os
 
 # 导入 get_answers_sync 函数
 from darc.agent.llm.proxy.query import get_answer_sync
-from darc.agent.llm.prompt.system_prompt_template import SYS_PROMPT_DICT, abstract_system_prompt
+from darc.agent.llm.prompt.system_prompt_template import SYS_PROMPT_DICT, abstract_system_prompt, top_PM_system_prompt
 from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
@@ -49,12 +49,13 @@ def compute(input: bytes) -> str:
     data = json.loads(decoded_string)
     # from_role = data["parameters"]["from_role"]
     prompt = data["content"]
-    response = get_answer_sync(prompt, SYS_PROMPT_DICT["Doc"])
+    response = get_answer_sync(prompt, top_PM_system_prompt)
     abstract = get_answer_sync(prompt, abstract_system_prompt)
+
     messages = [{
-            "content": f"abstract:{abstract}; Doc response: {response}",
+            "content": f"abstract:{abstract}; Top_PM response: {response}",
             "parameters": {
-                "from_role": "DistributedDoc",
+                "from_role": "TopPM",
                 "to_role": "random",
             }
         }

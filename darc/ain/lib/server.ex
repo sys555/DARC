@@ -18,7 +18,7 @@ defmodule Masrpc.Server do
   @spec send(Masrpc.SendRequest.t(), GRPC.Server.Stream.t()) :: Masrpc.OperationResponse.t()
   def send(%Masrpc.SendRequest{uid: uid, message: message}, _stream) do
     mas_pid = MasrpcServerState.get_mas_pid()
-    :ok = GenServer.call(mas_pid, {:send, uid, message})
+    :ok = GenServer.cast(mas_pid, {:send, uid, message})
     Masrpc.OperationResponse.new(status: "Send completed")
   end
 

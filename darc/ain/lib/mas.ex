@@ -19,17 +19,19 @@ defmodule MAS do
       {:ok, state}
     rescue
       e in UndefinedFunctionError ->
-        IO.puts("An error occurred: #{inspect(e)}")
+        IO.puts("An error occurred in mas init: #{inspect(e)}")
         {:stop, e}
     end
   end
 
   def handle_cast({:load, graph_id, caller_pid}, state) do
+    # query
     actor_specs = DBUtil.generate_actor_specs_from_db(graph_id)
     updated_actor_specs = Enum.map(actor_specs, fn actor_spec ->
       Map.put(actor_spec, :logger, self())
     end)
     {:ok, _supervisor} = Ain.ActorSupervisor.start_link(updated_actor_specs)
+    # query
     edges = DBUtil.get_edges_by_graph_id(graph_id)
     ActorUtil.connect_actors(edges, actor_specs)
 
@@ -39,14 +41,14 @@ defmodule MAS do
     {:noreply, state}
   end
 
-  def handle_call({:send, uid, message}, _from, state) do
+  def handle_cast({:send, uid, message}, state) do
     message = %Message{
               content: Map.get(message, "content", ""),
               parameters: Map.get(message, "parameters", %{}),
             }
 
     GenServer.cast(:global.whereis_name(uid), {:receive, message})
-    {:reply, :ok, state}
+    {:noreply, state}
   end
 
   def handle_call(_msg, _from, state) do
@@ -60,6 +62,7 @@ defmodule MAS do
   end
 
   def handle_cast({:get_log, uid, caller_pid}, state) do
+    IO.inspect(state.logs)
     matching_logs = Enum.filter(state.logs, fn message ->
       message.receiver_uid == uid
     end)

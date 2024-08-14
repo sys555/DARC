@@ -33,7 +33,7 @@ defmodule Ain.ActorModelServer do
       {:ok, state}
     rescue
       e in UndefinedFunctionError ->
-        IO.puts("An error occurred: #{inspect(e)}")
+        IO.puts("An error occurred in actor model server init: #{inspect(e)}")
         {:stop, e}
     end
   end

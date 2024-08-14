@@ -28,7 +28,7 @@ defmodule Ain.Actor do
       {:ok, state}
     rescue
       e in UndefinedFunctionError ->
-        IO.puts("An error occurred: #{inspect(e)}")
+        IO.puts("An error occurred in actor init: #{inspect(e)}")
         {:stop, e}
     end
   end
@@ -45,7 +45,6 @@ defmodule Ain.Actor do
       | address_book: new_address_book,
         face: new_face,
     }
-    IO.inspect(new_state)
     {:noreply, new_state}
   end
 
@@ -78,7 +77,8 @@ defmodule Ain.Actor do
             end
           rescue
             e in Enum.EmptyError ->
-              IO.puts("An error occurred: #{inspect(e)}")
+              IO.inspect(state)
+              IO.puts("An error occurred in handle_cast(:receive) Enum.EmptyError : #{inspect(e)}")
               # 记录日志或采取其他适当的操作
           end
         end)
@@ -140,9 +140,16 @@ defmodule Ain.Actor do
   end
 
   defp fetch_uids(role, face) do
-    face
-    |> Enum.filter(fn {_, r} -> r == role end)
-    |> Enum.map(fn {uid, _} -> uid end)
+    if role == "random" do
+      face
+      |> Enum.map(fn {uid, _} -> uid end)
+      |> Enum.random()
+      |> List.wrap()
+    else
+      face
+      |> Enum.filter(fn {_, r} -> r == role end)
+      |> Enum.map(fn {uid, _} -> uid end)
+    end
   end
 
   defp fetch_pids(uids, address_book) do
