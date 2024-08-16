@@ -20,7 +20,7 @@ db_url = 'postgresql+psycopg2://postgres:123456@localhost:5432/ain_repo'
     
 try:
     with MAS(db_url) as mas:
-        # mas.clear_tables()
+        mas.clear_tables()
             
         distribut_config = {
                 "role": [
@@ -51,10 +51,10 @@ try:
                     ("DistributedDoc", "DistributedTester"),
                 ],
                 "args": [
-                    ("DistributedPM", 10),
-                    ("DistributedDev", 55),
-                    ("DistributedTester", 25),
-                    ("DistributedDoc", 10),
+                    ("DistributedPM", 1),
+                    ("DistributedDev", 5),
+                    ("DistributedTester", 3),
+                    ("DistributedDoc", 1),
                 ]
             }
         
@@ -78,10 +78,10 @@ try:
                     ("DistributedDoc", "DistributedPM"),
                 ],
                 "args": [
-                    ("DistributedPM", 10),
-                    ("DistributedDev", 55),
-                    ("DistributedTester", 25),
-                    ("DistributedDoc", 10),
+                    ("DistributedPM", 1),
+                    ("DistributedDev", 5),
+                    ("DistributedTester", 3),
+                    ("DistributedDoc", 1),
                 ]
             }
         
@@ -109,11 +109,11 @@ try:
                     ("DistributedDoc", "TopPM"),
                 ],
                 "args": [
-                    ("TopPM", 4),
-                    ("DistributedPM", 6),
-                    ("DistributedDev", 55),
-                    ("DistributedTester", 25),
-                    ("DistributedDoc", 10),
+                    ("TopPM", 1),
+                    ("DistributedPM", 1),
+                    ("DistributedDev", 3),
+                    ("DistributedTester", 3),
+                    ("DistributedDoc", 2),
                 ]
             }
         
@@ -163,9 +163,9 @@ try:
             """
         repo_name = "flameshow"
         
-        # mas.config_db(layer_config)
-        mas.load_data()
-        mas.load("917c9a69-1ad1-4bfe-8c01-73755d774c4b")
+        mas.config_db(distribut_config)
+        # mas.load_data()
+        # mas.load("59223d30-7f3a-4b7f-acb8-5873914ba228")
         
         # mas.role_intro("RepoSketcher")
         

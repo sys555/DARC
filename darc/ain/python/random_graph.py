@@ -4,17 +4,17 @@ from darc.ain.python.mas import MAS
 import uuid
 
 # 生成小世界图
-n = 100  # 节点数
-k = 20    # 每个节点相连的最近邻居节点数
+n = 10  # 节点数
+k = 5    # 每个节点相连的最近邻居节点数
 p = 0.1  # 重连概率
 G = nx.watts_strogatz_graph(n, k, p)
 
 # 定义角色配比
 roles_distribution = [
-    ("DistributedPM", 10),
-    ("DistributedDev", 55),
-    ("DistributedTester", 25),
-    ("DistributedDoc", 10),
+    ("DistributedPM", 1),
+    ("DistributedDev", 4),
+    ("DistributedTester", 4),
+    ("DistributedDoc", 1),
 ]
 
 # 创建角色列表
