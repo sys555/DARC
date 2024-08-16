@@ -1,1 +1,1 @@
-REPO_NAME = "EVM_inscription"
+REPO_NAME = "flameshow"

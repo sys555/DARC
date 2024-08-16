@@ -1,0 +1,150 @@
+{
+    "actors": [
+        {
+            "uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "name": "Actor 1",
+            "role": "hero",
+            "age": 30,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "inserted_at": "2024-08-02T07:41:27.831462",
+            "updated_at": "2024-08-02T07:41:27.831471"
+        },
+        {
+            "uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "name": "Actor 2",
+            "role": "villain",
+            "age": 28,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "inserted_at": "2024-08-02T07:41:27.831480",
+            "updated_at": "2024-08-02T07:41:27.831481"
+        },
+        {
+            "uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "name": "Actor 3",
+            "role": "sidekick",
+            "age": 25,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "inserted_at": "2024-08-02T07:41:27.831489",
+            "updated_at": "2024-08-02T07:41:27.831490"
+        },
+        {
+            "uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "name": "Actor 4",
+            "role": "mentor",
+            "age": 50,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "inserted_at": "2024-08-02T07:41:27.831498",
+            "updated_at": "2024-08-02T07:41:27.831499"
+        }
+    ],
+    "edges": [
+        {
+            "uid": "833992b3-e9e4-4702-ab3e-e6c9749cf215",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "to_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "inserted_at": "2024-08-02T07:41:27.831513",
+            "updated_at": "2024-08-02T07:41:27.831515"
+        },
+        {
+            "uid": "e2afd8b4-4489-4c84-a2a9-820fbeeeff3e",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "to_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "inserted_at": "2024-08-02T07:41:27.831523",
+            "updated_at": "2024-08-02T07:41:27.831525"
+        },
+        {
+            "uid": "2d941f7e-ff92-49ab-aee5-9f5bcf05c75d",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "to_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "inserted_at": "2024-08-02T07:41:27.831532",
+            "updated_at": "2024-08-02T07:41:27.831533"
+        },
+        {
+            "uid": "c8bbb69d-63ba-47ce-afbb-6cebe022ebb3",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "to_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "inserted_at": "2024-08-02T07:41:27.831540",
+            "updated_at": "2024-08-02T07:41:27.831542"
+        },
+        {
+            "uid": "41616833-bfe7-42c4-abf1-c7fa461cfdfa",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "to_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "inserted_at": "2024-08-02T07:41:27.831549",
+            "updated_at": "2024-08-02T07:41:27.831550"
+        },
+        {
+            "uid": "c3db511a-7b00-4393-b6e1-fc382ddf2238",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "to_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "inserted_at": "2024-08-02T07:41:27.831557",
+            "updated_at": "2024-08-02T07:41:27.831558"
+        },
+        {
+            "uid": "a13ab3d8-e80a-4add-b76a-327a16300f7e",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "to_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "inserted_at": "2024-08-02T07:41:27.831565",
+            "updated_at": "2024-08-02T07:41:27.831566"
+        },
+        {
+            "uid": "00767505-6a63-44ca-bcb2-47131af67af1",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "to_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "inserted_at": "2024-08-02T07:41:27.831574",
+            "updated_at": "2024-08-02T07:41:27.831575"
+        },
+        {
+            "uid": "cac85e0c-ed1d-4d1f-8f49-ca4ad1fa367d",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "to_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "inserted_at": "2024-08-02T07:41:27.831582",
+            "updated_at": "2024-08-02T07:41:27.831583"
+        },
+        {
+            "uid": "42c58691-2abe-456d-94ba-c1dbe91bea90",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "to_uid": "2d934217-d28e-48fd-aafc-1a61675afa10",
+            "inserted_at": "2024-08-02T07:41:27.831590",
+            "updated_at": "2024-08-02T07:41:27.831591"
+        },
+        {
+            "uid": "73b64e72-c114-42b2-8c71-39f9bf052c88",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "to_uid": "d4cb9209-8288-4a96-bbae-50c122e5b270",
+            "inserted_at": "2024-08-02T07:41:27.831600",
+            "updated_at": "2024-08-02T07:41:27.831602"
+        },
+        {
+            "uid": "f69d9bed-73dc-4e71-b4ee-c7cb32357443",
+            "since": 2023,
+            "graph_id": "36f9144c-e071-4e6f-a6fa-e020eca699c3",
+            "from_uid": "61f87613-7c72-4a84-a3f0-b30859763bfa",
+            "to_uid": "24459021-240a-4fb2-854c-799dbba6b627",
+            "inserted_at": "2024-08-02T07:41:27.831612",
+            "updated_at": "2024-08-02T07:41:27.831613"
+        }
+    ]
+}

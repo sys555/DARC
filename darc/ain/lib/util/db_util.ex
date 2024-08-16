@@ -44,31 +44,24 @@ defmodule Util.DBUtil do
     end
   end
 
-  @doc """
-  根据 init_data 生成任务 (Task)
-  """
-  def generate_task(init_data) do
-    %Task{}
-    |> Task.changeset(init_data)
-    |> Repo.insert()
-  end
-
   defp transform_actors(actors) do
     # [
     #   %Actor{uid: "198a4c54-77f1-490b-be52-b57c57732b82", name: "node1", role: "Producer"},
     #   %Actor{uid: "198a4c54-77f1-490b-be52-b57c57732b83", name: "node2", role: "Consumer"}
     # ]
     # to
-    #
-    # :uuid => uid,
+    # [
+    # :uid => uid,
     # :name => name,
     # :role => role
-    #
-    Enum.map(actors, fn %Actor{uid: uid, name: name, role: role}->
+    # ]
+    Enum.map(actors, fn %Actor{uid: uid, name: name, role: role, age: age, graph_id: graph_id}->
       %{
-        :uuid => uid,
+        :uid => uid,
         :name => name,
-        :role => role
+        :role => role,
+        :age => age,
+        :graph_id => graph_id
       }
     end)
   end
@@ -85,21 +78,29 @@ defmodule Util.DBUtil do
     end)
   end
 
-  def get_actors_and_edges_by_graph_id(graph_id) do
-    actors =
-      from(a in Actor, where: a.graph_id == ^graph_id)
-      |> Repo.all()
-
-    edges =
-      from(e in Edge, where: e.graph_id == ^graph_id)
-      |> Repo.all()
-
-    # 转换 actor 和 edge 数据结构
-    transformed_actors = transform_actors(actors)
-    transformed_edges = transform_edges(edges)
-
-    {:ok, %{actors: transformed_actors, edges: transformed_edges}}
+  def get_actor_with_uid(uid) do
+    Repo.get(Actor, uid)
   end
 
+  def insert_actors(actor_specs) do
+    Enum.each(actor_specs, fn spec ->
+      %Actor{}
+      |> Actor.changeset(spec)
+      |> Repo.insert!()
+    end)
+  end
 
+  def insert_edges(edges) do
+    Enum.each(edges, fn {from_id, to_id, graph_id} ->
+      edge_attrs = %{
+        "from_uid" => to_string(from_id),
+        "to_uid" => to_string(to_id),
+        "graph_id" => graph_id
+      }
+
+      %Edge{}
+      |> Edge.changeset(edge_attrs)
+      |> Repo.insert()
+    end)
+  end
 end

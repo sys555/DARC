@@ -143,3 +143,5 @@ erl_crash.dump
 autogen/
 
 eval_data/
+
+experiment/

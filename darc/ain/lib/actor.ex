@@ -1,9 +1,10 @@
 defmodule Ain.Actor do
   use GenServer
   alias Ain.Python
+  alias Util.ActorUtil
 
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: {:global, args.uuid})
+    GenServer.start_link(__MODULE__, args, name: {:global, args.uid})
   end
 
   def init(args) do
@@ -13,31 +14,32 @@ defmodule Ain.Actor do
       # 将 当前 GenServer 进程注册为 Python 代码中异步操作的回调处理器
       Python.call(python_session, String.to_atom(args.role), :register_handler, [self()])
       state = %{
-        uuid: Map.get(args, :uuid, ""),
+        uid: Map.get(args, :uid, ""),
         name: Map.get(args, :name, ""),
         role: Map.get(args, :role, ""),
-        # address(uuid) => pid
+        # address(uid) => pid
         address_book: Map.get(args, :address_book, %{}),
-        # address(uuid) => role
+        # address(uid) => role
         face: Map.get(args, :face, %{}),
         logs: [],
         python_session: python_session,
+        logger: Map.get(args, :logger, nil),
       }
       {:ok, state}
     rescue
       e in UndefinedFunctionError ->
-        IO.puts("An error occurred: #{inspect(e)}")
+        IO.puts("An error occurred in actor init: #{inspect(e)}")
         {:stop, e}
     end
   end
 
   def handle_cast({:explore, message}, state) do
     parsed_message = Message.parse(message)
-    uuid = parsed_message.parameters["to_uuid"]
+    uid = parsed_message.parameters["to_uid"]
     to_pid = parsed_message.parameters["to_pid"]
     to_role = parsed_message.parameters["to_role"]
-    new_address_book = Map.put(state.address_book, uuid, to_pid)
-    new_face = Map.put(state.face, uuid, to_role)
+    new_address_book = Map.put(state.address_book, uid, to_pid)
+    new_face = Map.put(state.face, uid, to_role)
     new_state = %{
       state
       | address_book: new_address_book,
@@ -47,9 +49,9 @@ defmodule Ain.Actor do
   end
 
   def handle_cast({:receive, message}, state) do
-    IO.inspect("================================================================================================================================")
+    # IO.inspect("================================================================================================================================")
     # IO.inspect(state)
-    IO.inspect("================================================================================================================================")
+    # IO.inspect("================================================================================================================================")
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
@@ -69,12 +71,14 @@ defmodule Ain.Actor do
             {to_pid, response_message} = parse_computed_message(computed_message, state)
             if to_pid != "None" and response_message != "None" do
               GenServer.cast(to_pid, {:receive, response_message})
+              GenServer.cast(state.logger, {:log, response_message})
             else
-              IO.puts("Parsed message returned nil values, skipping cast.")
+              # IO.puts("Parsed message returned nil values, skipping cast.")
             end
           rescue
             e in Enum.EmptyError ->
-              IO.puts("An error occurred: #{inspect(e)}")
+              IO.inspect(state)
+              IO.puts("An error occurred in handle_cast(:receive) Enum.EmptyError : #{inspect(e)}")
               # 记录日志或采取其他适当的操作
           end
         end)
@@ -101,36 +105,55 @@ defmodule Ain.Actor do
 
   def parse_computed_message(computed_message, state) do
     with %{"parameters" => %{"to_role" => role}} <- computed_message,
-          uuids when uuids != [] <- fetch_uuids(role, state.face),
-          pids when pids != [] <- fetch_pids(uuids, state.address_book),
+          uids when uids != [] <- fetch_uids(role, state.face),
+          pids when pids != [] <- fetch_pids(uids, state.address_book),
           to_pid when not is_nil(to_pid) <- path(pids) do
             content = Map.get(computed_message, "content", "")
-            message = Message.create(self(), to_pid, content, computed_message["parameters"])
+            message = %Message{
+              uid: UUID.uuid4(),
+              sender_pid: self(),
+              receiver_pid: to_pid,
+              sender_uid: state.uid,
+              receiver_uid: ActorUtil.get_uid_by_pid(state.address_book, to_pid),
+              content: content,
+              parameters: computed_message["parameters"],
+              timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
+            }
       {to_pid, message}
     else
       %{} ->
-        IO.puts("Info: computed_message is empty or to_role is missing.")
+        # IO.puts(state.uid)
+        # IO.puts(state.name)
+        # IO.puts(state.role)
+        # IO.puts("Info: computed_message is empty or to_role is missing.")
         {"None", "None"}
-      uuids when uuids == [] ->
-        IO.puts("Info: No UUIDs found for role #{computed_message["parameters"]["to_role"]}.")
+      uids when uids == [] ->
+        # IO.puts("Info: No UIDs found for role #{computed_message["parameters"]["to_role"]}.")
         {"None", "None"}
       pids when pids == [] ->
-        IO.puts("Infp: No PIDs found for the given UUIDs.")
+        # IO.puts("Infp: No PIDs found for the given UIDs.")
         {"None", "None"}
       to_pid when is_nil(to_pid) ->
-        IO.puts("Info: path(pids) returned nil.")
+        # IO.puts("Info: path(pids) returned nil.")
         {"None", "None"}
     end
   end
 
-  defp fetch_uuids(role, face) do
-    face
-    |> Enum.filter(fn {_, r} -> r == role end)
-    |> Enum.map(fn {uuid, _} -> uuid end)
+  defp fetch_uids(role, face) do
+    if role == "random" do
+      face
+      |> Enum.map(fn {uid, _} -> uid end)
+      |> Enum.random()
+      |> List.wrap()
+    else
+      face
+      |> Enum.filter(fn {_, r} -> r == role end)
+      |> Enum.map(fn {uid, _} -> uid end)
+    end
   end
 
-  defp fetch_pids(uuids, address_book) do
-    uuids |> Enum.map(&Map.get(address_book, &1))
+  defp fetch_pids(uids, address_book) do
+    uids |> Enum.map(&Map.get(address_book, &1))
   end
 
   defp path(pids) do
