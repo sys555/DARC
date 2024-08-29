@@ -2,6 +2,7 @@ defmodule Ain.Actor do
   use GenServer
   alias Ain.Python
   alias Util.ActorUtil
+  alias DB.{Actor, Edge, Task}
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: {:global, args.uid})
@@ -137,6 +138,25 @@ defmodule Ain.Actor do
         # IO.puts("Info: path(pids) returned nil.")
         {"None", "None"}
     end
+  end
+
+  def handle_cast({:update_actor, actor}, state) do
+    # 更新已有的键
+    new_state = %{
+      state
+      | uid: actor.uid || state.uid,
+        name: actor.name || state.name,
+        role: actor.role || state.role
+    }
+
+    python_session = Python.start(actor.role)
+    Python.call(python_session, String.to_atom(actor.role), :register_handler, [self()])
+
+    new_state = %{
+      new_state
+      | python_session: python_session,
+    }
+    {:noreply, new_state}
   end
 
   defp fetch_uids(role, face) do

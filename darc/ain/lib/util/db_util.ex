@@ -103,4 +103,16 @@ defmodule Util.DBUtil do
       |> Repo.insert()
     end)
   end
+
+  def update_actor(uid, attrs) do
+    uid
+      |> get_actor_with_uid()
+      |> case do
+        nil -> {:error, "Actor not found"}
+        actor ->
+          actor
+          |> Actor.changeset(attrs)
+          |> Repo.update()
+      end
+  end
 end

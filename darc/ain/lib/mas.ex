@@ -70,4 +70,14 @@ defmodule MAS do
     send(caller_pid, {:get_log_complete, matching_logs})
     {:noreply, state}
   end
+
+  def handle_cast({:update_actor, uid}, state) do
+    case DBUtil.get_actor_with_uid(uid) do
+      nil ->
+        {:noreply, state}
+      actor ->
+        GenServer.cast(:global.whereis_name(uid), {:update_actor, actor})
+        {:noreply, state}
+    end
+  end
 end
