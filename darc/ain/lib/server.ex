@@ -40,4 +40,11 @@ defmodule Masrpc.Server do
         Masrpc.OperationResponse.new(status: "Get log complete", logs: json_list)
     end
   end
+
+  @spec update_actor(Masrpc.UpdateActorRequest.t(), GPRC.Server.Strea.t()) :: Masrpc.UpdateActorResponse.t()
+  def update_actor(%Masrpc.UpdateActorRequest{actor_uid: actor_uid}, _stream) do
+    IO.inspect("================================")
+    IO.inspect("update")
+    Masrpc.UpdateActorResponse.new(status: "Update actor complete")
+  end
 end

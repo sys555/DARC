@@ -32,22 +32,12 @@ defmodule Masrpc.GetLogRequest do
   field :uid, 1, type: :string
 end
 
-defmodule Masrpc.UpdateActorRequest.PropertiesEntry do
-  @moduledoc false
-
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
-
-  field :key, 1, type: :string
-  field :value, 2, type: :string
-end
-
 defmodule Masrpc.UpdateActorRequest do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  field :actor_id, 1, type: :string, json_name: "actorId"
-  field :properties, 2, repeated: true, type: Masrpc.UpdateActorRequest.PropertiesEntry, map: true
+  field :actor_uid, 1, type: :string, json_name: "actorUid"
 end
 
 defmodule Masrpc.OperationResponse do
