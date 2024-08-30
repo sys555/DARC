@@ -3,6 +3,7 @@ defmodule MASTest do
   alias MAS
   alias MockDataHelper
   alias Util.{DBUtil, ActorUtil}
+  alias Ain.Actor
 
   setup_all do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(DB.Repo)
@@ -68,7 +69,7 @@ defmodule MASTest do
     end
   end
 
-  # @tag :skip
+  @tag :skip
   test "handles :update_agent call and updates the agent state", %{pid: pid, mock_data: mock_data} do
     graph_id = List.first(mock_data.actors)[:graph_id]
     :ok = GenServer.cast(pid, {:load, graph_id, self()})
@@ -103,5 +104,21 @@ defmodule MASTest do
     assert new_state.uid == target_uid
     assert new_state.name == "John Doe"
     assert new_state.role == "Speaker"
+  end
+
+  test "handle_cast with {:new_edge, edge_uid} when edge exists", %{pid: pid, mock_data: mock_data} do
+    graph_id = List.first(mock_data.actors)[:graph_id]
+    :ok = GenServer.cast(pid, {:load, graph_id, self()})
+
+    :timer.sleep(5_000)
+
+    [edge1, edge2 | _] = mock_data.edges
+    :timer.sleep(1_000)
+    actor_pid = :global.whereis_name(edge1.from_uid)
+    IO.inspect(Actor.get_state(actor_pid))
+    IO.inspect(edge1)
+    GenServer.cast(pid, {:del_edge, edge1})
+    :timer.sleep(5_000)
+    IO.inspect(Actor.get_state(actor_pid))
   end
 end

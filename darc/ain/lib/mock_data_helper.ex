@@ -5,7 +5,7 @@ defmodule MockDataHelper do
   def generate_mock_data do
     graph_id = UUID.generate()
 
-    actors = for i <- 1..4 do
+    actors = for i <- 1..2 do
       %{
         uid: UUID.generate(),
         name: "Actor #{i}",
@@ -16,7 +16,12 @@ defmodule MockDataHelper do
     end
 
     edges = for actor1 <- actors, actor2 <- actors, actor1[:uid] != actor2[:uid] do
-      {actor1[:uid], actor2[:uid], graph_id}
+      %{
+        uid: UUID.generate(),
+        from_uid: actor1[:uid],
+        to_uid: actor2[:uid],
+        graph_id: graph_id
+      }
     end
 
     %{actors: actors, edges: edges}

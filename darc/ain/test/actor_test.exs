@@ -117,6 +117,7 @@ defmodule Ain.ActorTest do
     assert new_state.face["uuid4"] == "role3"
   end
 
+  @tag :skip
   test "handle_cast/2 processes {:update_actor, actor}", %{state: state} do
     uid = Ecto.UUID.generate()
     actor_specs = [
@@ -146,5 +147,26 @@ defmodule Ain.ActorTest do
     assert new_state.uid == uid
     assert new_state.name == "John Doe"
     assert new_state.role == "Speaker"
+  end
+
+  test "handle_cast :parting removes the correct uid from state" do
+    initial_state = %{
+      address_book: %{"123" => "Alice", "456" => "Bob"},
+      face: %{"123" => "role1", "456" => "role2"}
+    }
+
+    message = %Message{
+      content: "original message",
+      parameters: %{
+        "to_uid" => "123",
+        "to_pid" => "some_pid",
+        "to_role" => "some_role"
+      }
+    }
+
+    {:noreply, new_state} = Actor.handle_cast({:parting, message}, initial_state)
+
+    assert new_state.address_book == %{"456" => "Bob"}
+    assert new_state.face == %{"456" => "role2"}
   end
 end

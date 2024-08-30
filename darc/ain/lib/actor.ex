@@ -34,6 +34,14 @@ defmodule Ain.Actor do
     end
   end
 
+  def get_state(pid) do
+    GenServer.call(pid, :get_state)
+  end
+
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
+
   # new edge
   def handle_cast({:explore, message}, state) do
     parsed_message = Message.parse(message)
@@ -198,5 +206,6 @@ defmodule Ain.Actor do
     # random
     Enum.random(pids)
   end
+
 
 end

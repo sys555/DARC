@@ -82,6 +82,13 @@ defmodule Util.DBUtil do
     Repo.get(Actor, uid)
   end
 
+  def get_edge_with_uid(uid) do
+    IO.inspect(uid)
+    res = Repo.get(Edge, uid)
+    IO.inspect(res)
+    res
+  end
+
   def insert_actors(actor_specs) do
     Enum.each(actor_specs, fn spec ->
       %Actor{}
@@ -91,17 +98,17 @@ defmodule Util.DBUtil do
   end
 
   def insert_edges(edges) do
-    Enum.each(edges, fn {from_id, to_id, graph_id} ->
-      edge_attrs = %{
-        "from_uid" => to_string(from_id),
-        "to_uid" => to_string(to_id),
-        "graph_id" => graph_id
-      }
-
+    Enum.each(edges, fn edge ->
       %Edge{}
-      |> Edge.changeset(edge_attrs)
+      |> Edge.changeset(edge)
       |> Repo.insert()
     end)
+  end
+
+  def insert_edge(edge) do
+    %Edge{}
+    |> Edge.changeset(edge)
+    |> Repo.insert()
   end
 
   def update_actor(uid, attrs) do
