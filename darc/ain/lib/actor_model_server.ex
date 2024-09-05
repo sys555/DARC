@@ -110,4 +110,5 @@ defmodule Ain.ActorModelServer do
   defp update_state(state, key, func) do
     Map.update!(state, key, func)
   end
+
 end

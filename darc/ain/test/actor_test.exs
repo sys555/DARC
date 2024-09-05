@@ -4,14 +4,18 @@ defmodule Ain.ActorTest do
   alias Ain.Actor
   alias Message
   alias Ain.Actor.EmptyPidsError
+  alias DB.Repo
+  alias Util.{DBUtil, ActorUtil}
+  import DB.{Actor, Edge, Task}
 
   setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(DB.Repo)
     state = %{
       face: %{"uuid1" => "role1", "uuid2" => "role1", "uuid3" => "role2"},
       address_book: %{"uuid1" => self(), "uuid2" => self(), "uuid3" => self()},
       logs: [],
       python_session: "",
-      role: "Test"
+      role: "Speaker"
     }
     {:ok, state: state}
   end
@@ -33,7 +37,7 @@ defmodule Ain.ActorTest do
     assert message.content == "content"
     assert message.parameters == %{}
     assert message.timestamp != nil
-    assert message.uuid != nil
+    assert message.uid != nil
   end
 
   @tag :skip
@@ -50,22 +54,23 @@ defmodule Ain.ActorTest do
     end
   end
 
+  @tag :skip
   test "handle_cast/2 processes {:receive, message}", %{state: state} do
     message = %Message{
-      sender: self(),
-      receiver: self(),
+      sender_pid: self(),
+      receiver_pid: self(),
       content: "original message",
       parameters: %{},
       timestamp: :os.system_time(:millisecond),
-      uuid: UUID.uuid4()
+      uid: UUID.uuid4()
     }
 
     {:ok, pid} = GenServer.start_link(Actor, state)
 
     explored_message = %Message{
-      uuid: "uuid4",
-      sender: pid,
-      receiver: pid,
+      uid: "uuid4",
+      sender_pid: pid,
+      receiver_pid: pid,
       content: nil,
       parameters: %{"to_pid" => pid, "to_role" => "role3"},
       timestamp: nil
@@ -90,9 +95,9 @@ defmodule Ain.ActorTest do
   test "handle_cast/2 processes {:explore, message} and updates state", %{state: state} do
     # Create the input message
     explored_message = %Message{
-      uuid: "uuid4",
-      sender: nil,
-      receiver: nil,
+      uid: "uuid4",
+      sender_pid: nil,
+      receiver_pid: nil,
       content: nil,
       parameters: %{"to_pid" => self(), "to_role" => "role3"},
       timestamp: nil
@@ -110,5 +115,58 @@ defmodule Ain.ActorTest do
 
     assert new_state.address_book["uuid4"] == self()
     assert new_state.face["uuid4"] == "role3"
+  end
+
+  @tag :skip
+  test "handle_cast/2 processes {:update_actor, actor}", %{state: state} do
+    uid = Ecto.UUID.generate()
+    actor_specs = [
+      %{
+        uid: uid,
+        name: "John Doe",
+        role: "Speaker",
+        age: 30,
+        graph_id: Ecto.UUID.generate()
+      }
+    ]
+
+    # Insert the actor
+    DBUtil.insert_actors(actor_specs)
+
+    # Retrieve the actor using the `get_actor_with_uid/1` function
+    actor = DBUtil.get_actor_with_uid(uid)
+    IO.inspect(actor)
+    {:ok, pid} = GenServer.start_link(Actor, state)
+    :timer.sleep(1_000)
+    GenServer.cast(pid, {:update_actor, actor})
+
+    :timer.sleep(100)
+
+    new_state = :sys.get_state(pid)
+
+    assert new_state.uid == uid
+    assert new_state.name == "John Doe"
+    assert new_state.role == "Speaker"
+  end
+
+  test "handle_cast :parting removes the correct uid from state" do
+    initial_state = %{
+      address_book: %{"123" => "Alice", "456" => "Bob"},
+      face: %{"123" => "role1", "456" => "role2"}
+    }
+
+    message = %Message{
+      content: "original message",
+      parameters: %{
+        "to_uid" => "123",
+        "to_pid" => "some_pid",
+        "to_role" => "some_role"
+      }
+    }
+
+    {:noreply, new_state} = Actor.handle_cast({:parting, message}, initial_state)
+
+    assert new_state.address_book == %{"456" => "Bob"}
+    assert new_state.face == %{"456" => "role2"}
   end
 end

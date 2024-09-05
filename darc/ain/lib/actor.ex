@@ -2,6 +2,7 @@ defmodule Ain.Actor do
   use GenServer
   alias Ain.Python
   alias Util.ActorUtil
+  alias DB.{Actor, Edge, Task}
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: {:global, args.uid})
@@ -17,9 +18,9 @@ defmodule Ain.Actor do
         uid: Map.get(args, :uid, ""),
         name: Map.get(args, :name, ""),
         role: Map.get(args, :role, ""),
-        # address(uid) => pid
+        # uid => pid
         address_book: Map.get(args, :address_book, %{}),
-        # address(uid) => role
+        # uid => role
         face: Map.get(args, :face, %{}),
         logs: [],
         python_session: python_session,
@@ -33,6 +34,15 @@ defmodule Ain.Actor do
     end
   end
 
+  def get_state(pid) do
+    GenServer.call(pid, :get_state)
+  end
+
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
+
+  # new edge
   def handle_cast({:explore, message}, state) do
     parsed_message = Message.parse(message)
     uid = parsed_message.parameters["to_uid"]
@@ -45,6 +55,23 @@ defmodule Ain.Actor do
       | address_book: new_address_book,
         face: new_face,
     }
+    {:noreply, new_state}
+  end
+
+  # del edge
+  def handle_cast({:parting, message}, state) do
+    parsed_message = Message.parse(message)
+    uid = parsed_message.parameters["to_uid"]
+
+    new_address_book = Map.delete(state.address_book, uid)
+    new_face = Map.delete(state.face, uid)
+
+    new_state = %{
+      state
+      | address_book: new_address_book,
+        face: new_face,
+    }
+
     {:noreply, new_state}
   end
 
@@ -139,6 +166,25 @@ defmodule Ain.Actor do
     end
   end
 
+  def handle_cast({:update_actor, actor}, state) do
+    # 更新已有的键
+    new_state = %{
+      state
+      | uid: actor.uid || state.uid,
+        name: actor.name || state.name,
+        role: actor.role || state.role
+    }
+
+    python_session = Python.start(actor.role)
+    Python.call(python_session, String.to_atom(actor.role), :register_handler, [self()])
+
+    new_state = %{
+      new_state
+      | python_session: python_session,
+    }
+    {:noreply, new_state}
+  end
+
   defp fetch_uids(role, face) do
     if role == "random" do
       face
@@ -160,5 +206,6 @@ defmodule Ain.Actor do
     # random
     Enum.random(pids)
   end
+
 
 end

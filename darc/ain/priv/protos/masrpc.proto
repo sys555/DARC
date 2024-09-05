@@ -18,10 +18,20 @@ message GetLogRequest {
     string uid = 1;
 }
 
+// The request message for an update_actor operation.
+message UpdateActorRequest {
+    string actor_uid = 1;
+}
+
 // The response message for operations.
 message OperationResponse {
     string status = 1;
     repeated string logs = 2;
+}
+
+// The response message for update_actor operation.
+message UpdateActorResponse {
+    string status = 1;
 }
 
 // The MasRPC service definition.
@@ -34,4 +44,7 @@ service MasRPC {
 
     // GetLog function
     rpc GetLog (GetLogRequest) returns (OperationResponse) {}
+
+    // UpdateActor function
+    rpc UpdateActor (UpdateActorRequest) returns (UpdateActorResponse) {}
 }

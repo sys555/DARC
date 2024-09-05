@@ -55,6 +55,11 @@ class MasRPCStub(object):
                 request_serializer=masrpc__pb2.GetLogRequest.SerializeToString,
                 response_deserializer=masrpc__pb2.OperationResponse.FromString,
                 _registered_method=True)
+        self.UpdateActor = channel.unary_unary(
+                '/masrpc.MasRPC/UpdateActor',
+                request_serializer=masrpc__pb2.UpdateActorRequest.SerializeToString,
+                response_deserializer=masrpc__pb2.UpdateActorResponse.FromString,
+                _registered_method=True)
 
 
 class MasRPCServicer(object):
@@ -82,6 +87,13 @@ class MasRPCServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateActor(self, request, context):
+        """UpdateActor function
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MasRPCServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -99,6 +111,11 @@ def add_MasRPCServicer_to_server(servicer, server):
                     servicer.GetLog,
                     request_deserializer=masrpc__pb2.GetLogRequest.FromString,
                     response_serializer=masrpc__pb2.OperationResponse.SerializeToString,
+            ),
+            'UpdateActor': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateActor,
+                    request_deserializer=masrpc__pb2.UpdateActorRequest.FromString,
+                    response_serializer=masrpc__pb2.UpdateActorResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -183,6 +200,33 @@ class MasRPC(object):
             '/masrpc.MasRPC/GetLog',
             masrpc__pb2.GetLogRequest.SerializeToString,
             masrpc__pb2.OperationResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateActor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/masrpc.MasRPC/UpdateActor',
+            masrpc__pb2.UpdateActorRequest.SerializeToString,
+            masrpc__pb2.UpdateActorResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -70,4 +70,64 @@ defmodule MAS do
     send(caller_pid, {:get_log_complete, matching_logs})
     {:noreply, state}
   end
+
+  def handle_cast({:update_actor, uid}, state) do
+    case DBUtil.get_actor_with_uid(uid) do
+      nil ->
+        {:noreply, state}
+      actor ->
+        GenServer.cast(:global.whereis_name(uid), {:update_actor, actor})
+        {:noreply, state}
+    end
+  end
+
+  def handle_cast({:new_edge, edge}, state) do
+    case DBUtil.get_edge_with_uid(edge.uid) do
+      nil ->
+        {:noreply, state}
+      edge ->
+        case DBUtil.get_actor_with_uid(edge.to_uid) do
+          nil ->
+            {:noreply, state}
+          to_actor ->
+            to_actor = DBUtil.get_actor_with_uid(edge.to_uid)
+            to_role = to_actor.role
+            to_uid = edge.to_uid
+            to_pid = :global.whereis_name(edge.to_uid)
+            message = %Message{
+              content: "hi",
+              parameters: %{
+                "to_uid" => to_uid,
+                "to_pid" => to_pid,
+                "to_role" => to_role
+              },
+            }
+            GenServer.cast(:global.whereis_name(edge.from_uid), {:explore, message})
+            {:noreply, state}
+        end
+    end
+  end
+
+  def handle_cast({:del_edge, edge}, state) do
+    case DBUtil.get_actor_with_uid(edge.to_uid) do
+      nil ->
+        {:noreply, state}
+      to_actor ->
+        to_actor = DBUtil.get_actor_with_uid(edge.to_uid)
+        to_role = to_actor.role
+        to_uid = edge.to_uid
+        to_pid = :global.whereis_name(edge.to_uid)
+        message = %Message{
+          content: "hi",
+          parameters: %{
+            "to_uid" => to_uid,
+            "to_pid" => to_pid,
+            "to_role" => to_role
+          },
+        }
+
+        GenServer.cast(:global.whereis_name(edge.from_uid), {:parting, message})
+        {:noreply, state}
+    end
+  end
 end

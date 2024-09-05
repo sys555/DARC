@@ -32,6 +32,14 @@ defmodule Masrpc.GetLogRequest do
   field :uid, 1, type: :string
 end
 
+defmodule Masrpc.UpdateActorRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :actor_uid, 1, type: :string, json_name: "actorUid"
+end
+
 defmodule Masrpc.OperationResponse do
   @moduledoc false
 
@@ -39,6 +47,14 @@ defmodule Masrpc.OperationResponse do
 
   field :status, 1, type: :string
   field :logs, 2, repeated: true, type: :string
+end
+
+defmodule Masrpc.UpdateActorResponse do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :status, 1, type: :string
 end
 
 defmodule Masrpc.MasRPC.Service do
@@ -51,6 +67,8 @@ defmodule Masrpc.MasRPC.Service do
   rpc :Send, Masrpc.SendRequest, Masrpc.OperationResponse
 
   rpc :GetLog, Masrpc.GetLogRequest, Masrpc.OperationResponse
+
+  rpc :UpdateActor, Masrpc.UpdateActorRequest, Masrpc.UpdateActorResponse
 end
 
 defmodule Masrpc.MasRPC.Stub do

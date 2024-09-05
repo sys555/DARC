@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cmasrpc.proto\x12\x06masrpc\"\x1f\n\x0bLoadRequest\x12\x10\n\x08graph_id\x18\x01 \x01(\t\"}\n\x0bSendRequest\x12\x0b\n\x03uid\x18\x01 \x01(\t\x12\x31\n\x07message\x18\x02 \x03(\x0b\x32 .masrpc.SendRequest.MessageEntry\x1a.\n\x0cMessageEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x1c\n\rGetLogRequest\x12\x0b\n\x03uid\x18\x01 \x01(\t\"1\n\x11OperationResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0c\n\x04logs\x18\x02 \x03(\t2\xba\x01\n\x06MasRPC\x12\x38\n\x04Load\x12\x13.masrpc.LoadRequest\x1a\x19.masrpc.OperationResponse\"\x00\x12\x38\n\x04Send\x12\x13.masrpc.SendRequest\x1a\x19.masrpc.OperationResponse\"\x00\x12<\n\x06GetLog\x12\x15.masrpc.GetLogRequest\x1a\x19.masrpc.OperationResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cmasrpc.proto\x12\x06masrpc\"\x1f\n\x0bLoadRequest\x12\x10\n\x08graph_id\x18\x01 \x01(\t\"}\n\x0bSendRequest\x12\x0b\n\x03uid\x18\x01 \x01(\t\x12\x31\n\x07message\x18\x02 \x03(\x0b\x32 .masrpc.SendRequest.MessageEntry\x1a.\n\x0cMessageEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x1c\n\rGetLogRequest\x12\x0b\n\x03uid\x18\x01 \x01(\t\"\'\n\x12UpdateActorRequest\x12\x11\n\tactor_uid\x18\x01 \x01(\t\"1\n\x11OperationResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0c\n\x04logs\x18\x02 \x03(\t\"%\n\x13UpdateActorResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2\x84\x02\n\x06MasRPC\x12\x38\n\x04Load\x12\x13.masrpc.LoadRequest\x1a\x19.masrpc.OperationResponse\"\x00\x12\x38\n\x04Send\x12\x13.masrpc.SendRequest\x1a\x19.masrpc.OperationResponse\"\x00\x12<\n\x06GetLog\x12\x15.masrpc.GetLogRequest\x1a\x19.masrpc.OperationResponse\"\x00\x12H\n\x0bUpdateActor\x12\x1a.masrpc.UpdateActorRequest\x1a\x1b.masrpc.UpdateActorResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -31,8 +31,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_SENDREQUEST_MESSAGEENTRY']._serialized_end=182
   _globals['_GETLOGREQUEST']._serialized_start=184
   _globals['_GETLOGREQUEST']._serialized_end=212
-  _globals['_OPERATIONRESPONSE']._serialized_start=214
-  _globals['_OPERATIONRESPONSE']._serialized_end=263
-  _globals['_MASRPC']._serialized_start=266
-  _globals['_MASRPC']._serialized_end=452
+  _globals['_UPDATEACTORREQUEST']._serialized_start=214
+  _globals['_UPDATEACTORREQUEST']._serialized_end=253
+  _globals['_OPERATIONRESPONSE']._serialized_start=255
+  _globals['_OPERATIONRESPONSE']._serialized_end=304
+  _globals['_UPDATEACTORRESPONSE']._serialized_start=306
+  _globals['_UPDATEACTORRESPONSE']._serialized_end=343
+  _globals['_MASRPC']._serialized_start=346
+  _globals['_MASRPC']._serialized_end=606
 # @@protoc_insertion_point(module_scope)
