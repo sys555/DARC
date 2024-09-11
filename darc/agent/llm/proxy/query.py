@@ -8,6 +8,9 @@ from loguru import logger
 
 from darc.agent.llm.prompt.system_prompt_template import bundle_prompt
 import logging
+import os
+
+logger = logging.getLogger(__name__)
 
 # logging.getLogger('LiteLLM').setLevel(logging.WARNING)
 
@@ -59,6 +62,31 @@ def get_answer_sync(question, system_prompt="") -> Any:
         logger.error(f"Error getting answer: {type(e)}, {str(e)}")
     return answer
 
+def query_with_uid(question, uid) -> Any:
+    try:
+        # logger.debug(question)
+        system_prompt = get_system_prompt_with_uid(uid)
+        answer = choice_response_content(
+            get_response_sync(question, system_prompt)
+        )
+        # logger.debug(answer)
+    except Exception as e:
+        logger.error(f"Error getting answer: {type(e)}, {str(e)}")
+    return answer
+
+def get_system_prompt_with_uid(uid: str) -> str:
+    current_path = os.path.abspath(__file__)
+    root_path = os.path.abspath(os.path.join(current_path, "../../../../"))
+    file_path = os.path.join(root_path, "agent/llm/persona/uid_system_prompt.jsonl")
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            for line in file:
+                record = json.loads(line)
+                if record.get("uid") == uid:
+                    return record.get("prompt", "")
+    except Exception as e:
+        logger.error(f"Error reading system prompt: {type(e)}, {str(e)}")
+    return ""
 
 def gen_timestamp_prompt():
     # 引导 agent 输出时间戳

@@ -188,6 +188,33 @@ class MAS:
         except (ModuleNotFoundError, AttributeError) as e:
             return f"Error: {e}"
         
+    def bind_system_prompt(self, actors, prompt_path, output_path):
+        # 读取 prompt_path 中的 prompt 数据
+        prompts = []
+        try:
+            with open(prompt_path, 'r', encoding='utf-8') as file:
+                for line in file:
+                    if len(prompts) < len(actors):
+                        data = json.loads(line)
+                        prompts.append(data['persona'])
+            # 确保 actors 和 prompts 数量一致
+            if len(actors) != len(prompts):
+                raise ValueError("The number of actors and prompts must be the same.")
+
+            # 将每个 actor 的 uuid 与 prompt 进行绑定，并写入 output_path 文件
+            with open(output_path, 'w', encoding='utf-8') as output_file:
+                for actor, prompt in zip(actors, prompts):
+                    actor_uid = str(actor.uid)
+                    binding = {
+                        "uid": actor_uid,
+                        "prompt": prompt
+                    }
+                    output_file.write(json.dumps(binding, ensure_ascii=False) + '\n')
+                    print(f"Bound actor {actor_uid} with prompt: {prompt}")
+        except Exception as e:
+            print(str(e))
+        
+        
 
 # 示例调用
 if __name__ == "__main__":

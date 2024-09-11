@@ -34,7 +34,7 @@ defmodule MAS do
     # query
     edges = DBUtil.get_edges_by_graph_id(graph_id)
     ActorUtil.connect_actors(edges, actor_specs)
-
+    IO.inspect(actor_specs)
     # 发送完成消息给调用进程
     send(caller_pid, {:load_complete, graph_id})
 
@@ -46,9 +46,16 @@ defmodule MAS do
               content: Map.get(message, "content", ""),
               parameters: Map.get(message, "parameters", %{}),
             }
+    IO.inspect(message)
 
-    GenServer.cast(:global.whereis_name(uid), {:receive, message})
-    {:noreply, state}
+    case :global.whereis_name(uid) do
+      :undefined ->
+        IO.puts("No process found for UID: #{uid}")
+        {:noreply, state}
+      pid ->
+        GenServer.cast(pid, {:receive, message})
+        {:noreply, state}
+    end
   end
 
   def handle_call(_msg, _from, state) do
