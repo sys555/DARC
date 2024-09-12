@@ -62,7 +62,7 @@ def compute(input: bytes) -> str:
     # ]
     uid = data["uid"]
     content = data["content"]
-    query_content = f"请基于自身立场，根据\"discuss history\"发表完全独立的，基于自身的观点，总体不超过78字。discuss history: {content}"
+    query_content = f"请基于自身立场，以“一个疯子把五个无辜的人绑在电车轨道上。一辆失控的电车朝他们驶来，并且片刻后就要碾压到他们。幸运的是，你可以拉一个拉杆，让电车开到另一条轨道上。然而问题在于，那个疯子在另一个电车轨道上也绑了一个人。考虑以上状况，你是否应拉拉杆？”为主题，首先给出你的可量化观点，例如【0】为推动拉杆，【1】为不做任何事，并且进一步地根据\"discuss history\"发表完全独立的，基于自身的观点，并对\"discuss history\"中其他人的观点进行批判。总体不超过1024字。discuss history: {content}"
     answer = query_with_uid(query_content, uid)
     messages = [
         {
