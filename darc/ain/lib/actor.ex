@@ -76,13 +76,11 @@ defmodule Ain.Actor do
   end
 
   def handle_cast({:receive, message}, state) do
-    # IO.inspect("================================================================================================================================")
-    # IO.inspect(state)
-    # IO.inspect("================================================================================================================================")
     try do
       updated_logs = [message | state.logs]
       updated_state = %{state | logs: updated_logs}
       trimmed_message = %{
+        uid: state.uid,
         content: message.content,
         parameters: message.parameters
       }
@@ -134,7 +132,7 @@ defmodule Ain.Actor do
     with %{"parameters" => %{"to_role" => role}} <- computed_message,
           uids when uids != [] <- fetch_uids(role, state.face),
           pids when pids != [] <- fetch_pids(uids, state.address_book),
-          to_pid when not is_nil(to_pid) <- path(pids) do
+          to_pid when not is_nil(to_pid) <- path(uids, state) do
             content = Map.get(computed_message, "content", "")
             message = %Message{
               uid: UUID.uuid4(),
@@ -202,10 +200,9 @@ defmodule Ain.Actor do
     uids |> Enum.map(&Map.get(address_book, &1))
   end
 
-  defp path(pids) do
+  defp path(uids, state) do
     # random
-    Enum.random(pids)
+    to_uid = Enum.random(uids)
+    Map.get(state.address_book, to_uid)
   end
-
-
 end
