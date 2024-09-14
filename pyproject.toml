@@ -6,7 +6,7 @@ authors = ["rochacbruno"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 pytest-cov = "^5.0.0"
 isort = "^5.13.2"
 black = "^24.4.2"
@@ -21,6 +21,7 @@ pytz = "^2024.1"
 sqlalchemy = "^2.0.31"
 grpcio = "^1.65.4"
 grpcio-tools = "^1.65.4"
+mem0ai = "^0.1.13"
 
 
 [tool.poetry.group.dev.dependencies]

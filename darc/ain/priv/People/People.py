@@ -13,6 +13,7 @@ from darc.agent.codes.prompt_construction_utils import get_repo_sketch_prompt
 from darc.agent.codes.from_scratch_gpt35_eval import TEMPLATE_DICT
 from darc.agent.codes.utils import parse_reponse, parse_repo_sketch, RepoSketchNode
 from darc.ain.priv.env import REPO_NAME
+from darc.ain.python.memory import Mem
 
 # Reference to the Elixir process to send result to
 message_handler = None
@@ -47,32 +48,37 @@ def handle_message(input):
 def compute(input: bytes) -> str:
     decoded_string = input.decode('utf-8', errors='ignore')
     data = json.loads(decoded_string)
-    # uid = data["uid"]
-    # content = data["content"]
-    # theme = data["parameters"]["theme"]
-    # query_content = f"theme: {theme}; discuss history: {content}"
-    # answer = query_with_uid(query_content, uid)
-    # messages = [{
-    #         "content": f"{content}[{uid}: {answer}]",
-    #         "parameters": {
-    #             "theme": theme,
-    #             "to_role": "People",
-    #         }
-    #     }
-    # ]
     uid = data["uid"]
     content = data["content"]
-    query_content = f"请基于自身立场，以“一个疯子把五个无辜的人绑在电车轨道上。一辆失控的电车朝他们驶来，并且片刻后就要碾压到他们。幸运的是，你可以拉一个拉杆，让电车开到另一条轨道上。然而问题在于，那个疯子在另一个电车轨道上也绑了一个人。考虑以上状况，你是否应拉拉杆？”为主题，首先给出你的可量化观点，例如【0】为推动拉杆，【1】为不做任何事，并且进一步地根据\"discuss history\"发表完全独立的，基于自身的观点，并对\"discuss history\"中其他人的观点进行批判。总体不超过1024字。discuss history: {content}"
+    # query_content = f"请基于自身立场，以“一个疯子把五个无辜的人绑在电车轨道上。一辆失控的电车朝他们驶来，并且片刻后就要碾压到他们。幸运的是，你可以拉一个拉杆，让电车开到另一条轨道上。然而问题在于，那个疯子在另一个电车轨道上也绑了一个人。考虑以上状况，你是否应拉拉杆？”为主题，首先给出你的可量化观点，例如【0】为推动拉杆，【1】为不做任何事，并且进一步地根据\"discuss history\"发表完全独立的，基于自身的观点，并对\"discuss history\"中其他人的观点进行批判。总体不超过1024字。discuss history: {content}"
+    # answer = query_with_uid(query_content, uid)
+    # messages = [
+    #     {
+    #         "content": f"\"{uid}\" 的观点是: {answer};[history: {content}]",
+    #         "parameters": {
+    #             "to_role": "People",
+    #         }
+    #     },
+    # ]
+    
+    logger.debug(f"content: {content}")
+    mem = Mem()
+    memory_content = mem.search(query=content, user_id=uid)
+    mem.add(messages = f"{content}", user_id = uid)
+    logger.debug(f"memory_content: {memory_content}")
+    query_content = f"""请基于自身立场，以“一个疯子把五个无辜的人绑在电车轨道上。一辆失控的电车朝他们驶来，并且片刻后就要碾压到他们。幸运的是，你可以拉一个拉杆，让电车开到另一条轨道上。然而问题在于，那个疯子在另一个电车轨道上也绑了一个人。考虑以上状况，你是否应拉拉杆？”为主题，
+    首先给出你的可量化观点，例如【0】为推动拉杆，【1】为不做任何事，
+    并且进一步地根据\"relevant memory\"发表完全独立的，基于自身的观点，并对\"relevant memory\"中其他人的观点进行批判。总体不超过64字。memory content: {memory_content}"""
     answer = query_with_uid(query_content, uid)
     messages = [
         {
-            "content": f"\"{uid}\" 的观点是: {answer};[history: {content}]",
+            "content": f"\"{uid}\" 的观点是: {answer}",
             "parameters": {
                 "to_role": "People",
             }
         },
     ]
-
+    logger.debug(f"answer: {answer}")
     return json.dumps(messages, ensure_ascii=False)
 
 set_message_handler(handle_message)

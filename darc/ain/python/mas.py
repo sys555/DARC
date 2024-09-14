@@ -3,11 +3,11 @@ import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from module import Base, Actor, Edge
+from darc.ain.python.module import Base, Actor, Edge
 
 import grpc
-import masrpc_pb2 as masrpc_pb2
-import masrpc_pb2_grpc as masrpc_pb2_grpc
+import darc.ain.python.masrpc_pb2 as masrpc_pb2
+import darc.ain.python.masrpc_pb2_grpc as masrpc_pb2_grpc
 
 from loguru import logger
 import time

@@ -43,7 +43,7 @@ try:
         current_path = os.path.abspath(__file__)
         root_path = os.path.abspath(os.path.join(current_path, "../../../"))
         mas.config_db(chat_config)
-        
+        time.sleep(2)
         # actor <->system prompt
         actors = mas.find_with_role("People")
         prompt_path = root_path + "/agent/llm/persona/persona.jsonl"
