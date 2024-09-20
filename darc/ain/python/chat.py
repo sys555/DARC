@@ -43,7 +43,7 @@ try:
         current_path = os.path.abspath(__file__)
         root_path = os.path.abspath(os.path.join(current_path, "../../../"))
         mas.config_db(chat_config)
-        
+        time.sleep(2)
         # actor <->system prompt
         actors = mas.find_with_role("People")
         prompt_path = root_path + "/agent/llm/persona/persona.jsonl"
@@ -53,7 +53,7 @@ try:
         time.sleep(24)
         mas.send(str(actors[0].uid), content)
 
-        time.sleep(600)
+        time.sleep(180)
         logger.debug(mas.actors)
         # Open the file in append mode
         with open('./output.txt', 'a', encoding='utf-8') as file:

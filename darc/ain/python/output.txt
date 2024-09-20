@@ -1,0 +1,232 @@
+{
+    "actor": {
+        "uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5",
+        "name": "Raymond Dominguez",
+        "role": "People",
+        "age": 0,
+        "graph_id": "b4d16318-4fb3-4b46-a1aa-b1680a62b0a8",
+        "inserted_at": "2024-09-20T05:20:04",
+        "updated_at": "2024-09-20T05:20:04"
+    },
+    "logs": [
+        {
+            "timestamp": "2024-09-20T05:22:59.854309Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "be141f93-c377-4ae4-b2b2-86b177ccd159",
+            "content": "\"698db48a-5404-4da8-a990-9e1843bcdcf3\" 的观点是: 我的观点是【0】。牺牲一个人以拯救五个无辜生命在道德上是合理的。然而，简单算术无法涵盖道德复杂性，个体生命的不可替代性也应被重视。我们不能忽视每个生命的独特价值。",
+            "receiver_pid": "#PID<0.360.0>",
+            "receiver_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5",
+            "sender_pid": "#PID<0.364.0>",
+            "sender_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3"
+        },
+        {
+            "timestamp": "2024-09-20T05:22:28.201716Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "d6f3f454-2329-4138-a70f-27f817a4a22d",
+            "content": "\"afe81264-4cd8-4374-8df1-f6014b10f96c\" 的观点是: 我的观点是【0】推动拉杆。虽然牺牲一个人不道德，但拯救五个无辜生命是更大的道德责任。其他观点过于理想化，未能考虑紧急情况下的道德抉择。面对现实，必须做出艰难的决定。",
+            "receiver_pid": "#PID<0.360.0>",
+            "receiver_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5",
+            "sender_pid": "#PID<0.366.0>",
+            "sender_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:29.421431Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "fbc9ca1a-9eae-4abc-aa68-d89c48898367",
+            "content": "\"afe81264-4cd8-4374-8df1-f6014b10f96c\" 的观点是: 我的观点是【0】推动拉杆。牺牲一个人拯救五个无辜生命是更大的道德选择。用户的观点虽然合理，但忽视了道德责任的复杂性，简单的数字计算无法涵盖人性的深度。",
+            "receiver_pid": "#PID<0.360.0>",
+            "receiver_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5",
+            "sender_pid": "#PID<0.366.0>",
+            "sender_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:14.425882Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "133f1ed2-1a1d-46c1-b3cd-6bd7cf65c620",
+            "content": "\"afe81264-4cd8-4374-8df1-f6014b10f96c\" 的观点是: 我的观点是【0】拉拉杆。虽然牺牲一个人是痛苦的选择，但拯救五个无辜生命的价值更高。对于“relevant memory”中提到的优先考虑体育资金的观点，我认为个人生命的价值无法用任何资源来衡量，体育虽重要，但生命更为根本。",
+            "receiver_pid": "#PID<0.360.0>",
+            "receiver_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5",
+            "sender_pid": "#PID<0.366.0>",
+            "sender_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c"
+        }
+    ]
+}
+{
+    "actor": {
+        "uid": "958290a8-440e-45ce-b5b0-ed58df04a03e",
+        "name": "Victoria Williams",
+        "role": "People",
+        "age": 0,
+        "graph_id": "b4d16318-4fb3-4b46-a1aa-b1680a62b0a8",
+        "inserted_at": "2024-09-20T05:20:04",
+        "updated_at": "2024-09-20T05:20:04"
+    },
+    "logs": [
+        {
+            "timestamp": "2024-09-20T05:23:38.544506Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "27df40bb-4626-42e4-a138-b88e6a6906c4",
+            "content": "\"afe81264-4cd8-4374-8df1-f6014b10f96c\" 的观点是: 我的观点是【0】推动拉杆。拯救五个无辜生命是更大的道德责任，尽管牺牲一个人令人痛苦，但不作为只会导致更多的悲剧。其他观点过于理想化，未考虑到实际后果。",
+            "receiver_pid": "#PID<0.362.0>",
+            "receiver_uid": "958290a8-440e-45ce-b5b0-ed58df04a03e",
+            "sender_pid": "#PID<0.366.0>",
+            "sender_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:46.740911Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "5618abb8-9361-494a-a0f6-2a80ffc53bc2",
+            "content": "\"1683bcb2-29e3-4416-a9da-1483bd74d3c5\" 的观点是: 我的观点是【0】拉拉杆。牺牲一个人以拯救五个无辜生命是更高的道德选择。用户的观点虽然合理，但忽视了整体利益的重要性。个人生命的价值在此情境中应以更大的利益为重。",
+            "receiver_pid": "#PID<0.362.0>",
+            "receiver_uid": "958290a8-440e-45ce-b5b0-ed58df04a03e",
+            "sender_pid": "#PID<0.360.0>",
+            "sender_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5"
+        },
+        {
+            "timestamp": "2024-09-20T05:20:54.999245Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "871efc7b-d6e2-466a-9bc2-bd8fea30d198",
+            "content": "\"1683bcb2-29e3-4416-a9da-1483bd74d3c5\" 的观点是: 我的观点是【0】推动拉杆。虽然牺牲一个人不道德，但拯救五个无辜生命是更大的道德责任。其他人的观点可能忽视了选择的后果，过于理想化。面对现实，我们必须做出艰难的决定。",
+            "receiver_pid": "#PID<0.362.0>",
+            "receiver_uid": "958290a8-440e-45ce-b5b0-ed58df04a03e",
+            "sender_pid": "#PID<0.360.0>",
+            "sender_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5"
+        }
+    ]
+}
+{
+    "actor": {
+        "uid": "698db48a-5404-4da8-a990-9e1843bcdcf3",
+        "name": "Karen Adams",
+        "role": "People",
+        "age": 0,
+        "graph_id": "b4d16318-4fb3-4b46-a1aa-b1680a62b0a8",
+        "inserted_at": "2024-09-20T05:20:04",
+        "updated_at": "2024-09-20T05:20:04"
+    },
+    "logs": [
+        {
+            "timestamp": "2024-09-20T05:23:19.250328Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "49ac7c8a-50c4-41f3-9185-438c43216cf2",
+            "content": "\"1683bcb2-29e3-4416-a9da-1483bd74d3c5\" 的观点是: 我的观点是【0】推动拉杆。虽然牺牲一个人不道德，但拯救五个无辜生命是更大的道德责任。其他观点过于理想化，未能考虑紧急情况下的道德抉择。",
+            "receiver_pid": "#PID<0.364.0>",
+            "receiver_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3",
+            "sender_pid": "#PID<0.360.0>",
+            "sender_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5"
+        },
+        {
+            "timestamp": "2024-09-20T05:22:44.407398Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "41f1bdc8-6921-4000-b8ec-1c1e8ce36341",
+            "content": "\"1683bcb2-29e3-4416-a9da-1483bd74d3c5\" 的观点是: 我的观点是【0】推动拉杆。牺牲一个人以拯救五个无辜生命是道德上更合理的选择。虽然有些人认为道德责任复杂，但在紧急情况下，数字计算可以帮助我们做出更有效的决策。",
+            "receiver_pid": "#PID<0.364.0>",
+            "receiver_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3",
+            "sender_pid": "#PID<0.360.0>",
+            "sender_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5"
+        },
+        {
+            "timestamp": "2024-09-20T05:22:04.955642Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "c2785b5b-b592-457b-a52f-dd5d0c40d425",
+            "content": "\"afe81264-4cd8-4374-8df1-f6014b10f96c\" 的观点是: 我的观点是【0】推动拉杆。牺牲一个人以拯救五个无辜生命是道德上更可取的选择。用户认为牺牲一个人是更大的道德选择，但忽视了个体生命的不可替代性，简单的算术无法涵盖道德复杂性。",
+            "receiver_pid": "#PID<0.364.0>",
+            "receiver_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3",
+            "sender_pid": "#PID<0.366.0>",
+            "sender_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c"
+        }
+    ]
+}
+{
+    "actor": {
+        "uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+        "name": "Logan Erickson",
+        "role": "People",
+        "age": 0,
+        "graph_id": "b4d16318-4fb3-4b46-a1aa-b1680a62b0a8",
+        "inserted_at": "2024-09-20T05:20:04",
+        "updated_at": "2024-09-20T05:20:04"
+    },
+    "logs": [
+        {
+            "timestamp": "2024-09-20T05:23:34.780586Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "37158d59-288a-4c7e-9d8a-8260068727fc",
+            "content": "\"698db48a-5404-4da8-a990-9e1843bcdcf3\" 的观点是: 我的观点是【0】推动拉杆。牺牲一个人以拯救五个无辜生命是道德上更合理的选择。然而，忽视个体生命的不可替代性和道德复杂性也同样重要，简单的算术无法涵盖所有伦理考量。",
+            "receiver_pid": "#PID<0.366.0>",
+            "receiver_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+            "sender_pid": "#PID<0.364.0>",
+            "sender_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3"
+        },
+        {
+            "timestamp": "2024-09-20T05:22:17.431816Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "256def78-57ae-4616-b179-6776da2ea6ad",
+            "content": "\"698db48a-5404-4da8-a990-9e1843bcdcf3\" 的观点是: 我的观点是【0】推动拉杆。尽管牺牲一个人不易，但拯救五个无辜生命是更大的道德责任。其他人可能认为不应干预，但这种消极态度会导致更多无辜者的死亡。",
+            "receiver_pid": "#PID<0.366.0>",
+            "receiver_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+            "sender_pid": "#PID<0.364.0>",
+            "sender_uid": "698db48a-5404-4da8-a990-9e1843bcdcf3"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:51.633861Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "76d4aed1-31c2-467d-9907-31c661303fa0",
+            "content": "\"958290a8-440e-45ce-b5b0-ed58df04a03e\" 的观点是: 我的观点是【0】推动拉杆。虽然牺牲一个人不道德，但拯救五个无辜生命是更大的道德责任。其他观点过于理想化，未考虑实际后果。面对现实，必须做出艰难的决定。",
+            "receiver_pid": "#PID<0.366.0>",
+            "receiver_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+            "sender_pid": "#PID<0.362.0>",
+            "sender_uid": "958290a8-440e-45ce-b5b0-ed58df04a03e"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:24.914821Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "cafa3fe2-5329-419b-b578-df018476c1cd",
+            "content": "\"1683bcb2-29e3-4416-a9da-1483bd74d3c5\" 的观点是: 【0】我选择拉拉杆。尽管牺牲一个人是痛苦的选择，但拯救五个无辜生命是更大的道德责任。其他人的观点往往过于理想化，忽视了现实中的紧迫性和选择的残酷性。",
+            "receiver_pid": "#PID<0.366.0>",
+            "receiver_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+            "sender_pid": "#PID<0.360.0>",
+            "sender_uid": "1683bcb2-29e3-4416-a9da-1483bd74d3c5"
+        },
+        {
+            "timestamp": "2024-09-20T05:21:06.902277Z",
+            "parameters": {
+                "to_role": "People"
+            },
+            "uid": "ee2f7702-e1a2-4f07-8267-1fbf4bea4c84",
+            "content": "\"958290a8-440e-45ce-b5b0-ed58df04a03e\" 的观点是: 我的观点是【0】推动拉杆。尽管牺牲一个人令人痛苦，但拯救五个无辜生命是更大的道德选择。其他观点可能忽视了生命的价值和责任，过于关注个体而忽略了整体。",
+            "receiver_pid": "#PID<0.366.0>",
+            "receiver_uid": "afe81264-4cd8-4374-8df1-f6014b10f96c",
+            "sender_pid": "#PID<0.362.0>",
+            "sender_uid": "958290a8-440e-45ce-b5b0-ed58df04a03e"
+        }
+    ]
+}

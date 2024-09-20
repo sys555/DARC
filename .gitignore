@@ -145,3 +145,5 @@ autogen/
 eval_data/
 
 experiment/
+
+output.txt
