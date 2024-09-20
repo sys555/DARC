@@ -12,6 +12,7 @@ import darc.ain.python.masrpc_pb2_grpc as masrpc_pb2_grpc
 from loguru import logger
 import time
 import importlib
+from faker import Faker
 
 class MAS:
     def __init__(self, db_url):
@@ -25,6 +26,9 @@ class MAS:
         self.channel = grpc.insecure_channel("localhost:50051")
         self.stub = masrpc_pb2_grpc.MasRPCStub(self.channel)
         
+        # fake name
+        self.faker = Faker()
+
         # self.load_data()
 
     def __enter__(self):
@@ -110,7 +114,7 @@ class MAS:
             for _ in range(num_actors):
                 actor = {
                     "uid": uuid.uuid4(),
-                    "name": f"{role}_{uuid.uuid4()}",
+                    "name": self.faker.name(),
                     "role": role,
                     "age": 0,  # Assuming age is not relevant for now
                     "graph_id": graph_id
