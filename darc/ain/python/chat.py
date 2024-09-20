@@ -53,7 +53,7 @@ try:
         time.sleep(24)
         mas.send(str(actors[0].uid), content)
 
-        time.sleep(600)
+        time.sleep(180)
         logger.debug(mas.actors)
         # Open the file in append mode
         with open('./output.txt', 'a', encoding='utf-8') as file:
