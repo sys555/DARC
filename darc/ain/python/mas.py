@@ -13,6 +13,7 @@ from loguru import logger
 import time
 import importlib
 from faker import Faker
+import os
 
 class MAS:
     def __init__(self, db_url):
@@ -192,7 +193,11 @@ class MAS:
         except (ModuleNotFoundError, AttributeError) as e:
             return f"Error: {e}"
         
-    def bind_system_prompt(self, actors, prompt_path, output_path):
+    def bind_system_prompt(self, actors):
+        current_path = os.path.abspath(__file__)
+        root_path = os.path.abspath(os.path.join(current_path, "../../../"))
+        prompt_path = root_path + "/agent/llm/persona/persona.jsonl"
+        output_path = root_path + "/agent/llm/persona/uid_system_prompt.jsonl"
         # 读取 prompt_path 中的 prompt 数据
         prompts = []
         try:

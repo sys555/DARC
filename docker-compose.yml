@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  darc:
+    build: .
+    environment:
+      - OPENAI_API_KEY=your_openai_api_key
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/app
+    command: bash -c "cd darc/ain && mix do deps.get, deps.compile && cd /app && python your_script.py"
